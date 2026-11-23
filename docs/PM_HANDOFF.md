@@ -1,6 +1,6 @@
 # PM 인수인계
 
-_마지막 갱신: 2026-11-23_
+_마지막 갱신: 2026-11-24_
 
 ## 현재 상태
 - private_dashboard(비공개)에서 코드만 기록 없이 이 저장소(공개)로 이사함.
@@ -15,8 +15,14 @@ _마지막 갱신: 2026-11-23_
 - AI는 운영 DB에 접근하지 않고 개발용 Supabase로만 테스트(개발 DB 생성은 사용자 확인 필요).
 - 상황판에는 대시보드 데이터를 넣지 않고, 홈에 에이전트별 진행 작업만 표시.
 
+## 계획 (계획 → 감사 → 승인 → 작업)
+- #1 엔진 설치 계획(PM 직접): Opus 독립 감사 1회차 지적 8건 반영 완료, 사용자 확인 대기.
+- #2 전체 구조 화면(오케스트레이터 구조 탭 양식): 엔진 설치 뒤 첫 시험 작업, 그때 계획 감사.
+- ai-orchestrator #303 홈 '지금 일하는 AI'·프로젝트 접기·다른 프로젝트 링크: 감사 3/3 OK, `orch:go` 대기.
+- 프로젝트 화면 링크는 이 저장소 `docs/roadmap.json` 최상위 `app.url`(Vercel 재연결 후 추가).
+
 ## 다음 할 일
-1. 사용자: 상황판 `ORCH_REPOS`에 `jonghee1998/personal-dashboard` 추가, `ORCH_GITHUB_TOKEN`에 이 저장소 권한 추가.
+1. 사용자: 상황판 `ORCH_REPOS`에 `jonghee1998/Personal-dashboard` 추가(토큰 orch-dashboard 권한은 추가함), #303 `orch:go`, #1 확인.
 2. PM: 엔진 설치(2단계) — scripts/orch, 워크플로, CLAUDE.md·AGENTS.md, CI 개인정보 패턴 검사.
 3. 사용자: Secrets 입력(CLAUDE_CODE_OAUTH_TOKEN, BOT_PAT, NTFY_TOPIC), Codex 리뷰 켜기.
 4. ai-orchestrator: 상황판 홈에 '에이전트 → 프로젝트 → 작업' 한 줄 표시 계획.
