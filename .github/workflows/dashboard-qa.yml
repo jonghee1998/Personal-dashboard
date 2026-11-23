@@ -16,7 +16,6 @@ on:
       - 'tests/**'
       - 'scripts/**'
       - '.github/workflows/dashboard-qa.yml'
-  pull_request:
   schedule:
     - cron: '15 0 * * *'
   workflow_dispatch:
