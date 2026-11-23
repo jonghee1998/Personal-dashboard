@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "setup": [
+    {"id": "0.1", "title": "목적·최종 목표", "status": "done", "note": "모바일 개인 대시보드, 기존 화면 구성 유지", "ref": "docs/PROJECT_PLAN.md"},
+    {"id": "0.2", "title": "기술 스택·아키텍처", "status": "done", "note": "Next.js + Supabase + Vercel"},
+    {"id": "0.3", "title": "GitHub 저장소", "status": "done", "note": "공개, private_dashboard에서 기록 없이 이사"},
+    {"id": "0.4", "title": "브랜치·권한·반영 정책", "status": "todo", "note": "엔진 기본 정책 적용"},
+    {"id": "0.5", "title": "엔진·워크플로 설치", "status": "todo", "note": "scripts/orch + 워크플로"},
+    {"id": "0.6", "title": "매뉴얼·개발 규칙", "status": "todo", "note": "CLAUDE.md·AGENTS.md, 실데이터 금지 규칙"},
+    {"id": "0.7", "title": "Claude 구독 토큰", "status": "todo", "note": "CLAUDE_CODE_OAUTH_TOKEN"},
+    {"id": "0.8", "title": "GitHub 작업 토큰", "status": "todo", "note": "BOT_PAT에 이 저장소 추가"},
+    {"id": "0.9", "title": "Codex 리뷰 연결", "status": "todo", "note": "Codex 코드 리뷰에서 이 저장소 켜기"},
+    {"id": "0.10", "title": "Codex 사용량 인증", "status": "na", "note": "ai-orchestrator에서만 측정"},
+    {"id": "0.11", "title": "프로젝트 스킬", "status": "todo", "note": "필요한 것만 골라 반영"},
+    {"id": "0.12", "title": "CI·테스트·화면 테스트", "status": "doing", "note": "단위 테스트 80개 통과, 빌드·연동·화면 테스트 없음"},
+    {"id": "0.13", "title": "Vercel 배포", "status": "todo", "note": "새 저장소로 재연결, 개발계·운영계 분리"},
+    {"id": "0.14", "title": "외부 서비스 연결", "status": "doing", "note": "Supabase 운영 DB 사용 중, 개발 DB 필요"},
+    {"id": "0.15", "title": "모바일 알림", "status": "todo", "note": "NTFY_TOPIC"},
+    {"id": "0.16", "title": "통합 상황판 연결", "status": "doing", "note": "ORCH_REPOS 등록 필요"},
+    {"id": "0.17", "title": "사용량·시간·배포 정책", "status": "todo", "note": "ON/OFF·시간대·10개 단위 배포"},
+    {"id": "0.18", "title": "보안 검증", "status": "doing", "note": "실데이터 문서 제거 완료, 패턴 검사 CI 남음"},
+    {"id": "0.19", "title": "실제 E2E 테스트", "status": "todo", "note": "개발 DB로 수신→화면 확인"},
+    {"id": "0.20", "title": "개발 가능 상태", "status": "todo"}
+  ],
+  "expansion": [
+    {"id": "6.1", "title": "코드 진단 보고서", "status": "todo", "note": "살릴 것·다시 만들 것·지울 것"},
+    {"id": "6.2", "title": "수신 API 재설계", "status": "todo", "note": "/api/ingest 일원화, 검증·중복 방지·트랜잭션"},
+    {"id": "6.3", "title": "개발 DB 연동 테스트", "status": "todo", "note": "가짜 데이터로 실제 DB 쓰기·읽기 검증"},
+    {"id": "6.4", "title": "화면 정리·디자인", "status": "todo", "note": "기존 구성 유지, 데모 기능 삭제"},
+    {"id": "6.5", "title": "피클AI API 전환", "status": "todo", "note": "Issue 소통 종료, 규격 v2 전달"},
+    {"id": "6.6", "title": "기존 저장소 삭제", "status": "todo", "note": "이사 확인 후 사용자가 삭제"}
+  ]
+}

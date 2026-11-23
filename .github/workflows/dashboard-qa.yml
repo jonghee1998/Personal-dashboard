@@ -1,0 +1,60 @@
+name: Dashboard data QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/dashboard-visibility.ts'
+      - 'lib/dashboard-display.ts'
+      - 'lib/dashboard-freshness.ts'
+      - 'lib/ingest-integrity.ts'
+      - 'lib/transaction-reconciliation.ts'
+      - 'lib/transaction-backfill.ts'
+      - 'lib/backfill-plan-schema.ts'
+      - 'supabase/**'
+      - 'components/**'
+      - 'app/api/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/dashboard-qa.yml'
+  pull_request:
+  schedule:
+    - cron: '15 0 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --experimental-strip-types --test tests/*.test.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p 'test_*.py'
+
+  atomic-backfill:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: backfill_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d backfill_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test isolated PostgreSQL migration and atomic rollback
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d backfill_test -v ON_ERROR_STOP=1 -f tests/atomic-backfill.test.sql

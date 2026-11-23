@@ -1,0 +1,15 @@
+# Transaction backfill preview v1
+POST /api/backfill/preview, existing ingest Bearer token. Read-only. No migration and no apply endpoint.
+
+Submit every current visible transaction exactly once in entries, including ambiguous/unmatched/conflict rows (without evidence). Inventory is checked against the actual current DB, not hardcoded 106. For exact_unique supply evidence:
+```json
+{"entries":[{"external_id":"existing-id","classification":"exact_unique","evidence":{"source_system":"samsungcard","account_key":"opaque-card-a","billing_month":"2026-11","amount_basis":"statement_billed","source_record_id_type":"fingerprint","source_date":"2026-11-01","source_merchant":"Exact source merchant","source_amount":1000,"evidence_sha256":"<64 lowercase hex SHA256 of source file>","source_row_ref":"sheet-name:row-number"}}]}
+```
+For purchase_approval with genuinely unique provider row ID supply source_record_id and source_record_id_type provider. For statement fingerprint omit source_record_id; server computes full SHA256 of canonical JSON array ["v1",account_key,billing_month,amount_basis,source_date,NFC-trimmed-whitespace-normalized merchant,source_amount,"KRW"]. No occurrence assignment. Existing identical tuples are held ambiguous even if source file row order differs. No derived_line support yet; repeated approval numbers or missing billing month remain unresolved. Use actual source fields and compare to existing title/date/signed amount/currency; mismatch blocks, do not change source values to fit DB. If existing title differs, report for manual review. Source file digest and row ref are collector assertions, not independently verified evidence. Do not transmit PAN or private details to GitHub.
+
+Response HTTP 200 preview_only or 409 blocked. Includes candidate patches, per-row updated_at and row digest, inventory_digest, plan_digest, classifications and problems. All rows still unchanged; applied_count=0. Plan digest is NOT an approval or executable token. Preview reads are not a transactional snapshot; apply must re-check under lock with server-side transactional RPC and actual user approval. Full inventory changes invalidate plan. Fingerprint reconciliation remains a separate pending capability.
+
+Expected from collector report: 90 unique statement rows + up to 7 recent approvals; 4 ambiguous duplicates + 5 unmatched outside current sheet. Prior report said 5 recent approvals have December billing and 2 have no billing date: reconcile this before preview; missing billing month must not be invented, so eligible may be <=95. Confirm actual total and per-group arithmetic. No production apply until reviewed plan and separate atomic implementation.
+
+## Server-computed monetary summary
+Preview returns inventory_amount_krw, classification_amounts_krw, eligible_amount_krw and unresolved_amount_krw from stored row amounts. These are signed stored KRW amounts, not a statement total; report them verbatim. Non-KRW, missing or non-integer inventory amounts block preview for review. Compare source document subtotals separately. Never adjust fees to force a match. No apply authorization is issued by this endpoint.
