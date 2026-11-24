@@ -2,7 +2,7 @@
 Status: implementation committed; Supabase migration and live integration must be verified.
 
 ## Migration
-Apply `supabase/migrations/20261112_sync_runs.sql` in the existing Supabase SQL editor. It adds an audit table only, with RLS; it does not change existing business records. Until then GET/POST /api/sync-runs returns 503. Ordinary dashboard reads/ingest are independent of this table.
+The table is defined in `supabase/migrations/20261112000100_sync_runs.sql`. Empty development DB: apply every file in `supabase/migrations/` in name order. Existing production DB: applied state is unconfirmed — the operator decides with the check procedure in `supabase/README.md` and applies only what is needed. It adds an audit table only, with RLS; it does not change existing business records. Until then GET/POST /api/sync-runs returns 503. Ordinary dashboard reads/ingest are independent of this table.
 
 ## Collector flow
 1. Assign a UUID run_id for each collection execution. Keep a dataset/source pair consistent across all chunks. Include run_id, source_system, as_of, verified_at and the required provenance in all ingest rows. Use validate_only before production writes.

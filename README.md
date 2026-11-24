@@ -14,7 +14,9 @@
 - 클라이언트 데이터 갱신: 60초마다 재조회
 
 ## 설치
-1. Supabase에서 프로젝트 생성 → **SQL Editor**에서 `supabase/schema.sql` 실행
+1. Supabase에서 프로젝트 생성 → DB 스키마 적용 ([supabase/README.md](supabase/README.md))
+   - 빈 개발 DB: `supabase/migrations/` 의 파일을 이름순으로 전부 적용
+   - 기존 운영 DB: 적용 상태 미확인 — 운영자가 `supabase/README.md` 의 대조 절차로 판단한 뒤 필요한 것만 적용
 2. Supabase Authentication > Users에서 본인 로그인 계정 생성; UUID를 복사
 3. Vercel에 이 GitHub 저장소를 import (Framework: Next.js)
 4. Vercel Environment Variables에 `.env.example`의 5개 항목 설정
