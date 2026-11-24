@@ -13,18 +13,28 @@ import unittest
 from unittest.mock import MagicMock
 import io
 import json
+import os
+import urllib.request
+from unittest import mock
 from scripts.ingest_gate import (
     validate_endpoint_url,
     bind_and_verify_ingest_payload,
     transmit_gated_ingest,
-    ALLOWED_INGEST_ENDPOINTS,
+    get_ingest_origin,
+    NoRedirectHandler,
+    ALLOWED_INGEST_PATHS,
     IngestGateError,
     InvariantError
 )
 
+ORIGIN = "https://dashboard.example.invalid"
+
 class TestIngestGate(unittest.TestCase):
 
     def setUp(self):
+        patcher = mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": ORIGIN})
+        patcher.start()
+        self.addCleanup(patcher.stop)
         # Synthetic points manifest & item (zero real PII)
         self.synthetic_points_manifest = {
             "provider": "samsungcard",
@@ -59,8 +69,8 @@ class TestIngestGate(unittest.TestCase):
     # --- Endpoint Allowlist Tests ---
 
     def test_allowlist_permits_official_endpoints(self):
-        for ep in ALLOWED_INGEST_ENDPOINTS:
-            validate_endpoint_url(ep)  # Should not raise
+        for p in ALLOWED_INGEST_PATHS:
+            validate_endpoint_url(ORIGIN + p)  # Should not raise
 
     def test_allowlist_rejects_foreign_host(self):
         with self.assertRaises(IngestGateError) as ctx:
@@ -194,6 +204,88 @@ class TestIngestGate(unittest.TestCase):
         with self.assertRaises(IngestGateError):
             transmit_gated_ingest("https://dashboard.example.invalid/api/sync-runs","token","points",self.synthetic_points_manifest,self.synthetic_points_items,opener=mock_opener)
         self.assertEqual(mock_opener.open.call_count,0)
+
+class TestIngestBaseUrlEnv(unittest.TestCase):
+    URL = ORIGIN + "/api/ingest"
+
+    def _data(self):
+        t = TestIngestGate("test_binding_success_on_valid_payload")
+        t.setUp()
+        self.addCleanup(t.doCleanups)
+        return t.synthetic_points_manifest, t.synthetic_points_items
+
+    def _assert_rejected(self, value):
+        manifest, items = self._data()
+        opener = MagicMock()
+        env = dict(os.environ)
+        env.pop("DASHBOARD_INGEST_BASE_URL", None)
+        if value is not None:
+            env["DASHBOARD_INGEST_BASE_URL"] = value
+        with mock.patch.dict(os.environ, env, clear=True):
+            with self.assertRaises(IngestGateError) as ctx:
+                transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener)
+        self.assertEqual(opener.open.call_count, 0)
+        msg = str(ctx.exception)
+        self.assertNotIn("example.invalid", msg)
+        self.assertNotIn("http", msg)
+
+    def test_missing_env_rejected(self):
+        self._assert_rejected(None)
+
+    def test_invalid_values_rejected_without_network(self):
+        bad = ["", "   ", "http://dashboard.example.invalid",
+               "https://dashboard.example.invalid/api/ingest",
+               "https://dashboard.example.invalid//",
+               "https://user:pw@dashboard.example.invalid",
+               "https://dashboard.example.invalid:", "https://dashboard.example.invalid:abc",
+               "https://dashboard.example.invalid:0", "https://dashboard.example.invalid:65536",
+               "https://dashboard.example.invalid?", "https://dashboard.example.invalid/?",
+               "https://dashboard.example.invalid#", "https://dashboard.example.invalid/#",
+               "https://", "https:///x"]
+        for value in bad:
+            with self.subTest(value=value):
+                self._assert_rejected(value)
+
+    def test_origin_error_is_code_only(self):
+        with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": "http://secret-host.example.invalid"}):
+            with self.assertRaises(IngestGateError) as ctx:
+                get_ingest_origin()
+        self.assertEqual(str(ctx.exception), "INGEST_BASE_URL_INVALID")
+
+    def test_whitespace_trimmed_slash_and_port_ok(self):
+        with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": "  https://dashboard.example.invalid:8443/ "}):
+            self.assertEqual(get_ingest_origin(), "https://dashboard.example.invalid:8443")
+
+    def test_other_host_rejected_and_configured_origin_allowed(self):
+        manifest, items = self._data()
+        opener = MagicMock()
+        with self.assertRaises(IngestGateError) as ctx:
+            transmit_gated_ingest("https://other.example.invalid/api/ingest", "tok", "points", manifest, items, opener=opener)
+        self.assertEqual(str(ctx.exception), "UNAUTHORIZED_ENDPOINT")
+        self.assertEqual(opener.open.call_count, 0)
+        resp = MagicMock()
+        resp.read.return_value = b'{"status":"ok"}'
+        opener.open.return_value.__enter__.return_value = resp
+        with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": ORIGIN}):
+            res = transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener)
+        self.assertEqual(res["status"], "ok")
+        self.assertEqual(opener.open.call_count, 1)
+
+    def test_redirect_blocked_without_target_in_error(self):
+        req = urllib.request.Request(self.URL)
+        with self.assertRaises(IngestGateError) as ctx:
+            NoRedirectHandler().redirect_request(req, None, 302, "Found", {}, "https://redirect-target.example.invalid/x")
+        self.assertEqual(str(ctx.exception), "HTTP_REDIRECT_FORBIDDEN")
+
+    def test_redirect_response_causes_no_followup_send(self):
+        manifest, items = self._data()
+        opener = MagicMock()
+        opener.open.side_effect = IngestGateError("HTTP_REDIRECT_FORBIDDEN")
+        with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": ORIGIN}):
+            with self.assertRaises(IngestGateError) as ctx:
+                transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener)
+        self.assertEqual(opener.open.call_count, 1)
+        self.assertNotIn("example.invalid", str(ctx.exception))
 
 if __name__ == "__main__":
     unittest.main()
