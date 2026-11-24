@@ -1,7 +1,8 @@
 // 화면 테스트. 빌드된 앱(next build 이후)을 가짜 Supabase env 로 띄우고, 합성 세션 쿠키로 로그인한 / 를 연다.
 // /api/dashboard 는 브라우저에서 합성 응답(dashboard-fixture.mjs)으로 가로채고, 시계는 FIXTURE_NOW 로 고정한다.
 // 검사: 무세션 / → /login, 구조 탭(섹션·SVG·넘침·짝·겹침·잘림), 다섯 탭 대표 문구·가로 넘침, DOM 뼈대 기준선 비교,
-// api 인증·로그·수신·항목 검사. 하나라도 실패하면 exit 1.
+// 데이터 경계 검사(①~⑦: 조회 실패·401·지연, 상태·할 일·메모 쓰기와 중복 방지), api 인증·로그·수신·항목 검사.
+// 하나라도 실패하면 exit 1.
 // 기준선 갱신: SCREENS_UPDATE_BASELINE=1 npm run screens (화면 마크업을 일부러 바꿀 때만)
 import {spawn} from 'node:child_process';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
@@ -182,8 +183,263 @@ const domSkeleton = page => page.evaluate(() => {
   return walk(document.querySelector('.demoShell') ?? document.body);
 });
 
+// ── 데이터 경계 검사(390 폭). 각 검사는 새 페이지에서 /api/dashboard·/api/items 를 가로채 합성 응답만 쓴다. ──
+const TASK_B = '합성할일B';
+const MEMO_A = '합성메모A';
+const fixtureItem = title => dashboardSnapshot().items.find(x => x.title === title);
+/** 합성할일B: 할 일 추가 성공 응답·두 번째 할 일 */
+const taskB = () => ({...fixtureItem(FIXTURE_TEXT.task), id: '00000000-0000-4000-8000-000000000910', title: TASK_B, kind: 'task', status: 'pending', due_date: null, event_date: null, metadata: {created_manually: true}});
+const json = (status, body) => ({status, contentType: 'application/json', body: JSON.stringify(body)});
+/** 풀릴 때까지 기다리는 문 (지연 route 용) */
+function gate() { let open; const wait = new Promise(r => { open = r; }); return {wait, open}; }
+
+/**
+ * 경계 검사용 페이지. dashboard(route) 와 items(route, request) 를 직접 넘긴다(기본 합성 응답 route 없음).
+ * items 요청은 method·본문을 itemsLog 에 쌓는다.
+ */
+async function boundaryPage(browser, {dashboard, items}) {
+  const context = await browser.newContext({viewport: {width: BASELINE_WIDTH, height: 844}});
+  const raw = validSessionCookie(fake.url);
+  const eq = raw.indexOf('=');
+  await context.addCookies([{name: raw.slice(0, eq), value: raw.slice(eq + 1), url: BASE}]);
+  const page = await context.newPage();
+  await page.clock.setFixedTime(new Date(FIXTURE_NOW));
+  const itemsLog = [];
+  await page.route('**/api/dashboard', route => route.request().method() === 'GET'
+    ? dashboard(route) : route.fulfill(json(405, {error: 'Method not allowed'})));
+  await page.route('**/api/items', async route => {
+    const req = route.request();
+    let body = null;
+    try { body = req.postDataJSON(); } catch {}
+    const entry = {method: req.method(), body};
+    itemsLog.push(entry);
+    if (items) return items(route, entry);
+    return route.fulfill(json(500, {error: '합성 오류'}));
+  });
+  return {context, page, itemsLog};
+}
+const okDashboard = (extra = []) => route => route.fulfill(json(200, (s => ({...s, items: [...s.items, ...extra]}))(dashboardSnapshot())));
+const errorBox = page => page.locator('aside.error');
+const taskPanel = page => page.locator('.taskPanel');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/** 한 경계 검사: fn(page, itemsLog, ctx) → 문제 목록. 결과를 PASS/FAIL 로 출력 */
+async function boundary(browser, name, routes, fn) {
+  const {context, page, itemsLog} = await boundaryPage(browser, routes);
+  try {
+    const errs = await fn(page, itemsLog);
+    if (errs.length) fail(name, errs); else console.log(`PASS ${name}`);
+  } catch (e) { fail(name, [e.message.split('\n')[0]]); }
+  finally { await context.close(); }
+}
+
+async function checkDataBoundaries(browser) {
+  // ① 첫 조회 200 → 수동 새로고침 500: 오류 + '마지막 조회값 유지 중', 합성할일A 유지
+  // ①-2 같은 상황에서 형식이 틀린 200(isDashboardSnapshot 실패)
+  for (const [name, bad, message] of [
+    ['경계 ① 새로고침 500 → 마지막 스냅샷 유지', route => route.fulfill(json(500, {error: '합성 오류'})), '데이터 조회에 실패했습니다'],
+    ['경계 ①-2 새로고침 형식 틀린 200 → 마지막 스냅샷 유지', route => route.fulfill(json(200, {items: '합성형식오류A'})), '불완전한 조회 응답입니다'],
+  ]) {
+    let calls = 0;
+    await boundary(browser, name, {dashboard: route => (++calls === 1 ? okDashboard() : bad)(route)}, async page => {
+      const open = await openDashboard(page);
+      if (open.length) return open;
+      await page.locator('button.refreshButton').click();
+      const errs = [];
+      if (!await visible(errorBox(page).filter({hasText: '마지막 조회값 유지 중'}).filter({hasText: message}))) errs.push(`'${message} · 마지막 조회값 유지 중' 안 보임`);
+      if (!await visible(taskPanel(page).filter({hasText: FIXTURE_TEXT.task}))) errs.push(`'${FIXTURE_TEXT.task}' 사라짐`);
+      if (calls < 2) errs.push(`새로고침 요청 없음 (조회 ${calls}번)`);
+      return errs;
+    });
+  }
+
+  // ② PATCH 500 → 체크 되돌림 + '상태 저장에 실패했습니다'
+  await boundary(browser, '경계 ② 상태 PATCH 500 → 체크 되돌림·오류', {dashboard: okDashboard()}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const check = taskPanel(page).locator(`button.check[aria-label^="${FIXTURE_TEXT.task} "]`);
+    await check.click();
+    const errs = [];
+    if (!await visible(errorBox(page).filter({hasText: '상태 저장에 실패했습니다'}))) errs.push("'상태 저장에 실패했습니다' 안 보임");
+    if ((await check.getAttribute('class')).split(' ').includes('checked')) errs.push('체크가 되돌아가지 않음');
+    if (await check.getAttribute('aria-label') !== `${FIXTURE_TEXT.task} 완료 표시`) errs.push('aria-label 이 원래대로가 아님');
+    const patch = log.filter(x => x.method === 'PATCH');
+    if (patch.length !== 1 || !same(patch[0].body, {action: 'status', id: fixtureItem(FIXTURE_TEXT.task).id, status: 'done'})) errs.push(`PATCH 본문 ${JSON.stringify(patch.map(x => x.body))}`);
+    return errs;
+  });
+
+  // ③ /api/dashboard 401 → /login
+  await boundary(browser, '경계 ③ 조회 401 → /login', {dashboard: route => route.fulfill(json(401, {error: 'Unauthorized'}))}, async page => {
+    await page.goto(`${BASE}/`);
+    try { await page.waitForURL(url => new URL(url).pathname === '/login', {timeout: 15_000}); return []; }
+    catch { return [`${new URL(page.url()).pathname} 에 머묾 (기대 /login)`]; }
+  });
+
+  // ④ 조회 응답 전에도 구조 탭은 열린다
+  {
+    const g = gate();
+    await boundary(browser, '경계 ④ 응답 전 구조 탭', {dashboard: async route => { await g.wait; await okDashboard()(route).catch(() => {}); }}, async page => {
+      await page.goto(`${BASE}/`, {waitUntil: 'domcontentloaded'});
+      const errs = [];
+      if (!await visible(page.locator('.loading'), 15_000)) errs.push('로딩 화면이 아님');
+      await clickTab(page, '구조');
+      if (!await visible(page.locator('section.archSection'))) errs.push('section.archSection 안 보임');
+      g.open();
+      return errs;
+    });
+    g.open();
+  }
+
+  // ⑤ 할 일 추가: 본문 {title}, 201 + {item} → 목록 반영·입력 비움 / 500 → 입력 유지·오류
+  const addTask = async page => {
+    await page.locator('button.taskOpenButton').click();
+    const input = page.locator('input[aria-label="새 할 일"]');
+    await input.fill(TASK_B);
+    await page.locator('form.taskAddForm button[type="submit"]').click();
+    return input;
+  };
+  await boundary(browser, '경계 ⑤ 할 일 추가 201 → 목록 반영·입력 비움', {dashboard: okDashboard(), items: (route, e) => route.fulfill(e.method === 'POST' ? json(201, {item: taskB()}) : json(500, {}))}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const input = await addTask(page);
+    const errs = [];
+    if (!await visible(taskPanel(page).locator('.listitem', {hasText: TASK_B}))) errs.push(`목록에 '${TASK_B}' 없음`);
+    if (await input.count()) errs.push('추가 뒤 입력 폼이 닫히지 않음');
+    await page.locator('button.taskOpenButton').click();
+    if (await input.inputValue() !== '') errs.push('다시 연 입력이 비어 있지 않음');
+    const post = log.filter(x => x.method === 'POST');
+    if (post.length !== 1 || !same(post[0].body, {title: TASK_B})) errs.push(`POST 본문 ${JSON.stringify(post.map(x => x.body))}`);
+    return errs;
+  });
+  await boundary(browser, '경계 ⑤ 할 일 추가 500 → 입력 유지·오류', {dashboard: okDashboard()}, async page => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const input = await addTask(page);
+    const errs = [];
+    if (!await visible(errorBox(page).filter({hasText: '할 일을 추가하지 못했습니다'}))) errs.push('추가 실패 오류 안 보임');
+    if (await input.inputValue().catch(() => null) !== TASK_B) errs.push('입력이 남지 않음');
+    if (await taskPanel(page).locator('.listitem', {hasText: TASK_B}).count()) errs.push(`실패했는데 '${TASK_B}' 가 목록에 있음`);
+    return errs;
+  });
+
+  // ⑤-2 POST 지연 중 반복 제출(Enter·저장 버튼·requestSubmit) → POST 1건
+  {
+    const g = gate();
+    await boundary(browser, '경계 ⑤-2 지연 중 반복 제출 → POST 1건', {dashboard: okDashboard(), items: async (route, e) => { await g.wait; await route.fulfill(e.method === 'POST' ? json(201, {item: taskB()}) : json(500, {})).catch(() => {}); }}, async (page, log) => {
+      const open = await openDashboard(page);
+      if (open.length) return open;
+      const input = await addTask(page);
+      for (let i = 0; i < 3; i++) {
+        await input.press('Enter').catch(() => {});
+        await page.locator('form.taskAddForm button[type="submit"]').click({force: true, timeout: 1_000}).catch(() => {});
+        await page.evaluate(() => document.querySelector('form.taskAddForm')?.requestSubmit()).catch(() => {});
+      }
+      await sleep(300);
+      const during = log.filter(x => x.method === 'POST').length;
+      g.open();
+      const errs = [];
+      if (!await visible(taskPanel(page).locator('.listitem', {hasText: TASK_B}))) errs.push(`목록에 '${TASK_B}' 없음`);
+      await sleep(300);
+      const total = log.filter(x => x.method === 'POST').length;
+      if (during !== 1 || total !== 1) errs.push(`POST ${total}건 (지연 중 ${during}건, 기대 1건)`);
+      else console.log(`  가로챈 POST ${total}건`);
+      return errs;
+    });
+    g.open();
+  }
+
+  // ⑥ 할 일 삭제: 본문 {id}, 200 → 사라짐 / 500 → 남음
+  const taskA = fixtureItem(FIXTURE_TEXT.task);
+  const deleteButton = (page, title) => taskPanel(page).locator(`button.taskDeleteButton[aria-label="${title} 삭제"]`);
+  await boundary(browser, '경계 ⑥ 할 일 삭제 200 → 목록에서 사라짐', {dashboard: okDashboard(), items: (route, e) => route.fulfill(e.method === 'DELETE' ? json(200, {deleted: true}) : json(500, {}))}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    await deleteButton(page, FIXTURE_TEXT.task).click();
+    const errs = [];
+    try { await taskPanel(page).locator('.listitem', {hasText: FIXTURE_TEXT.task}).waitFor({state: 'detached', timeout: 5_000}); }
+    catch { errs.push(`'${FIXTURE_TEXT.task}' 가 남음`); }
+    const del = log.filter(x => x.method === 'DELETE');
+    if (del.length !== 1 || !same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del.map(x => x.body))}`);
+    return errs;
+  });
+  await boundary(browser, '경계 ⑥ 할 일 삭제 500 → 남음', {dashboard: okDashboard()}, async page => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    await deleteButton(page, FIXTURE_TEXT.task).click();
+    const errs = [];
+    if (!await visible(errorBox(page).filter({hasText: '할 일을 삭제하지 못했습니다'}))) errs.push('삭제 실패 오류 안 보임');
+    if (!await visible(taskPanel(page).locator('.listitem', {hasText: FIXTURE_TEXT.task}))) errs.push(`'${FIXTURE_TEXT.task}' 가 사라짐`);
+    return errs;
+  });
+
+  // ⑥-2 DELETE 지연 중 같은 항목·다른 할 일 삭제 반복 → DELETE 1건
+  {
+    const g = gate();
+    await boundary(browser, '경계 ⑥-2 지연 중 반복 삭제 → DELETE 1건', {dashboard: okDashboard([taskB()]), items: async (route, e) => { await g.wait; await route.fulfill(e.method === 'DELETE' ? json(200, {deleted: true}) : json(500, {})).catch(() => {}); }}, async (page, log) => {
+      const open = await openDashboard(page);
+      if (open.length) return open;
+      if (!await visible(deleteButton(page, TASK_B))) return [`두 번째 할 일 '${TASK_B}' 없음`];
+      await deleteButton(page, FIXTURE_TEXT.task).click();
+      for (let i = 0; i < 3; i++) {
+        await deleteButton(page, FIXTURE_TEXT.task).click({force: true, timeout: 1_000}).catch(() => {});
+        await deleteButton(page, TASK_B).click({timeout: 1_000}).catch(() => {});
+      }
+      await sleep(300);
+      const during = log.filter(x => x.method === 'DELETE').length;
+      g.open();
+      const errs = [];
+      try { await taskPanel(page).locator('.listitem', {hasText: FIXTURE_TEXT.task}).waitFor({state: 'detached', timeout: 5_000}); }
+      catch { errs.push(`'${FIXTURE_TEXT.task}' 가 남음`); }
+      await sleep(300);
+      const del = log.filter(x => x.method === 'DELETE');
+      if (during !== 1 || del.length !== 1) errs.push(`DELETE ${del.length}건 (지연 중 ${during}건, 기대 1건)`);
+      else if (!same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del[0].body)}`);
+      else console.log(`  가로챈 DELETE ${del.length}건`);
+      if (!await visible(taskPanel(page).locator('.listitem', {hasText: TASK_B}))) errs.push(`'${TASK_B}' 가 사라짐`);
+      return errs;
+    });
+    g.open();
+  }
+
+  // ⑦ 거래 메모 PATCH: 본문 {action:'memo', id, memo}, 200 + {item} → 편집창 닫힘·메모 표시 / 500 → 초안 유지·오류
+  const merchant = fixtureItem(FIXTURE_TEXT.merchant);
+  const memoRequest = {action: 'memo', id: merchant.id, memo: MEMO_A};
+  const memoEntry = page => page.locator('.memoEntry', {hasText: FIXTURE_TEXT.merchant});
+  const editMemo = async page => {
+    await clickTab(page, '금융');
+    await page.locator('.financeSeg button', {hasText: '메모'}).click();
+    await memoEntry(page).locator('button.memoRead').click();
+    const area = memoEntry(page).locator(`textarea[aria-label="${FIXTURE_TEXT.merchant} 메모"]`);
+    await area.fill(MEMO_A);
+    await memoEntry(page).locator('button.memoSave').click();
+    return area;
+  };
+  const memoBody = log => { const p = log.filter(x => x.method === 'PATCH'); return p.length === 1 && same(p[0].body, memoRequest) ? [] : [`PATCH 본문 ${JSON.stringify(p.map(x => x.body))}`]; };
+  await boundary(browser, '경계 ⑦ 메모 PATCH 200 → 편집창 닫힘·합성메모A 표시', {dashboard: okDashboard(), items: (route, e) => route.fulfill(e.method === 'PATCH' && same(e.body, memoRequest) ? json(200, {item: {...merchant, metadata: {...merchant.metadata, memo: MEMO_A}}}) : json(500, {}))}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const area = await editMemo(page);
+    const errs = [...memoBody(log)];
+    try { await area.waitFor({state: 'detached', timeout: 5_000}); } catch { errs.push('편집창이 닫히지 않음'); }
+    if (!await visible(memoEntry(page).locator('button.memoRead', {hasText: MEMO_A}))) errs.push(`저장된 메모 '${MEMO_A}' 안 보임`);
+    if (await errorBox(page).count()) errs.push(`오류 표시: ${await errorBox(page).first().textContent()}`);
+    return errs;
+  });
+  await boundary(browser, '경계 ⑦ 메모 PATCH 500 → 초안 유지·오류', {dashboard: okDashboard()}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const area = await editMemo(page);
+    const errs = [];
+    if (!await visible(errorBox(page).filter({hasText: '거래 메모를 저장하지 못했습니다'}))) errs.push("'거래 메모를 저장하지 못했습니다' 안 보임");
+    errs.push(...memoBody(log));
+    if (await area.inputValue().catch(() => null) !== MEMO_A) errs.push(`입력란에 '${MEMO_A}' 초안이 남지 않음`);
+    return errs;
+  });
+}
+
 const problems = [];
-const fail = (name, errs) => { problems.push(...errs.map(e => `${name}: ${e}`)); console.log(`FAIL ${name} ${errs.join('; ')}`); };
+const fail =(name, errs) => { problems.push(...errs.map(e => `${name}: ${e}`)); console.log(`FAIL ${name} ${errs.join('; ')}`); };
 let browser;
 try {
   await waitReady();
@@ -260,7 +516,9 @@ try {
     finally { await context.close(); }
   }
 
-  const api = await checkApiAuth(BASE, fake);
+  await checkDataBoundaries(browser);
+
+  const api =await checkApiAuth(BASE, fake);
   if (api.problems.length) fail('api 인증 검사', [`${api.problems.length}건`]);
   else console.log(`PASS api 인증 검사 ${api.results.length}건`);
   const logCheck = await checkApiLogs(BASE, fake, serverLogs);
