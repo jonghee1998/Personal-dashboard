@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, v2ConflictBody, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
+import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, v2ConflictBody, failedExample, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
 import {
-  FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, INGEST_RUN_REPORT, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
+  FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, INGEST_RUN_REPORT, INGEST_RUN_FAILED, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
   fakeCommitResponse, fakeReportRun, fakeExistingPage, fakeSupabaseResponse, startFakeSupabase,
 } from '../scripts/screens/api-auth.mjs';
 import {parseIngestV2} from '../lib/ingest-v2.ts';
@@ -11,8 +11,15 @@ import {handleIngest, readAllPages, payload} from '../lib/ingest-service.ts';
 const NOW = Date.parse('2026-01-02T00:00:00+09:00');
 const cases = Object.fromEntries(apiIngestCases().map(c => [c.id, c]));
 
-test('검사 아홉 경우 a~i, run_id f3·f4·f5·f6·f7', () => {
-  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']);
+test('검사 열 경우 a~j, run_id f3·f4·f5·f6·f7·f8', () => {
+  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+  // j: 문서 failed 예시 그대로, run_id 만 f8
+  assert.equal(cases.j.headers.authorization, `Bearer ${FAKE_TOKEN}`);
+  assert.equal(cases.j.body.run.run_id, INGEST_RUN_FAILED);
+  assert.deepEqual(cases.j.body.items, []);
+  assert.equal(cases.j.body.run.status, 'failed');
+  assert.deepEqual(cases.j.body.manifest, {item_count: 0, amount_total: null});
+  assert.deepEqual({...cases.j.body, run: {...cases.j.body.run, run_id: failedExample().run.run_id}}, failedExample());
   // i: f7 본문의 키가 가짜 서버의 report 기록과 같다
   assert.equal(cases.i.body.run.run_id, INGEST_RUN_REPORT);
   assert.equal(cases.i.headers.authorization, `Bearer ${FAKE_TOKEN}`);
@@ -35,7 +42,7 @@ test('검사 아홉 경우 a~i, run_id f3·f4·f5·f6·f7', () => {
 });
 
 test('v2 본문은 parseIngestV2 를 통과(1항목·500항목), v1 본문은 v1 스키마 통과', () => {
-  for (const body of [v2Body(INGEST_RUN_OK), v2Body(INGEST_RUN_COMMIT_FAIL), pagedBody(), v2Body(INGEST_RUN_REPLAY), v2ConflictBody(), cases.i.body]) {
+  for (const body of [v2Body(INGEST_RUN_OK), v2Body(INGEST_RUN_COMMIT_FAIL), pagedBody(), v2Body(INGEST_RUN_REPLAY), v2ConflictBody(), cases.i.body, cases.j.body]) {
     const r = parseIngestV2(structuredClone(body), NOW);
     assert.equal(r.ok, true, JSON.stringify(r.violations));
     assert.deepEqual(r.itemViolations, []);
@@ -45,6 +52,7 @@ test('v2 본문은 parseIngestV2 를 통과(1항목·500항목), v1 본문은 v1
   assert.equal(pagedBody().items.length, PAGED_ITEMS);
   assert.equal(new Set(pagedBody().items.map(x => x.metadata.source_record_id)).size, PAGED_ITEMS);
   assert.equal(v2Body(INGEST_RUN_OK).items.length, 1);
+  assert.equal(parseIngestV2(structuredClone(cases.j.body), NOW).items.length, 0);
   assert.equal(payload.safeParse(v1Body()).success, true);
 });
 
@@ -228,6 +236,47 @@ test('i 판정: 어긋난 관찰은 실패', async () => {
   const f6 = i.calls.map(x => x.method === 'GET' ? {...x, query: x.query.replace(`run_id=eq.${INGEST_RUN_REPORT}`, `run_id=eq.${INGEST_RUN_REPLAY}`)} : x);
   assert.ok(f6.some(x => x.query.includes(INGEST_RUN_REPLAY)));
   assert.ok(judgeIngestCase(cases.i, {...i, calls: f6}).length, 'i run_id f6');
+});
+
+test('j: simulate 판정 통과', async () => {
+  const j = await simulate(cases.j);
+  assert.deepEqual(judgeIngestCase(cases.j, j), []);
+  assert.equal(j.status, 200);
+  assert.equal(countPath(j.calls, 'dashboard_ingest_existing'), 0);
+  assert.equal(countPath(j.calls, 'dashboard_ingest_candidates'), 0);
+  assert.equal(countPath(j.calls, 'dashboard_ingest_commit'), 1);
+  const body = JSON.parse(j.bodyText);
+  assert.equal(body.upserted, 0); assert.deepEqual(body.items, []); assert.equal(body.run.status, 'failed');
+});
+
+test('j 판정: 어긋난 관찰은 실패', async () => {
+  const j = await simulate(cases.j);
+  const body = JSON.parse(j.bodyText);
+  const commitCall = j.calls.find(x => x.path.endsWith('dashboard_ingest_commit'));
+  const lookupCall = j.calls.find(x => x.method === 'GET');
+  assert.ok(commitCall && lookupCall);
+  const withCommit = f => j.calls.map(x => x === commitCall ? {...x, body: f(structuredClone(x.body))} : x);
+  const existingCall = {method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_existing', query: '', body: {p_user: FAKE_USER_ID, p_external_ids: ['txn-000001'], p_after: null}, status: 200};
+  const bad = {
+    'status 503': {...j, status: 503},
+    'no-store 없음': {...j, cacheControl: null},
+    '본문 upserted 1': {...j, bodyText: JSON.stringify({...body, upserted: 1})},
+    '본문 run.status success': {...j, bodyText: JSON.stringify({...body, run: {...body.run, status: 'success'}})},
+    'commit 0건': {...j, calls: j.calls.filter(x => x !== commitCall)},
+    'commit 2건': {...j, calls: [...j.calls, commitCall]},
+    'commit p_rows 1행': {...j, calls: withCommit(b => ({...b, p_rows: [{kind: 'transaction', external_id: 'txn-000001', title: '합성가맹점A'}]}))},
+    'p_run.error_code null': {...j, calls: withCommit(b => ({...b, p_run: {...b.p_run, error_code: null}}))},
+    'existing RPC 1건': {...j, calls: [...j.calls, existingCall]},
+    '실행 조회 run_id f6': {...j, calls: j.calls.map(x => x.method === 'GET' ? {...x, query: x.query.replace(`run_id=eq.${INGEST_RUN_FAILED}`, `run_id=eq.${INGEST_RUN_REPLAY}`)} : x)},
+  };
+  for (const [name, observed] of Object.entries(bad)) assert.ok(judgeIngestCase(cases.j, observed).length, name);
+  // 호출 순서만 바꿈: commit 을 실행 조회 앞으로 옮기고 내용은 그대로 → 순서 오류만으로 실패
+  const reordered = [commitCall, ...j.calls.filter(x => x !== commitCall)];
+  assert.equal(reordered.length, j.calls.length);
+  assert.ok(reordered.indexOf(commitCall) < reordered.indexOf(lookupCall));
+  const errs = judgeIngestCase(cases.j, {...j, calls: reordered});
+  assert.equal(errs.length, 1, JSON.stringify(errs));
+  assert.match(errs[0], /뒤|commit 보다/);
 });
 
 // f6: 가짜 commit 이 받은 p_run 을 실행 기록으로 기억하고, 네 필터(user_id·run_id·dataset·source_system)로 조회한다.
