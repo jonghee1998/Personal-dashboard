@@ -33,7 +33,7 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 브라우저·서버 | 달라야 함 (프로젝트가 다르면 자연히 다름) |
 | `SUPABASE_SERVICE_ROLE_KEY` | 서버만 | 달라야 함 (`check-env --compare` 가 검사) |
 | `PICKLE_INGEST_TOKEN` | 서버만(수신 API) | 달라야 함 (`check-env --compare` 가 검사) |
-| `DASHBOARD_USER_ID` | 서버만(수신 API) | 달라야 함 (각 Supabase 프로젝트의 사용자 ID) |
+| `DASHBOARD_USER_ID` | 서버만(수신 API) | 달라야 함 (`check-env --compare` 가 검사, 각 Supabase 프로젝트의 사용자 ID) |
 
 - 자동 모드가 켜져 있으면 최종 PR 이 사람 확인 없이 main 에 반영된다. 그래서 운영 Vercel 을 새 저장소 main 에 연결하면 **그 시점의 main(6단계 수신 함수를 쓰는 코드 포함)이 바로 운영에 배포**된다. 연결은 (2) 배포 순서의 마지막 단계에서만 한다.
 - `lib/supabase.ts` 5~6행과 `lib/supabase-server.ts` 5~6·26~30행은 배포 환경의 `NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_ANON_KEY`·`SUPABASE_SERVICE_ROLE_KEY` 를 그대로 쓴다. 즉 **Vercel 에 실제로 들어간 값이 곧 접속 대상**이다. 파일 값이 맞아도 Vercel 설정이 다르면 다른 DB 에 붙는다.
@@ -143,6 +143,16 @@ select f.sig, r.role, has_function_privilege(r.role, f.sig, 'execute') as can_ex
 
 - 로그인하지 않고 `/` 에 들어가면 `/login` 으로 간다.
 - 토큰 없이 `POST /api/ingest` 를 보내면 401 이 온다. 이 응답은 `app/api/ingest/route.ts` 30~31행에서 DB 접근 전에 나오므로, 이것만으로는 DB·키 설정을 확인하지 못한다.
+- 개발 env 의 `PICKLE_INGEST_TOKEN`(개발 토큰)을 `Authorization: Bearer` 로 붙여 운영 `POST /api/ingest` 를 보내면 401 이 와야 한다. 본문은 비워도 되고 실데이터를 보내지 않는다.
+  - 401 만으로는 통과가 아니다. `lib/collector-auth.ts` 10~16행 `checkCollectorToken` 은 운영 토큰이 없거나(`server_secret_missing`) 32자 미만이거나(`server_secret_short`) Bearer 헤더가 앱까지 오지 않아도(`no_bearer`) 똑같이 401 을 주고, 앞단(프록시 등)이 돌려준 401 도 상태 코드로는 구분되지 않는다.
+  - 그래서 운영자는 운영 배포의 요청별 로그(배포 플랫폼이 요청 하나마다 요청 ID 를 붙여 그 요청 처리 중 나온 앱 출력을 묶어 보여 주는 로그)에서 이 점검 요청(`POST /api/ingest`, 401)의 항목을 찾고, 같은 요청 ID 에 묶인 `app/api/ingest/route.ts` 31행의 `collector_auth_failed` 줄(`lib/collector-auth.ts` 20~26행 `collectorAuthFailureLog` 가 만드는 JSON, route `'/api/ingest'`)의 reason 을 본다.
+  - 앱 로그 JSON 자체에는 event·route·reason 만 있고 요청을 구분하는 값이 없다(`lib/collector-auth.ts` 20~26행). 요청 시각만 맞춰 다른 요청의 로그 줄을 근거로 삼으면 안 된다.
+  - 401 이고, 같은 요청 ID 에 묶인 collector_auth_failed 로그의 reason 이 mismatch 여야 통과다.
+  - 요청 단위로 연결할 수 없으면(요청 항목·로그 줄이 없거나 시각만 맞는 경우) 통과가 아니다. 즉 요청별 로그에 그 요청 항목이 없거나(앞단에서 막힌 경우 포함), 그 요청에 묶인 `collector_auth_failed` 줄이 없거나, reason 이 `mismatch` 가 아니면 실패로 본다.
+  - 401 이 아닌 응답(200·다른 4xx·5xx)은 점검 실패다.
+  - 개발·운영 토큰이 같은지는 이 요청으로 추정하지 않는다. 토큰 동일 여부는 (2) 배포 전 확인의 `npm run check-env -- --compare`(`PICKLE_INGEST_TOKEN` 비교) 결과로 확인한다.
+  - 결과는 통과 여부만 기록하고 토큰 값·주소·요청 ID·로그 원문은 적지 않는다.
+  - 실패하면 이 절 마지막 줄대로 (4) 되돌리기를 하고 8단계는 doing 으로 둔다.
 - 로그인한 뒤 다섯 탭(홈·금융·뉴스·혜택·기록)이 보인다.
 - 수집 확인: 지금 쓰는 v1 수집기의 다음 정상 요청(또는 수집기에서 수동 실행 1회) 중 `validate_only` 가 아닌 요청이 200 을 받고, 응답 본문의 `upserted`(저장 건수)가 1 이상인지 본다.
   - `lib/ingest-service.ts` 138행에서 v1 은 `validate_only` 요청에도 200(`upserted` 0)을 준다. 그래서 200 만으로는 저장을 확인하지 못한다.
