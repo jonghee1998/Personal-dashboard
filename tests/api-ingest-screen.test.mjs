@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
 import {
-  FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
+  FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
   fakeCommitResponse, fakeExistingPage, fakeSupabaseResponse, startFakeSupabase,
 } from '../scripts/screens/api-auth.mjs';
 import {parseIngestV2} from '../lib/ingest-v2.ts';
@@ -128,4 +128,85 @@ test('판정: 어긋난 관찰은 실패', async () => {
   const commit = e.calls.find(x => x.path.endsWith('dashboard_ingest_commit'));
   const nulls = {...commit, body: {...commit.body, p_expected: commit.body.p_expected.map((x, i) => i === 0 ? {...x, updated_at: null} : x)}};
   assert.ok(judgeIngestCase(cases.e, {...e, calls: e.calls.map(x => x === commit ? nulls : x)}).length);
+});
+
+// f6: 가짜 commit 이 받은 p_run 을 실행 기록으로 기억하고, 네 필터(user_id·run_id·dataset·source_system)로 조회한다.
+const OTHER_USER = '00000000-0000-4000-8000-0000000000a2';
+const replayRun = {run_id: INGEST_RUN_REPLAY, dataset: 'transactions', source_system: 'fake-source', status: 'succeeded',
+  error_code: null, item_count: 2, payload_digest: 'f'.repeat(64), source_as_of: '2026-01-01T00:00:00+09:00', collected_at: '2026-01-01T00:01:00+09:00'};
+const replayCommit = () => ({p_user: FAKE_USER_ID, p_rows: [{kind: 'transaction', external_id: 'txn-f6-1', title: '합성가맹점A'}, {kind: 'transaction', external_id: 'txn-f6-2', title: '합성가맹점B'}],
+  p_expected: [], p_source_ids: [], p_known: [], p_run: {...replayRun}});
+const runQuery = (o = {}) => {
+  const f = {user_id: FAKE_USER_ID, run_id: INGEST_RUN_REPLAY, dataset: replayRun.dataset, source_system: replayRun.source_system, ...o};
+  return ['select=*', ...Object.entries(f).filter(([, v]) => v !== undefined).map(([k, v]) => `${k}=eq.${encodeURIComponent(v)}`)].join('&');
+};
+const getRun = (q, ctx, accept = 'application/json') => fakeSupabaseResponse('GET', '/rest/v1/dashboard_sync_runs', q, accept, undefined, ctx);
+const commitRun = (args, ctx) => fakeSupabaseResponse('POST', '/rest/v1/rpc/dashboard_ingest_commit', '', 'application/json', args, ctx);
+
+test('f6: ctx.runs 없으면 commit 200 이지만 기록을 저장하지 않고 조회는 []', () => {
+  const out = commitRun(replayCommit());
+  assert.equal(out.status, 200); assert.equal(out.body.run.run_id, INGEST_RUN_REPLAY);
+  assert.deepEqual(getRun(runQuery()), {status: 200, body: []});
+  // ctx 는 있지만 runs 가 Map 이 아니어도 저장·반환 없음
+  commitRun(replayCommit(), {items: []});
+  assert.deepEqual(getRun(runQuery(), {items: []}), {status: 200, body: []});
+});
+
+test('f6: ctx.runs 가 있으면 commit 뒤 네 필터가 맞는 조회가 ingest_v2 기록 1개', () => {
+  const runs = new Map();
+  assert.deepEqual(getRun(runQuery(), {runs}), {status: 200, body: []}, 'commit 전에는 []');
+  assert.equal(commitRun(replayCommit(), {runs}).status, 200);
+  const r = getRun(runQuery(), {runs});
+  assert.equal(r.status, 200); assert.equal(r.body.length, 1);
+  assert.deepEqual(r.body[0], {
+    user_id: FAKE_USER_ID, run_id: INGEST_RUN_REPLAY, dataset: 'transactions', source_system: 'fake-source', status: 'succeeded',
+    error_code: null, expected_count: replayRun.item_count, payload_digest: replayRun.payload_digest, commit_source: 'ingest_v2',
+    accepted_count: 2, source_as_of: replayRun.source_as_of, collected_at: replayRun.collected_at,
+  });
+  // Accept 가 객체면 객체
+  assert.deepEqual(getRun(runQuery(), {runs}, 'application/vnd.pgrst.object+json').body, r.body[0]);
+  // 이미 있으면 덮어쓰지 않는다
+  commitRun({...replayCommit(), p_run: {...replayRun, payload_digest: 'e'.repeat(64), item_count: 1}}, {runs});
+  assert.equal(runs.size, 1);
+  assert.equal(getRun(runQuery(), {runs}).body[0].payload_digest, replayRun.payload_digest);
+  assert.equal(getRun(runQuery(), {runs}).body[0].expected_count, 2);
+});
+
+test('f6: user_id·dataset·source_system 불일치는 각각 []', () => {
+  const runs = new Map();
+  commitRun(replayCommit(), {runs});
+  for (const o of [{user_id: OTHER_USER}, {dataset: 'other-dataset'}, {source_system: 'other-source'}]) {
+    assert.deepEqual(getRun(runQuery(o), {runs}), {status: 200, body: []}, JSON.stringify(o));
+  }
+});
+
+test('f6: dataset·source_system·user_id 필터를 뺀 조회는 각각 []', () => {
+  const runs = new Map();
+  commitRun(replayCommit(), {runs});
+  for (const k of ['dataset', 'source_system', 'user_id']) {
+    assert.deepEqual(getRun(runQuery({[k]: undefined}), {runs}), {status: 200, body: []}, k);
+    assert.deepEqual(getRun(runQuery({[k]: undefined}), {runs}, 'application/vnd.pgrst.object+json'), {status: 200, body: []}, k);
+  }
+});
+
+test('f6: startFakeSupabase 로 HTTP commit 뒤 네 필터 GET 이 기록을 돌려주고, f3 은 여전히 []', async () => {
+  const fake = await startFakeSupabase();
+  const post = args => fetch(`${fake.url}/rest/v1/rpc/dashboard_ingest_commit`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(args)});
+  try {
+    assert.ok(fake.runs instanceof Map); assert.equal(fake.runs.size, 0);
+    const c = await post(replayCommit());
+    assert.equal(c.status, 200); await c.arrayBuffer();
+    assert.equal(fake.runs.size, 1);
+    const g = await fetch(`${fake.url}/rest/v1/dashboard_sync_runs?${runQuery()}`, {headers: {accept: 'application/vnd.pgrst.object+json'}});
+    assert.equal(g.status, 200);
+    const row = await g.json();
+    assert.equal(row.commit_source, 'ingest_v2'); assert.equal(row.run_id, INGEST_RUN_REPLAY);
+    assert.equal(row.expected_count, replayRun.item_count); assert.equal(row.payload_digest, replayRun.payload_digest);
+    // f3 commit 뒤에도 f3 조회는 [] (f3 은 기억하지 않는다)
+    const c3 = await post({...replayCommit(), p_run: {...replayRun, run_id: INGEST_RUN_OK}});
+    assert.equal(c3.status, 200); await c3.arrayBuffer();
+    assert.equal(fake.runs.size, 1);
+    const g3 = await fetch(`${fake.url}/rest/v1/dashboard_sync_runs?${runQuery({run_id: INGEST_RUN_OK})}`);
+    assert.equal(g3.status, 200); assert.deepEqual(await g3.json(), []);
+  } finally { await fake.close(); }
 });
