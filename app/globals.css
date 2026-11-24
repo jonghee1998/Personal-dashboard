@@ -957,7 +957,7 @@ html:has(.demoShell.conceptLight),body:has(.demoShell.conceptLight){
 }
 
 
-/* PERSONAL OS — muted category-first visual experiment. Only /demo via conceptOrbit. */
+/* PERSONAL OS — 현재 미사용 실험 스타일 */
 html:has(.demoShell.conceptOrbit),body:has(.demoShell.conceptOrbit){background:#f6f5f0;color:#28372c}
 .demoShell.conceptOrbit{
  --orbit-sage:#dce5d7;--orbit-sage-deep:#697d69;--orbit-orange:#e8c2a3;--orbit-ink:#28372c;
@@ -1030,8 +1030,7 @@ html:has(.demoShell.conceptOrbit),body:has(.demoShell.conceptOrbit){background:#
 @media(max-width:370px){.demoShell.conceptOrbit .orbitCategories{gap:3px}.demoShell.conceptOrbit .orbitCategoryIcon{width:43px;height:43px;border-radius:14px}.demoShell.conceptOrbit .orbitQuickCard{padding:14px 12px}.demoShell.conceptOrbit .orbitHero{padding:20px 18px}}
 
 
-/* MARINE 03 — image-led editorial direction. /demo only; production remains conceptLight.
-   Rollback by removing conceptMarine on the demo root. */
+/* MARINE 03 — 현재 미사용 실험 스타일 */
 html:has(.demoShell.conceptMarine),body:has(.demoShell.conceptMarine){background:#f4f5f2;color:#183244}
 .demoShell.designPreview.conceptMarine{
  --marine-ink:#13334b;--marine-navy:#073a61;--marine-deep:#063354;
@@ -1228,9 +1227,7 @@ html:has(.demoShell.conceptMarine),body:has(.demoShell.conceptMarine){background
 @media(prefers-reduced-motion:reduce){.demoShell.conceptMarine .marineService:hover{filter:none}}
 
 
-/* REFINED GREEN / demo only — evaluated UI references: calm financial hierarchy,
-   one focal amount, high contrast, warm neutrals and functional accent colour.
-   Remove conceptRefined from /demo to restore the previous approved theme. */
+/* REFINED GREEN — 현재 미사용 실험 스타일 */
 html:has(.demoShell.conceptRefined),body:has(.demoShell.conceptRefined){
  background:#f5f6f1;
  color:#26372e;
