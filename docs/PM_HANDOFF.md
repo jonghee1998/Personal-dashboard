@@ -26,7 +26,7 @@ _마지막 갱신: 2026-11-25 04시_
 - 보호 경로(`.github/`, `scripts/orch/`) 변경은 PM이 브랜치 → PR로 올리고 사용자가 Merge한다.
 - private_dashboard는 8단계(Vercel 새 저장소 연결) 전까지 지우지 않는다.
 - 사람만 할 수 있는 일(운영 배포, 비밀값, Vercel·Supabase 콘솔, 피클AI 설정)은 자동 모드에서 끝났다고 가정하고, 사람 할 일 Issue에 적는다.
-  - 단, 8단계 운영 배포는 예외: 운영자가 자동 모드를 끄고 직접 확인·done 표시한다. PM 은 roadmap 8단계가 done 이 되기 전에는 8단계를 done 으로 바꾸거나 9·10단계 계획을 세우지 않는다.
+  - 8단계 운영 배포도 같다(2026-11-24 사용자 전권 위임, 자동 모드는 끄지 않는다). 배포·배포 후 확인·8단계 done 표시는 사람 할 일이다. PM 은 8단계를 done 으로 바꾸지 않지만 8단계 계획을 더 만들지 않고 9·10단계 AI 몫으로 넘어간다.
 
 ## 계획 작성 체크리스트
 - 실제 코드 확인: 계획에 쓴 파일·함수·줄 번호를 직접 열어 확인한다.
@@ -37,9 +37,7 @@ _마지막 갱신: 2026-11-25 04시_
 - 보안·공개 저장소: 실데이터·운영 주소·키 금지, 운영 DB 접근 금지.
 
 ## 다음 할 일
-1. 8단계(배포 분리):
-   - AI 몫: 완료: scripts/check-env.mjs, docs/DEPLOY.md
-   - 사람 몫: 자동 모드 끄기(8단계 AI 몫 계획의 최종 PR 이 열리기 전) → 최종 PR 수동 반영 → docs/DEPLOY.md 배포 순서대로(env 점검·Vercel 범위별 실제 설정 대조 후 env 파일 삭제·DB 확인·필요한 파일만 적용·열/함수 정의·권한 확인 → 그 뒤 Vercel 연결·배포 → validate_only 아닌 v1 수집 200·upserted·화면 확인 포함 배포 후 확인) → 8단계 done 수동 PR(roadmap + targetRows·architecture.json 의 8단계 행 동시 갱신, npm test) → 자동 모드 다시 켜기
-   - 8단계는 운영자 확인 전까지 doing, 9·10단계는 그 확인 뒤에만. 9단계 done 때도 targetRows·architecture.json 의 9단계 행(수신 API·피클AI)을 함께 갱신
-2. 9단계: 피클AI v2 전환(사람 몫은 피클AI 설정 변경). 10단계: private_dashboard 삭제(사람).
-3. 정리(나중): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).
+1. 8단계(배포 분리): AI 몫 완료(scripts/check-env.mjs, docs/DEPLOY.md). **더 계획하지 않는다.** 남은 것은 사람 몫: docs/DEPLOY.md (2) 배포 순서 → (3) 배포 후 확인 → (5) 8단계 done 수동 PR(roadmap + targetRows·architecture.json 의 8단계 행, npm test). 사람 할 일 Issue 에 있다.
+2. 다음 계획은 9단계 AI 몫: 피클AI v2 새 규격 수신 확인(테스트·점검 도구·문서). 사람 몫은 피클AI 설정 변경. 9단계 done 때 targetRows·architecture.json 의 9단계 행(수신 API·피클AI)을 함께 갱신.
+3. 그다음 10단계 AI 몫: 옛 저장소(private_dashboard) 참조 정리. 삭제 자체는 사람 몫(8단계 배포 확인 뒤).
+4. 정리(나중): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).

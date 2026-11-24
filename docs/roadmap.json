@@ -213,7 +213,7 @@
       "id": "8",
       "title": "배포 분리",
       "status": "doing",
-      "note": "나: Vercel 새 저장소 연결 · AI: 개발계/운영계 설정 · AI 몫 완료(check-env, DEPLOY.md), 운영자 확인 대기(자동 모드 끄고 진행)"
+      "note": "AI 몫 완료(check-env, DEPLOY.md) · 나: DEPLOY.md 대로 배포·확인 후 done"
     },
     {
       "id": "9",
