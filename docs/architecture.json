@@ -638,9 +638,9 @@
             ],
             [
               "/api/sync-runs",
-              "GET · POST",
-              "GET 로그인 사용자 · POST 수집기",
-              "세션 · Bearer 토큰"
+              "POST",
+              "수집기(실행 보고, 9단계까지 호환)",
+              "Bearer 토큰"
             ],
             [
               "/api/dashboard",

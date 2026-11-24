@@ -29,7 +29,12 @@ test('case list covers token, session and origin routes', () => {
   const keys = new Set(cases.map(c => `${c.method} ${c.path}`));
   for (const k of ['POST /api/ingest', 'POST /api/sync-runs', 'POST /api/reconcile/transactions', 'POST /api/backfill/preview',
     'POST /api/backfill/stage', 'GET /api/dashboard', 'PATCH /api/items', 'POST /api/items', 'DELETE /api/items',
-    'GET /api/sync-runs', 'GET /api/backfill/control', 'POST /api/backfill/control']) assert.ok(keys.has(k), k);
+    'GET /api/backfill/control', 'POST /api/backfill/control']) assert.ok(keys.has(k), k);
+  const removed = cases.filter(c => c.method === 'GET' && c.path === '/api/sync-runs');
+  assert.equal(removed.length, 2);
+  assert.equal(removed.filter(c => c.headers.cookie === 'c=1').length, 1);
+  assert.equal(removed.filter(c => !c.headers.cookie).length, 1);
+  for (const c of removed) assert.deepEqual([c.expect, c.authUser], [405, 'zero']);
   const control = cases.filter(c => c.path === '/api/backfill/control' && c.method === 'POST');
   const pick = (cookie, same) => control.find(c => !!c.headers.cookie === cookie && (c.headers.origin === 'http://localhost:3100') === same && c.headers.origin);
   assert.deepEqual([pick(true, false).expect, pick(true, false).authUser], [403, 'zero']);

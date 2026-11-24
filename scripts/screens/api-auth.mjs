@@ -185,7 +185,7 @@ export function validSessionCookie(fakeUrl) {
 const TOKEN_ROUTES = ['/api/ingest', '/api/sync-runs', '/api/reconcile/transactions', '/api/backfill/preview', '/api/backfill/stage'];
 const SESSION_ROUTES = [
   ['GET', '/api/dashboard'], ['PATCH', '/api/items'], ['POST', '/api/items'], ['DELETE', '/api/items'],
-  ['GET', '/api/sync-runs'], ['GET', '/api/backfill/control'],
+  ['GET', '/api/backfill/control'],
 ];
 
 /** 검사 목록. expect: 기대 상태 코드, maxData: rest/v1 허용 건수(항상 0), authUser: /auth/v1/user 조건 */
@@ -207,6 +207,10 @@ export function apiAuthCases(origin, cookie) {
   cases.push({name: `쿠키 없음 Origin 없음 POST ${control}`, method: 'POST', path: control, headers: json, expect: 403, authUser: 'zero'});
   cases.push({name: `합성 세션 외부 Origin POST ${control}`, method: 'POST', path: control, headers: {...json, cookie, origin: 'https://attacker.example.invalid'}, expect: 403, authUser: 'zero'});
   cases.push({name: `합성 세션 같은 Origin POST ${control}`, method: 'POST', path: control, headers: {...json, cookie, origin}, expect: 401, authUser: 'some'});
+  // 없어진 경로: GET /api/sync-runs 는 6단계 ④에서 삭제 → 쿠키가 있어도 405, 세션 확인·데이터 요청 없음
+  const removed = '/api/sync-runs';
+  cases.push({name: `없어진 경로 쿠키 없음 GET ${removed}`, method: 'GET', path: removed, headers: {}, expect: 405, authUser: 'zero'});
+  cases.push({name: `없어진 경로 합성 세션 GET ${removed}`, method: 'GET', path: removed, headers: {cookie}, expect: 405, authUser: 'zero'});
   return cases;
 }
 
