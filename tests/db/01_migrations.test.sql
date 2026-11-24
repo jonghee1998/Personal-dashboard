@@ -47,6 +47,16 @@ begin
  then raise exception 'client can run ingest commit'; end if;
  if not has_function_privilege('service_role','public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)','execute') then raise exception 'service_role cannot run ingest commit'; end if;
 
+ -- 수신 지원 함수(메모 원자 갱신·페이지 조회·원천ID 정규화)
+ if to_regprocedure('public.dashboard_item_set_memo(uuid,text)') is null then raise exception 'missing set memo function'; end if;
+ if to_regprocedure('public.dashboard_ingest_existing(uuid,text[],uuid,integer)') is null then raise exception 'missing ingest existing function'; end if;
+ if to_regprocedure('public.dashboard_ingest_candidates(uuid,text[],uuid,integer)') is null then raise exception 'missing ingest candidates function'; end if;
+ if to_regprocedure('public.dashboard_norm_id(text)') is null then raise exception 'missing norm id function'; end if;
+ if has_function_privilege('anon','public.dashboard_item_set_memo(uuid,text)','execute') then raise exception 'anon can set memo'; end if;
+ if has_function_privilege('authenticated','public.dashboard_ingest_existing(uuid,text[],uuid,integer)','execute')
+  or has_function_privilege('authenticated','public.dashboard_ingest_candidates(uuid,text[],uuid,integer)','execute')
+ then raise exception 'client can run ingest lookup'; end if;
+
  -- auth-stub 의 기본 권한 뒤에도 마이그레이션 안의 revoke 가 효과를 낸다
  if not has_table_privilege('authenticated','public.dashboard_items','select') then raise exception 'default privilege not applied'; end if;
  if not has_table_privilege('authenticated','public.dashboard_sync_runs','select') then raise exception 'sync runs not readable'; end if;
