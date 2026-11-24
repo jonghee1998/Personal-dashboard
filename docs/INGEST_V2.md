@@ -259,4 +259,5 @@
 ### (6) 자동 검사 근거
 
 - 빌드된 앱 검사 `scripts/screens/api-ingest.mjs` 의 (f)·(g)·(h) 가 최초 전송·동일 재전송·같은 실행 키 다른 본문을 가짜 데이터로 확인한다.
+- 같은 검사의 (i) 는 같은 실행 키가 `/api/sync-runs` 별도 보고(`commit_source` 'report')로 먼저 기록되면 `409 RUN_ID_CONFLICT` 가 되는지(선점 409, (2)), (j) 는 실패 보고(`run.status` 'failed'·`items []`)가 200·`upserted` 0 이고 항목 없이 실행 기록만 commit 되는지((3) ⓑ)를 가짜 데이터로 확인한다.
 - 이 절의 필수 내용은 `tests/ingest-v2-cutover-doc.test.mjs` 가 확인한다.
