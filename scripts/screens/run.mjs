@@ -3,6 +3,7 @@ import {spawn} from 'node:child_process';
 import {existsSync, mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {chromium} from '@playwright/test';
+import {checkApiAuth, fakeAppEnv, startFakeSupabase} from './api-auth.mjs';
 
 const PORT = process.env.PORT || '3100';
 const SCREENS_DIR = process.env.SCREENS_DIR || '.screens';
@@ -19,7 +20,9 @@ if (!existsSync('.next')) {
 }
 
 mkdirSync(SCREENS_DIR, {recursive: true});
-const server = spawn('npx', ['next', 'start', '-p', PORT], {stdio: 'ignore', detached: true});
+// API 인증 검사용 가짜 Supabase 서버와 가짜 env 는 next start 전에 준비해 자식 프로세스에 넘긴다.
+const fake = await startFakeSupabase();
+const server = spawn('npx', ['next', 'start', '-p', PORT], {stdio: 'ignore', detached: true, env: {...process.env, ...fakeAppEnv(fake.url)}});
 const stop = () => { try { process.kill(-server.pid, 'SIGKILL'); } catch {} };
 process.on('exit', stop);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { stop(); process.exit(1); });
@@ -103,11 +106,15 @@ try {
       console.log(`FAIL ${label} ${e.message.split('\n')[0]}`);
     } finally { await page.close(); }
   }
+  const api = await checkApiAuth(BASE, fake);
+  if (api.problems.length) { failed = true; console.log(`FAIL api 인증 검사 ${api.problems.length}건`); }
+  else console.log(`PASS api 인증 검사 ${api.results.length}건`);
 } catch (e) {
   failed = true;
   console.error(e.message);
 } finally {
   if (browser) await browser.close();
   stop();
+  await fake.close();
 }
 process.exit(failed ? 1 : 0);
