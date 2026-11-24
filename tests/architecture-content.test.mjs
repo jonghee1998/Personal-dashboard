@@ -24,6 +24,44 @@ test('target table has 8 now→target rows with a phase per row',()=>{
  }
 });
 
+test('target table rows no longer mention the removed demo',()=>{
+ for(const r of targetRows)assert.ok(!r.now.includes('데모'),`${r.area}.now mentions 데모: ${r.now}`);
+});
+
+test('target table phases point at roadmap phases that are not done yet',()=>{
+ const phases=JSON.parse(readFileSync(join(root,'docs','roadmap.json'),'utf8')).phases;
+ for(const r of targetRows){
+  assert.ok(r.phase==='완료'||/^[1-9][0-9]*단계$/.test(r.phase),`${r.area}: phase must be 'N단계' or '완료' (got ${r.phase})`);
+  if(r.phase==='완료')continue;
+  const id=r.phase.replace(/단계$/,'');
+  const phase=phases.find(p=>p.id===id);
+  assert.notEqual(phase,undefined,`${r.area}: docs/roadmap.json has no phase with id '${id}'`);
+  assert.notEqual(phase.status,'done',`${r.area}: roadmap phase ${id} is already done but the row still shows '${r.phase}'. 단계를 done 으로 바꿀 때 targetRows 와 docs/architecture.json 의 해당 행도 함께 갱신하세요(phase → '완료').`);
+ }
+});
+
+test('screen row is complete after step 7',()=>{
+ const screen=targetRows.find(r=>r.area==='화면');
+ assert.notEqual(screen,undefined);
+ assert.equal(screen.phase,'완료');
+});
+
+test('docs/architecture.json target table matches targetRows',()=>{
+ const doc=JSON.parse(readFileSync(join(root,'docs','architecture.json'),'utf8'));
+ const head=['영역','지금','목표','단계'];
+ const tables=[];
+ const walk=(v)=>{
+  if(Array.isArray(v)){v.forEach(walk);return;}
+  if(v&&typeof v==='object'){
+   if(Array.isArray(v.head)&&JSON.stringify(v.head)===JSON.stringify(head))tables.push(v);
+   Object.values(v).forEach(walk);
+  }
+ };
+ walk(doc);
+ assert.equal(tables.length,1,"docs/architecture.json must have exactly one table with head ['영역','지금','목표','단계']");
+ assert.deepEqual(tables[0].rows,targetRows.map(r=>[r.area,r.now,r.target,r.phase]),'docs/architecture.json target table differs from targetRows — 둘을 함께 갱신하세요');
+});
+
 test('target diagram text names dev/ops areas and the legend',()=>{
  assert.equal(targetDiagram.legend,'왼쪽 = AI가 만지는 개발 영역 · 진한 상자 = 실데이터(AI 접근 금지)');
  assert.deepEqual(targetDiagram.github,['GitHub · AI 팀','코드만 · 데이터 없음']);
