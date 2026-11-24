@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {visibleDashboardItem} from '@/lib/dashboard-visibility';
@@ -9,14 +9,10 @@ import type {ExistingRow} from '@/lib/transaction-backfill';
 export const runtime='nodejs';
 const headers={'Cache-Control':'no-store'};
 import {backfillPlanSchema as schema} from '@/lib/backfill-plan-schema';
-function authorized(req:NextRequest){
- const secret=process.env.PICKLE_INGEST_TOKEN,auth=req.headers.get('authorization')??'';
- if(!secret||secret.length<32||!auth.startsWith('Bearer '))return false;
- const a=Buffer.from(auth.slice(7)),b=Buffer.from(secret);return a.length===b.length&&timingSafeEqual(a,b);
-}
 // Preview only. No DB write, approval, or executable apply token.
 export async function POST(req:NextRequest){
- if(!authorized(req))return NextResponse.json({error:'Unauthorized'},{status:401,headers});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/backfill/preview',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
  if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
  let raw:unknown;try{raw=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers});}

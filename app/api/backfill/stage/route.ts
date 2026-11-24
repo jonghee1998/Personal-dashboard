@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {backfillPlanSchema} from '@/lib/backfill-plan-schema';
@@ -11,9 +11,8 @@ export const runtime='nodejs';
 const headers={'Cache-Control':'no-store'};
 const schema=backfillPlanSchema.extend({expected_plan_digest:z.string().regex(/^[a-f0-9]{64}$/)});
 export async function POST(req:NextRequest){
- const token=process.env.PICKLE_INGEST_TOKEN,auth=req.headers.get('authorization')??'';
- if(!token||token.length<32||!auth.startsWith('Bearer '))return NextResponse.json({error:'Unauthorized'},{status:401,headers});
- const a=Buffer.from(auth.slice(7)),b=Buffer.from(token);if(a.length!==b.length||!timingSafeEqual(a,b))return NextResponse.json({error:'Unauthorized'},{status:401,headers});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/backfill/stage',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
  if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
  let raw:unknown;try{raw=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers});}
