@@ -16,7 +16,7 @@ const isInstallment=(row:Transaction)=>{
 };
 const seoulToday=()=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const num=(name:string)=>Number(parts.find(p=>p.type===name)?.value??0);return {year:num('year'),index:num('month')-1,day:num('day')}};
 const CHART_HEIGHT=186,TOP=25,BOTTOM=149,LEFT=20;
-export default function DemoDailySpending({transactions,coverageDay,onSaveMemo}:{transactions:Transaction[];coverageDay?:string|null;onSaveMemo:(id:string,memo:string)=>Promise<void>}){
+export default function DailySpending({transactions,coverageDay,onSaveMemo}:{transactions:Transaction[];coverageDay?:string|null;onSaveMemo:(id:string,memo:string)=>Promise<void>}){
  const [month,setMonth]=useState(()=>{const {year,index}=seoulToday();return {year,index}});
  const [selectedDate,setSelectedDate]=useState<string|null>(()=>coverageDay??null);
  const [editingId,setEditingId]=useState<string|null>(null);

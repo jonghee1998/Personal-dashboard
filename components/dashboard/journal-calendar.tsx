@@ -27,7 +27,7 @@ const categoryText={event:'일정',task:'할 일',news:'뉴스',point:'포인트
 const categoryIcon={event:'◷',task:'✓',news:'▤',point:'₩'};
 const categoryOrder={event:0,task:1,point:2,news:3};
 const dateFor=(x:Entry)=>x.kind==='task'?(x.due_date??x.event_date):(x.event_date??x.due_date);
-export default function DemoCalendar({entries,onToggleTask,onOpenNews}:{entries:Entry[];onToggleTask:(x:Entry)=>void;onOpenNews:(id:string)=>void}){
+export default function JournalCalendar({entries,onToggleTask,onOpenNews}:{entries:Entry[];onToggleTask:(x:Entry)=>void;onOpenNews:(id:string)=>void}){
  const [selected,setSelected]=useState(koreaToday);
  const [month,setMonth]=useState(()=>{const date=dateFromKey(koreaToday());return {year:date.getFullYear(),month:date.getMonth()}});
  const [search,setSearch]=useState('');
@@ -111,6 +111,6 @@ export default function DemoCalendar({entries,onToggleTask,onOpenNews}:{entries:
        {dateEntries.length?dateEntries.map(renderEntry):<div className="calendarNoEntries"><strong>기록 없음</strong></div>}
      </section>
    </>}
-   <p className="calendarDemoNote">🧪 가상 데이터로 뉴스·일정·포인트 변동을 검색하고 날짜별로 확인할 수 있어. 실제 데이터 저장은 아직 연결되지 않았어.</p>
+   <p className="calendarDemoNote">뉴스·일정·할 일·포인트 변동을 날짜별로 검색하고 확인할 수 있어.</p>
  </main>
 }
