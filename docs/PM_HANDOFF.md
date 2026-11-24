@@ -38,6 +38,7 @@ _마지막 갱신: 2026-11-25 04시_
 
 ## 다음 할 일
 1. 8단계(배포 분리): AI 몫 완료(scripts/check-env.mjs, docs/DEPLOY.md). **더 계획하지 않는다.** 남은 것은 사람 몫: docs/DEPLOY.md (2) 배포 순서 → (3) 배포 후 확인 → (5) 8단계 done 수동 PR(roadmap + targetRows·architecture.json 의 8단계 행, npm test). 사람 할 일 Issue 에 있다.
-2. 다음 계획은 9단계 AI 몫: 피클AI v2 새 규격 수신 확인(테스트·점검 도구·문서). 사람 몫은 피클AI 설정 변경. 9단계 done 때 targetRows·architecture.json 의 9단계 행(수신 API·피클AI)을 함께 갱신.
-3. 그다음 10단계 AI 몫: 옛 저장소(private_dashboard) 참조 정리. 삭제 자체는 사람 몫(8단계 배포 확인 뒤).
-4. 정리(나중): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).
+2. 9단계(피클AI 전환): AI 몫 완료 — 빌드된 앱 수신 검사(v2 최초·재전송·실행 키 충돌·report 선행 409·실패 보고·형식 오류)와 docs/INGEST_V2.md 전환 확인 절차(#80·#87·#91·#96). **더 계획하지 않는다.** 남은 것은 사람 몫(피클AI 설정을 v2 로 변경, 8단계 배포 확인 뒤). 9단계 done 때 targetRows·architecture.json 의 9단계 행(수신 API·피클AI)을 함께 갱신.
+3. 10단계(옛 저장소 정리): AI 몫 없음. 문서의 private_dashboard 언급은 이사 기록이라 남긴다. 삭제는 사람 몫(8단계 배포 확인 뒤).
+→ 그래서 자동 모드의 다음 계획은 **쓰지 않는다**(남은 일이 사람 몫뿐). 사람이 8·9단계를 끝냈다고 말하면 PM 이 done PR 을 올리고, 11단계(디자인)는 사용자가 요청할 때 시작한다.
+4. 정리(나중, 자동 계획 안 함 — 사용자와 정할 때): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).
