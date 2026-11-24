@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
+import {logApiFailure} from '@/lib/api-log';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {normalizeIncomingStatus} from '@/lib/dashboard-visibility';
@@ -11,12 +12,11 @@ const stoppedSubscriptionStatuses=['paused','stopped','cancelled','canceled','in
 const regularStatuses=['pending','done','active','archived','deleted'] as const;
 const item=z.object({kind:z.enum(kinds),external_id:z.string().min(1).max(180),title:z.string().min(1).max(400),description:z.string().max(10000).nullable().optional(),amount:z.number().finite().nullable().optional(),currency:z.string().max(8).default('KRW'),status:z.enum([...regularStatuses,...stoppedSubscriptionStatuses]).default('active'),category:z.string().max(100).nullable().optional(),source:z.string().max(100).nullable().optional(),event_date:z.string().date().nullable().optional(),due_date:z.string().date().nullable().optional(),url:z.string().url().max(2000).nullable().optional(),metadata:z.record(z.unknown()).default({})}).strict().superRefine((value,ctx)=>{if((stoppedSubscriptionStatuses as readonly string[]).includes(value.status)&&!(value.kind==='benefit'&&value.category==='ai_subscription'))ctx.addIssue({code:z.ZodIssueCode.custom,path:['status'],message:'Subscription-specific status requires ai_subscription'});});
 const payload=z.object({items:z.array(item).min(1).max(100),validate_only:z.boolean().default(false)}).strict();
-function validToken(value:string|null){const secret=process.env.PICKLE_INGEST_TOKEN;if(!secret||secret.length<32||!value)return false;const a=Buffer.from(value);const b=Buffer.from(secret);return a.length===b.length&&timingSafeEqual(a,b)}
 export async function POST(req:NextRequest){
- const authorization=req.headers.get('authorization');
- if(!validToken(authorization?.startsWith('Bearer ')?authorization.slice(7):null))return NextResponse.json({error:'Unauthorized'},{status:401});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/ingest',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401});}
  const userId=process.env.DASHBOARD_USER_ID;
- if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503});
+ if(!userId||!z.string().uuid().safeParse(userId).success){logApiFailure('/api/ingest','config');return NextResponse.json({error:'Server not configured'},{status:503});}
  let json:unknown;try{json=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400})}
  const parsed=payload.safeParse(json);if(!parsed.success)return NextResponse.json({error:'Invalid payload',details:parsed.error.flatten()},{status:400});
  const violations=parsed.data.items.flatMap((record,index)=>validateProductionRecord(record).map(error=>({index,...error})));
@@ -28,7 +28,7 @@ export async function POST(req:NextRequest){
  const incoming=parsed.data.items;
  const {data:existing,error:readError}=await db.from('dashboard_items')
    .select('*').eq('user_id',userId).in('external_id',incoming.map(x=>x.external_id));
- if(readError)return NextResponse.json({error:'Status lookup failed'},{status:500});
+ if(readError){logApiFailure('/api/ingest','status_lookup',readError);return NextResponse.json({error:'Status lookup failed'},{status:500});}
  const current=new Map((existing??[]).map(x=>[x.kind+':'+x.external_id,x]));
  const conflicts=incoming.flatMap((x,index)=>{
    const prior=current.get(x.kind+':'+x.external_id);
@@ -47,7 +47,7 @@ export async function POST(req:NextRequest){
      let query=db.from('dashboard_items').select('*').eq('user_id',userId).eq('kind','transaction').neq('status','archived').in('metadata->>source_record_id',sourceIds).order('id',{ascending:true}).limit(500);
      if(after)query=query.gt('id',after);
      const {data,error}=await query;
-     if(error||!data)return NextResponse.json({error:'Duplicate lookup failed'},{status:503});
+     if(error||!data){logApiFailure('/api/ingest','duplicate_lookup',error);return NextResponse.json({error:'Duplicate lookup failed'},{status:503});}
      candidates.push(...data);if(data.length<500)break;
      after=data[data.length-1].id;
    }
@@ -73,7 +73,7 @@ export async function POST(req:NextRequest){
    return {...x,status,metadata,user_id:userId};
  });
  const {data,error}=await db.from('dashboard_items').upsert(rows,{onConflict:'user_id,kind,external_id'}).select('id,kind,external_id');
- if(error)return NextResponse.json({error:'Write failed'},{status:500});
+ if(error){logApiFailure('/api/ingest','write',error);return NextResponse.json({error:'Write failed'},{status:500});}
  return NextResponse.json({upserted:data?.length??0,items:data,verification:'structural_provenance_only'},{headers:{'Cache-Control':'no-store'}});
- }catch{return NextResponse.json({error:'Server configuration error'},{status:503})}
+ }catch(e){logApiFailure('/api/ingest','unexpected',e);return NextResponse.json({error:'Server configuration error'},{status:503})}
 }

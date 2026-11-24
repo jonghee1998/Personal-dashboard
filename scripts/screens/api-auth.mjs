@@ -7,18 +7,49 @@ import {createServer} from 'node:http';
 export const FAKE_TOKEN = 'synthetic-ingest-token-for-api-auth-check-0001';
 export const FAKE_USER_ID = '00000000-0000-4000-8000-0000000000a1';
 
-/** 받은 요청을 기록만 하고 모두 401 로 거부하는 가짜 Supabase 서버 */
+/** 가짜 PostgREST 오류 본문. message·details 는 서버 로그에 나오면 안 되는 표시용 문자열이다. */
+export const FAKE_PGRST_MESSAGE = 'fake-message-should-not-be-logged';
+export const FAKE_PGRST_DETAILS = 'fake-details-should-not-be-logged';
+/** 가짜 서버가 '이미 기록된 실행'으로 돌려주는 run_id (api-log 검사 (d)) */
+export const FAKE_EXISTING_RUN_ID = '00000000-0000-4000-8000-0000000000f2';
+export function fakeExistingRun() {
+  return {
+    user_id: FAKE_USER_ID, run_id: FAKE_EXISTING_RUN_ID, dataset: 'transactions', source_system: 'fake-source',
+    status: 'failed', source_as_of: null, collected_at: null, expected_count: null,
+    received_count: 0, rejected_count: 0, error_code: 'FAKE_CHECK', payload_digest: null,
+  };
+}
+
+/** 가짜 서버 응답 결정(순수 함수) → {status, body} */
+export function fakeSupabaseResponse(method, path, query, accept) {
+  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
+    const row = fakeExistingRun();
+    return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? row : [row]};
+  }
+  if (path.startsWith('/rest/v1/')) {
+    return {status: 401, body: {code: 'PGRST301', message: FAKE_PGRST_MESSAGE, details: FAKE_PGRST_DETAILS, hint: null}};
+  }
+  return {status: 401, body: {code: 401, error_code: 'bad_jwt', msg: 'synthetic server rejects everything'}};
+}
+
+/** 받은 요청을 기록하고, 데이터 요청(rest/v1)은 PostgREST 모양 401, 그 밖은 401 로 거부하는 가짜 Supabase 서버.
+ *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200. requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지 기록한다. */
 export async function startFakeSupabase() {
-  const requests = [];
+  const requests = [], queries = [];
   const server = createServer((req, res) => {
-    requests.push({method: req.method, path: (req.url || '').split('?')[0]});
+    const url = req.url || '';
+    const q = url.indexOf('?');
+    const path = q < 0 ? url : url.slice(0, q), query = q < 0 ? '' : url.slice(q + 1);
+    requests.push({method: req.method, path});
+    queries.push({method: req.method, path, query});
     req.resume();
-    res.writeHead(401, {'content-type': 'application/json'});
-    res.end(JSON.stringify({code: 401, error_code: 'bad_jwt', msg: 'synthetic server rejects everything'}));
+    const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept);
+    res.writeHead(out.status, {'content-type': 'application/json'});
+    res.end(JSON.stringify(out.body));
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const url = `http://127.0.0.1:${server.address().port}`;
-  return {url, requests, close: () => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
+  return {url, requests, queries, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
 }
 
 /** next start 자식 프로세스에 넘길 가짜 환경변수 */

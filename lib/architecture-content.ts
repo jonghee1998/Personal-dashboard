@@ -101,7 +101,7 @@ export const apiRows:readonly ApiRow[]=[
 export const safeguardRows=[
  {name:'RLS',desc:'dashboard_items·sync_runs 는 본인 행만 조회, 화면 쓰기는 items 수정만. 백필 배치 테이블은 service_role 전용.'},
  {name:'service role 키',desc:'lib/supabase-server.ts 의 adminDb 에서만 사용. 브라우저(lib/supabase.ts)는 anon 키만.'},
- {name:'ingest 토큰',desc:'32자 미만이면 거부, timingSafeEqual 로 비교. 틀리면 401.'},
+ {name:'ingest 토큰',desc:'수집기 API 5개가 lib/collector-auth.ts 한 곳에서 검사: 32자 미만 거부, timingSafeEqual 비교. 틀리면 401.'},
  {name:'공개 저장소',desc:'코드·테스트·문서에 실데이터 금지. CI 가 추가된 줄을 개인정보 검사.'},
  {name:'AI 개발',desc:'운영 DB 접근 금지. 테스트는 가짜 데이터·모의 객체로만.'}
 ] as const;
