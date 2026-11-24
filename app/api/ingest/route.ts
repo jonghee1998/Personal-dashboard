@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {normalizeIncomingStatus} from '@/lib/dashboard-visibility';
@@ -11,10 +11,9 @@ const stoppedSubscriptionStatuses=['paused','stopped','cancelled','canceled','in
 const regularStatuses=['pending','done','active','archived','deleted'] as const;
 const item=z.object({kind:z.enum(kinds),external_id:z.string().min(1).max(180),title:z.string().min(1).max(400),description:z.string().max(10000).nullable().optional(),amount:z.number().finite().nullable().optional(),currency:z.string().max(8).default('KRW'),status:z.enum([...regularStatuses,...stoppedSubscriptionStatuses]).default('active'),category:z.string().max(100).nullable().optional(),source:z.string().max(100).nullable().optional(),event_date:z.string().date().nullable().optional(),due_date:z.string().date().nullable().optional(),url:z.string().url().max(2000).nullable().optional(),metadata:z.record(z.unknown()).default({})}).strict().superRefine((value,ctx)=>{if((stoppedSubscriptionStatuses as readonly string[]).includes(value.status)&&!(value.kind==='benefit'&&value.category==='ai_subscription'))ctx.addIssue({code:z.ZodIssueCode.custom,path:['status'],message:'Subscription-specific status requires ai_subscription'});});
 const payload=z.object({items:z.array(item).min(1).max(100),validate_only:z.boolean().default(false)}).strict();
-function validToken(value:string|null){const secret=process.env.PICKLE_INGEST_TOKEN;if(!secret||secret.length<32||!value)return false;const a=Buffer.from(value);const b=Buffer.from(secret);return a.length===b.length&&timingSafeEqual(a,b)}
 export async function POST(req:NextRequest){
- const authorization=req.headers.get('authorization');
- if(!validToken(authorization?.startsWith('Bearer ')?authorization.slice(7):null))return NextResponse.json({error:'Unauthorized'},{status:401});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/ingest',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401});}
  const userId=process.env.DASHBOARD_USER_ID;
  if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503});
  let json:unknown;try{json=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400})}

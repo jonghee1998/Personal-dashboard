@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {z} from 'zod';
 import {adminDb,serverDb} from '@/lib/supabase-server';
 import {datasets} from '@/lib/sync-audit';
@@ -22,13 +22,6 @@ const report=z.object({
  if(v.status!=='success'&&!v.error_code)ctx.addIssue({code:z.ZodIssueCode.custom,path:['error_code'],message:'Non-success report requires an error code'});
 });
 const headers={'Cache-Control':'no-store'};
-function validToken(req:NextRequest){
- const secret=process.env.PICKLE_INGEST_TOKEN;
- const supplied=req.headers.get('authorization')??'';
- if(!secret||secret.length<32||!supplied.startsWith('Bearer '))return false;
- const a=Buffer.from(supplied.slice(7)),b=Buffer.from(secret);
- return a.length===b.length&&timingSafeEqual(a,b);
-}
 export async function GET(){
  const db=await serverDb();const {data:{user}}=await db.auth.getUser();
  if(!user)return NextResponse.json({error:'Unauthorized'},{status:401,headers});
@@ -37,7 +30,8 @@ export async function GET(){
  return NextResponse.json({runs:data??[],verification:'collector_report_and_database_count_not_independent_source_verification'},{headers});
 }
 export async function POST(req:NextRequest){
- if(!validToken(req))return NextResponse.json({error:'Unauthorized'},{status:401,headers});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/sync-runs',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
  if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
  let raw:unknown;try{raw=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers})}

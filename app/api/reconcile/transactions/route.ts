@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {timingSafeEqual} from 'node:crypto';
+import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {reconcileStatement} from '@/lib/transaction-reconciliation';
@@ -13,14 +13,10 @@ const schema=z.object({
  expected_count:z.number().int().min(0).max(5000),expected_total:won,
  rows:z.array(z.object({source_record_id:z.string().trim().min(1).max(180),amount:won}).strict()).max(5000)
 }).strict();
-function authorized(req:NextRequest){
- const secret=process.env.PICKLE_INGEST_TOKEN,auth=req.headers.get('authorization')??'';
- if(!secret||secret.length<32||!auth.startsWith('Bearer '))return false;
- const a=Buffer.from(auth.slice(7)),b=Buffer.from(secret);return a.length===b.length&&timingSafeEqual(a,b);
-}
 // Read-only: no approval, no new financial rows, no changes to the audit table.
 export async function POST(req:NextRequest){
- if(!authorized(req))return NextResponse.json({error:'Unauthorized'},{status:401,headers});
+ const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
+ if(!collector.ok){console.error(collectorAuthFailureLog('/api/reconcile/transactions',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
  if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
  let body:unknown;try{body=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers});}
