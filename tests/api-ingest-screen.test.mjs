@@ -11,8 +11,12 @@ import {handleIngest, readAllPages, payload} from '../lib/ingest-service.ts';
 const NOW = Date.parse('2026-01-02T00:00:00+09:00');
 const cases = Object.fromEntries(apiIngestCases().map(c => [c.id, c]));
 
-test('검사 열 경우 a~j, run_id f3·f4·f5·f6·f7·f8', () => {
-  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+test('검사 목록 a~k, run_id f3·f4·f5·f6·f7·f8', () => {
+  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']);
+  assert.equal(cases.k.headers.authorization, `Bearer ${FAKE_TOKEN}`);
+  assert.equal(typeof cases.k.body.version, 'string');
+  assert.equal(cases.k.body.version, '2');
+  assert.deepEqual({...cases.k.body, version: 2}, v2Body(INGEST_RUN_OK));
   // j: 문서 failed 예시 그대로, run_id 만 f8
   assert.equal(cases.j.headers.authorization, `Bearer ${FAKE_TOKEN}`);
   assert.equal(cases.j.body.run.run_id, INGEST_RUN_FAILED);
@@ -277,6 +281,40 @@ test('j 판정: 어긋난 관찰은 실패', async () => {
   const errs = judgeIngestCase(cases.j, {...j, calls: reordered});
   assert.equal(errs.length, 1, JSON.stringify(errs));
   assert.match(errs[0], /뒤|commit 보다/);
+});
+
+test('k: 문자열 version은 400 Invalid payload, 숫자 version은 200', async () => {
+  const k = await simulate(cases.k);
+  assert.equal(k.status, 400);
+  assert.equal(JSON.parse(k.bodyText).error, 'Invalid payload');
+  assert.equal(k.cacheControl, null);
+  assert.equal(k.calls.length, 0);
+  assert.deepEqual(judgeIngestCase(cases.k, k), []);
+
+  const ctl = await simulate({...cases.k, body: {...cases.k.body, version: 2}});
+  assert.equal(ctl.status, 200);
+  assert.equal(JSON.parse(ctl.bodyText).version, 2);
+});
+
+test('k 판정: 어긋난 관찰은 실패', async () => {
+  const k = await simulate(cases.k);
+  const body = JSON.parse(k.bodyText);
+  const bad = {
+    '상태 200': {...k, status: 200},
+    '상태 422': {...k, status: 422},
+    'Invalid JSON 오류': {...k, bodyText: JSON.stringify({error: 'Invalid JSON'})},
+    '본문 version 키': {...k, bodyText: JSON.stringify({...body, version: 2})},
+    'details 누락': {...k, bodyText: JSON.stringify({...body, details: undefined})},
+    'details 배열': {...k, bodyText: JSON.stringify({...body, details: []})},
+    'Cache-Control no-store': {...k, cacheControl: 'no-store'},
+    'commit POST 1건': {...k, calls: [{method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_commit'}]},
+    '실행 조회 GET 1건': {...k, calls: [{method: 'GET', path: '/rest/v1/dashboard_sync_runs'}]},
+    '빈 본문': {...k, bodyText: ''},
+    'JSON이 아닌 본문': {...k, bodyText: 'Invalid payload'},
+  };
+  for (const [name, observed] of Object.entries(bad)) {
+    assert.ok(judgeIngestCase(cases.k, observed).length, name);
+  }
 });
 
 // f6: 가짜 commit 이 받은 p_run 을 실행 기록으로 기억하고, 네 필터(user_id·run_id·dataset·source_system)로 조회한다.
