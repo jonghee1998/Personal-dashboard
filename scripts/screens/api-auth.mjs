@@ -55,8 +55,61 @@ export function fakeCommitResponse(args) {
     run: run ? {run_id: run.run_id, dataset: run.dataset, source_system: run.source_system, status: run.status, accepted_count: items.length} : null}};
 }
 
-/** 가짜 서버 응답 결정(순수 함수) → {status, body}. body: POST 요청 본문(JSON 이면 객체) */
-export function fakeSupabaseResponse(method, path, query, accept, body) {
+/** 유효한 합성 세션의 access_token. 가짜 서버는 이 토큰의 GET /auth/v1/user 에만 200 을 준다(api-items 검사). */
+export const VALID_ACCESS_TOKEN = 'synthetic-valid-access-token';
+export const FAKE_AUTH_USER = {id: FAKE_USER_ID, aud: 'authenticated', role: 'authenticated'};
+
+/** /api/items 검사(api-items.mjs)용 메모리 행 id: c1 정산, c2 할 일, c3 뉴스, c4 할 일(삭제용) */
+export const ITEM_SETTLEMENT = '00000000-0000-4000-8000-0000000000c1';
+export const ITEM_TASK = '00000000-0000-4000-8000-0000000000c2';
+export const ITEM_NEWS = '00000000-0000-4000-8000-0000000000c3';
+export const ITEM_TASK_DELETE = '00000000-0000-4000-8000-0000000000c4';
+export function fakeItemRows() {
+  const row = (id, kind, title, status) => ({id, user_id: FAKE_USER_ID, kind, title, status, metadata: {}});
+  return [
+    row(ITEM_SETTLEMENT, 'settlement', '친구A 정산', 'pending'),
+    row(ITEM_TASK, 'task', '합성할일A', 'pending'),
+    row(ITEM_NEWS, 'news', '합성뉴스A', 'active'),
+    row(ITEM_TASK_DELETE, 'task', '합성할일B', 'pending'),
+  ];
+}
+
+/** PostgREST 필터 한 개(eq.·neq.·in.(…))를 파싱 → 값 검사 함수. 모르는 연산자면 null */
+export function parseFilter(raw) {
+  if (raw.startsWith('eq.')) { const v = raw.slice(3); return x => String(x) === v; }
+  if (raw.startsWith('neq.')) { const v = raw.slice(4); return x => String(x) !== v; }
+  const m = /^in\.\((.*)\)$/.exec(raw);
+  if (m) { const vs = m[1].split(','); return x => vs.includes(String(x)); }
+  return null;
+}
+
+/** 가짜 PATCH /rest/v1/dashboard_items: 쿼리 조건(select 제외)을 모두 만족하는 행만 본문 값으로 바꾼다(items 를 직접 바꿈).
+ *  Accept 에 vnd.pgrst.object 가 있으면 정확히 1행일 때만 바꾸고 200 행 객체, 아니면 406 PGRST116. 배열 Accept 면 배열. */
+export function fakePatchItems(items, query, accept, body) {
+  const tests = [];
+  for (const [k, v] of new URLSearchParams(query)) {
+    if (k === 'select') continue;
+    const f = parseFilter(v);
+    if (!f) return {status: 400, body: {code: 'PGRST100', message: 'fake', details: null, hint: null}};
+    tests.push(r => f(r[k]));
+  }
+  const hit = items.filter(r => tests.every(t => t(r)));
+  const object = (accept || '').includes('vnd.pgrst.object');
+  if (object && hit.length !== 1) return {status: 406, body: {code: 'PGRST116', message: 'fake', details: null, hint: null}};
+  const patch = body && typeof body === 'object' && !Array.isArray(body) ? body : {};
+  for (const r of hit) Object.assign(r, patch);
+  const out = hit.map(r => ({...r}));
+  return {status: 200, body: object ? out[0] : out};
+}
+
+/** 가짜 서버 응답 결정 → {status, body}. body: 요청 본문(JSON 이면 객체).
+ *  ctx: {authorization: Authorization 헤더, items: 메모리 행(fakePatchItems 가 바꿈)}. ctx 없으면 순수 함수. */
+export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}) {
+  const validSession = ctx.authorization === `Bearer ${VALID_ACCESS_TOKEN}`;
+  if (method === 'GET' && path === '/auth/v1/user' && validSession) return {status: 200, body: FAKE_AUTH_USER};
+  if (method === 'PATCH' && path === '/rest/v1/dashboard_items' && validSession && Array.isArray(ctx.items)) {
+    return fakePatchItems(ctx.items, query, accept, body);
+  }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
     const row = fakeExistingRun();
     return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? row : [row]};
@@ -78,7 +131,7 @@ export function fakeSupabaseResponse(method, path, query, accept, body) {
  *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200, 수신 검사용 경로(fakeSupabaseResponse 참고)는 200·503.
  *  requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지, calls 는 요청 본문(JSON)과 응답 상태까지 기록한다. */
 export async function startFakeSupabase() {
-  const requests = [], queries = [], calls = [];
+  const requests = [], queries = [], calls = [], items = fakeItemRows();
   const server = createServer((req, res) => {
     const url = req.url || '';
     const q = url.indexOf('?');
@@ -90,7 +143,7 @@ export async function startFakeSupabase() {
     req.on('end', () => {
       let body;
       try { body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined; } catch { body = undefined; }
-      const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept, body);
+      const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept, body, {authorization: req.headers.authorization, items});
       calls.push({method: req.method, path, query, body, status: out.status});
       res.writeHead(out.status, {'content-type': 'application/json'});
       res.end(JSON.stringify(out.body));
@@ -98,7 +151,7 @@ export async function startFakeSupabase() {
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const url = `http://127.0.0.1:${server.address().port}`;
-  return {url, requests, queries, calls, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
+  return {url, requests, queries, calls, items, resetItems: () => { items.splice(0, items.length, ...fakeItemRows()); }, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
 }
 
 /** next start 자식 프로세스에 넘길 가짜 환경변수 */
@@ -113,15 +166,20 @@ export function fakeAppEnv(fakeUrl) {
 }
 
 /** @supabase/ssr 형식의 합성 세션 쿠키 (sb-<host 첫 마디>-auth-token=base64-<base64url JSON>) */
-export function sessionCookie(fakeUrl) {
+export function sessionCookie(fakeUrl, accessToken = 'synthetic-access-token') {
   const ref = new URL(fakeUrl).hostname.split('.')[0];
   const now = Math.floor(Date.now() / 1000);
   const session = {
-    access_token: 'synthetic-access-token', refresh_token: 'synthetic-refresh-token',
+    access_token: accessToken, refresh_token: 'synthetic-refresh-token',
     token_type: 'bearer', expires_in: 3600, expires_at: now + 3600,
     user: {id: FAKE_USER_ID, aud: 'authenticated', role: 'authenticated', email: 'friend-a@example.invalid'},
   };
   return `sb-${ref}-auth-token=base64-${Buffer.from(JSON.stringify(session)).toString('base64url')}`;
+}
+
+/** 가짜 서버가 받아 주는 '유효한 합성 세션' 쿠키(access_token VALID_ACCESS_TOKEN) */
+export function validSessionCookie(fakeUrl) {
+  return sessionCookie(fakeUrl, VALID_ACCESS_TOKEN);
 }
 
 const TOKEN_ROUTES = ['/api/ingest', '/api/sync-runs', '/api/reconcile/transactions', '/api/backfill/preview', '/api/backfill/stage'];
