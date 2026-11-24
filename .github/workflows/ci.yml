@@ -44,7 +44,7 @@ jobs:
         run: node scripts/orch/pii-scan.mjs "$PII_BASE"
 
   # 결과 화면 테스트: scripts/screens/run.mjs 가 생기면 자동으로 돈다(없으면 건너뜀).
-  # /demo 가짜 데이터만 쓰므로 비밀값이 필요 없다.
+  # 합성 세션 쿠키 + 가짜 Supabase·/api/dashboard 응답만 쓰므로 비밀값이 필요 없다.
   screens:
     runs-on: ubuntu-latest
     timeout-minutes: 20
