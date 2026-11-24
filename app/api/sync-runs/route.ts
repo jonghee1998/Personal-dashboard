@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
+import {logApiFailure} from '@/lib/api-log';
 import {z} from 'zod';
 import {adminDb,serverDb} from '@/lib/supabase-server';
 import {datasets} from '@/lib/sync-audit';
@@ -33,7 +34,7 @@ export async function POST(req:NextRequest){
  const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
  if(!collector.ok){console.error(collectorAuthFailureLog('/api/sync-runs',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
- if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
+ if(!userId||!z.string().uuid().safeParse(userId).success){logApiFailure('/api/sync-runs','config');return NextResponse.json({error:'Server not configured'},{status:503,headers});}
  let raw:unknown;try{raw=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers})}
  const parsed=report.safeParse(raw);
  if(!parsed.success)return NextResponse.json({error:'Invalid sync report',details:parsed.error.flatten()},{status:422,headers});
@@ -42,7 +43,7 @@ export async function POST(req:NextRequest){
  const db=adminDb();
  const key={user_id:userId,run_id:v.run_id,dataset:v.dataset,source_system:v.source_system};
  const {data:prior,error:readError}=await db.from('dashboard_sync_runs').select('*').match(key).maybeSingle();
- if(readError)return NextResponse.json({error:'Sync audit unavailable; migration required or database unavailable'},{status:503,headers});
+ if(readError){logApiFailure('/api/sync-runs','read',readError);return NextResponse.json({error:'Sync audit unavailable; migration required or database unavailable'},{status:503,headers});}
  if(prior){
    // Compare the original report, not today's mutable item counts. Later syncs may
    // already have replaced the item metadata for this completed run.
@@ -57,11 +58,11 @@ export async function POST(req:NextRequest){
  if(v.dataset==='subscriptions')query=query.eq('category','ai_subscription');
  if(v.dataset==='applications')query=query.or('category.is.null,category.not.in.(points,ai_subscription)');
  const {count,error:countError}=await query;
- if(countError||count===null)return NextResponse.json({error:'Unable to verify persisted count'},{status:503,headers});
+ if(countError||count===null){logApiFailure('/api/sync-runs','count',countError);return NextResponse.json({error:'Unable to verify persisted count'},{status:503,headers});}
  if(count>v.received_count||count+v.rejected_count>v.received_count||(v.status==='success'&&count!==v.expected_count)||(v.status==='failed'&&count!==0))return NextResponse.json({error:'Sync report does not match persisted count',code:'SYNC_COUNT_MISMATCH',observed_count:count},{status:409,headers});
  const row={...v,...key,accepted_count:count,validated_at:new Date().toISOString(),verification_level:count>0?'structural_provenance_only':'unverified'};
  const {data,error}=await db.from('dashboard_sync_runs').insert(row).select('*').single();
- if(error)return NextResponse.json({error:'Sync audit write failed'},{status:503,headers});
+ if(error){logApiFailure('/api/sync-runs','write',error);return NextResponse.json({error:'Sync audit write failed'},{status:503,headers});}
  return NextResponse.json({recorded:true,run:data},{headers});
- }catch{return NextResponse.json({error:'Sync audit unavailable'},{status:503,headers});}
+ }catch(e){logApiFailure('/api/sync-runs','unexpected',e);return NextResponse.json({error:'Sync audit unavailable'},{status:503,headers});}
 }

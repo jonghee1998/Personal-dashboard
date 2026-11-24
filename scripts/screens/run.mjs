@@ -3,7 +3,9 @@ import {spawn} from 'node:child_process';
 import {existsSync, mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {chromium} from '@playwright/test';
+import {createInterface} from 'node:readline';
 import {checkApiAuth, fakeAppEnv, startFakeSupabase} from './api-auth.mjs';
+import {checkApiLogs} from './api-log.mjs';
 
 const PORT = process.env.PORT || '3100';
 const SCREENS_DIR = process.env.SCREENS_DIR || '.screens';
@@ -22,7 +24,10 @@ if (!existsSync('.next')) {
 mkdirSync(SCREENS_DIR, {recursive: true});
 // API 인증 검사용 가짜 Supabase 서버와 가짜 env 는 next start 전에 준비해 자식 프로세스에 넘긴다.
 const fake = await startFakeSupabase();
-const server = spawn('npx', ['next', 'start', '-p', PORT], {stdio: 'ignore', detached: true, env: {...process.env, ...fakeAppEnv(fake.url)}});
+// 서버 출력(stdout·stderr)은 화면에 내보내지 않고 줄 단위로 serverLogs 에 모은다(api 로그 검사용).
+const server = spawn('npx', ['next', 'start', '-p', PORT], {stdio: ['ignore', 'pipe', 'pipe'], detached: true, env: {...process.env, ...fakeAppEnv(fake.url)}});
+const serverLogs = [];
+for (const stream of [server.stdout, server.stderr]) createInterface({input: stream, crlfDelay: Infinity}).on('line', line => serverLogs.push(line));
 const stop = () => { try { process.kill(-server.pid, 'SIGKILL'); } catch {} };
 process.on('exit', stop);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { stop(); process.exit(1); });
@@ -109,6 +114,9 @@ try {
   const api = await checkApiAuth(BASE, fake);
   if (api.problems.length) { failed = true; console.log(`FAIL api 인증 검사 ${api.problems.length}건`); }
   else console.log(`PASS api 인증 검사 ${api.results.length}건`);
+  const logCheck = await checkApiLogs(BASE, fake, serverLogs);
+  if (logCheck.problems.length) { failed = true; console.log(`FAIL api 로그 검사 ${logCheck.problems.length}건`); }
+  else console.log(`PASS api 로그 검사 ${logCheck.results.length}건`);
 } catch (e) {
   failed = true;
   console.error(e.message);

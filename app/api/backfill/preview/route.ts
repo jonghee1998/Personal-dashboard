@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
+import {logApiFailure} from '@/lib/api-log';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {visibleDashboardItem} from '@/lib/dashboard-visibility';
@@ -14,27 +15,27 @@ export async function POST(req:NextRequest){
  const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
  if(!collector.ok){console.error(collectorAuthFailureLog('/api/backfill/preview',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
- if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
+ if(!userId||!z.string().uuid().safeParse(userId).success){logApiFailure('/api/backfill/preview','config');return NextResponse.json({error:'Server not configured'},{status:503,headers});}
  let raw:unknown;try{raw=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers});}
  const parsed=schema.safeParse(raw);if(!parsed.success)return NextResponse.json({error:'Invalid backfill plan',details:parsed.error.flatten()},{status:422,headers});
  try{
   const db=adminDb(),rows:ExistingRow[]=[];let after:string|null=null;
   const snapshot=await db.rpc('dashboard_backfill_inventory',{p_user:userId});
   if(!snapshot.error){
-   if(!Array.isArray(snapshot.data)||snapshot.data.length>5000)return NextResponse.json({error:'Inventory unavailable'},{status:503,headers});
+   if(!Array.isArray(snapshot.data)||snapshot.data.length>5000){logApiFailure('/api/backfill/preview','inventory_shape');return NextResponse.json({error:'Inventory unavailable'},{status:503,headers});}
    rows.push(...(snapshot.data as ExistingRow[]).filter(row=>visibleDashboardItem(row)&&!isReportedSyntheticId(row.external_id)));
   }else if(snapshot.error.code==='PGRST202'||snapshot.error.code==='42883'){
    // Compatibility before the new migration is installed. Stage uses the RPC only.
   while(true){
    let q=db.from('dashboard_items').select('*').eq('user_id',userId).eq('kind','transaction').neq('status','archived').neq('status','deleted').order('id',{ascending:true}).limit(500);
    if(after)q=q.gt('id',after);
-   const {data,error}=await q;if(error||!data)return NextResponse.json({error:'Transaction inventory read failed'},{status:503,headers});
+   const {data,error}=await q;if(error||!data){logApiFailure('/api/backfill/preview','fallback_read',error);return NextResponse.json({error:'Transaction inventory read failed'},{status:503,headers});}
    rows.push(...data.filter(row=>visibleDashboardItem(row)&&!isReportedSyntheticId(row.external_id)) as ExistingRow[]);
    if(data.length<500)break;after=data[data.length-1].id;
   }
-  }else return NextResponse.json({error:'Transaction inventory read failed'},{status:503,headers});
+  }else{logApiFailure('/api/backfill/preview','inventory_rpc',snapshot.error);return NextResponse.json({error:'Transaction inventory read failed'},{status:503,headers});}
   if(rows.length>5000)return NextResponse.json({error:'Inventory exceeds preview limit'},{status:409,headers});
   const result=previewBackfill(rows,parsed.data.entries,userId);
   return NextResponse.json(result,{status:result.status==='blocked'?409:200,headers});
- }catch{return NextResponse.json({error:'Backfill preview unavailable'},{status:503,headers});}
+ }catch(e){logApiFailure('/api/backfill/preview','unexpected',e);return NextResponse.json({error:'Backfill preview unavailable'},{status:503,headers});}
 }
