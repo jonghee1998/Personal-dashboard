@@ -1,3 +1,5 @@
+> 이 API 는 6단계 ⑤(2026-11)에 삭제됨. 기록용
+
 # Phase 2 legacy transaction backfill — proposed contract (no production writes yet)
 
 ## Non-negotiable

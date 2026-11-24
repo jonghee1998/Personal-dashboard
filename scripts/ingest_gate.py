@@ -29,7 +29,7 @@ from verify_report_invariants import (
 )
 
 INGEST_BASE_URL_ENV = "DASHBOARD_INGEST_BASE_URL"
-ALLOWED_INGEST_PATHS = ("/api/ingest", "/api/sync-runs", "/api/backfill/preview")
+ALLOWED_INGEST_PATHS = ("/api/ingest", "/api/sync-runs")
 INGEST_PATH = "/api/ingest"
 
 class IngestGateError(InvariantError):
