@@ -148,13 +148,6 @@ for(const [file,min] of routes){
  });
 }
 
-test('static: sync-runs GET is untouched by failure logging',()=>{
- const source=readFileSync(join(process.cwd(),'app/api/sync-runs/route.ts'),'utf8');
- const get=source.slice(source.indexOf('export async function GET'),source.indexOf('export async function POST'));
- assert.ok(get.includes('status:503'));
- assert.ok(!get.includes('logApiFailure('));
-});
-
 test('static: lib/api-log.ts is a pure module',()=>{
  const source=readFileSync(join(process.cwd(),'lib/api-log.ts'),'utf8');
  assert.ok(!/from\s+['"]next/.test(source));

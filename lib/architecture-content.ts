@@ -89,7 +89,7 @@ export type ApiRow={path:string;methods:string;caller:string;auth:string;cleanup
 /** Every app/api/**\/route.ts. tests/architecture-content.test.mjs compares this with the filesystem. */
 export const apiRows:readonly ApiRow[]=[
  {path:'/api/ingest',methods:'POST',caller:'피클AI 수집기',auth:'Bearer 토큰'},
- {path:'/api/sync-runs',methods:'GET · POST',caller:'GET 로그인 사용자 · POST 수집기',auth:'세션 · Bearer 토큰'},
+ {path:'/api/sync-runs',methods:'POST',caller:'POST 수집기(실행 보고, 9단계까지 호환)',auth:'Bearer 토큰'},
  {path:'/api/dashboard',methods:'GET',caller:'대시보드 화면',auth:'로그인 세션'},
  {path:'/api/items',methods:'PATCH · POST · DELETE',caller:'대시보드 화면 (상태·메모·할 일)',auth:'로그인 세션'},
  {path:'/api/reconcile/transactions',methods:'POST',caller:'수집기 (읽기 전용 대조)',auth:'Bearer 토큰',cleanup:true},

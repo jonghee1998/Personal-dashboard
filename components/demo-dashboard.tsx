@@ -6,6 +6,7 @@ import DemoDailySpending from '@/components/demo-daily-spending';
 import ArchitectureScreen,{ArchitectureIcon} from '@/components/architecture-screen';
 import {paymentDateLabel,paymentTime} from '@/lib/transaction-time';
 import {visibleDashboardItem,pointProvider} from '@/lib/dashboard-visibility';
+import {beginStatusChange,endStatusChange,revertStatus} from '@/lib/items-state';
 import {dashboardTimestamp,subscriptionDisplay,pointChangeDisplay,pointEventAmount,pointToday} from '@/lib/dashboard-display';
 import {isDashboardSnapshot,monitoredSources,registeredCoverageDay} from '@/lib/dashboard-freshness';
 import type {SyncHealth} from '@/lib/dashboard-freshness';
@@ -19,6 +20,7 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  const [rawItems,setItems]=useState<Item[]>(()=>demoData ? demoData.map(item=>({...item})) : []),[tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[editingMemo,setEditingMemo]=useState<string|null>(null),[memoDraft,setMemoDraft]=useState(''),[loading,setLoading]=useState(!isDemo),[refreshing,setRefreshing]=useState(false),[refreshNotice,setRefreshNotice]=useState(''),[error,setError]=useState(''),[userEmail,setUserEmail]=useState(''),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false),[taskBusy,setTaskBusy]=useState(false),[taskRemoving,setTaskRemoving]=useState<string|null>(null),[updates,setUpdates]=useState<Record<string,string|null>>({}),[sourceUpdates,setSourceUpdates]=useState<Record<string,string|null>>({});
  const [hasSnapshot,setHasSnapshot]=useState(isDemo),[syncHealth,setSyncHealth]=useState<Record<string,SyncHealth>>({});
  const readInFlight=useRef(false);
+ const statusInFlight=useRef<Set<string>>(new Set()),[statusBusy,setStatusBusy]=useState<string[]>([]);
  const refresh=useCallback(async()=>{
    if(isDemo||readInFlight.current)return false;
    readInFlight.current=true;
@@ -52,7 +54,7 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  const settledAmount=done.reduce((a,x)=>a+Number(x.amount??0),0);
  const points=by('benefit').filter(x=>x.category==='points').reduce((a,x)=>a+Number(x.amount??0),0);
  const tasks=by('task').filter(x=>x.status!=='archived'),taskComplete=tasks.filter(x=>x.status==='done').length;
- const change=async(x:Item,status:string)=>{if(isDemo){setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));return;}const prev=items;setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));try{const res=await fetch('/api/items',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:x.id,status})});if(!res.ok)throw new Error('저장 실패')}catch{setItems(prev);setError('상태 저장에 실패했습니다')}};
+ const change=async(x:Item,status:string)=>{if(isDemo){setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));return;}if(!beginStatusChange(statusInFlight.current,x.id))return;setStatusBusy([...statusInFlight.current]);setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));try{const res=await fetch('/api/items',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'status',id:x.id,status})});if(!res.ok)throw new Error('저장 실패')}catch{setItems(cur=>revertStatus(cur,x.id,status,x.status));setError('상태 저장에 실패했습니다')}finally{endStatusChange(statusInFlight.current,x.id);setStatusBusy([...statusInFlight.current])}};
  const addTask=async()=>{
    const title=taskDraft.trim();if(!title||taskBusy)return;
    setTaskBusy(true);setError('');
@@ -110,8 +112,8 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  };
  const card=(title:string,value:string,sub:string,cls='')=><section className={'metric '+cls}><div className="eyebrow">{title}</div><strong>{value}</strong><small>{sub}</small></section>;
  const linkItem=(x:Item)=> <article className="listitem" key={x.id}><div className="itembody"><b>{x.title}</b><small>{x.description??x.category??x.source??''}</small>{x.event_date&&<small>{x.event_date}</small>}</div>{x.amount!==null&&<strong>{money(Number(x.amount))}</strong>}{x.url&&<a href={x.url} target="_blank" rel="noopener noreferrer" className="external">↗</a>}</article>;
- const settleItem=(x:Item)=> <article className="listitem" key={x.id}><button className={'check '+(x.status==='done'?'checked':'')} onClick={()=>void change(x,x.status==='done'?'pending':'done')} aria-label={x.status==='done'?'정산 복원':'정산 완료'}>{x.status==='done'?'✓':''}</button><div className="itembody"><b>{x.title}</b><small>{x.due_date?'마감 '+x.due_date:'정산'}</small></div><strong>{money(Number(x.amount??0))}</strong></article>;
- const taskItem=(x:Item)=><article className="listitem taskListItem" key={x.id}><button type="button" className={'check '+(x.status==='done'?'checked':'')} onClick={()=>void change(x,x.status==='done'?'pending':'done')} aria-label={x.title+' '+(x.status==='done'?'완료 취소':'완료 표시')}>{x.status==='done'?'✓':''}</button><div className="itembody"><b className={x.status==='done'?'struck':''}>{x.title}</b>{x.due_date&&<small>{x.due_date}</small>}</div><button type="button" className="taskDeleteButton" onClick={()=>void removeTask(x)} disabled={taskRemoving===x.id} aria-label={x.title+' 삭제'} title="할 일 삭제">×</button></article>;
+ const settleItem=(x:Item)=> <article className="listitem" key={x.id}><button className={'check '+(x.status==='done'?'checked':'')} onClick={()=>void change(x,x.status==='done'?'pending':'done')} aria-busy={statusBusy.includes(x.id)||undefined} aria-label={x.status==='done'?'정산 복원':'정산 완료'}>{x.status==='done'?'✓':''}</button><div className="itembody"><b>{x.title}</b><small>{x.due_date?'마감 '+x.due_date:'정산'}</small></div><strong>{money(Number(x.amount??0))}</strong></article>;
+ const taskItem=(x:Item)=><article className="listitem taskListItem" key={x.id}><button type="button" className={'check '+(x.status==='done'?'checked':'')} onClick={()=>void change(x,x.status==='done'?'pending':'done')} aria-busy={statusBusy.includes(x.id)||undefined} aria-label={x.title+' '+(x.status==='done'?'완료 취소':'완료 표시')}>{x.status==='done'?'✓':''}</button><div className="itembody"><b className={x.status==='done'?'struck':''}>{x.title}</b>{x.due_date&&<small>{x.due_date}</small>}</div><button type="button" className="taskDeleteButton" onClick={()=>void removeTask(x)} disabled={taskRemoving===x.id} aria-label={x.title+' 삭제'} title="할 일 삭제">×</button></article>;
  const categoryGroups=Object.entries(transactions.reduce<Record<string,{total:number;rows:Item[]}>>((groups,x)=>{
    const category=(x.category??'기타').trim()||'기타';
    if(!groups[category])groups[category]={total:0,rows:[]};

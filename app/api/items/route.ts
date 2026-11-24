@@ -1,12 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {z} from 'zod';
 import {adminDb,serverDb} from '@/lib/supabase-server';
-
-const schema=z.discriminatedUnion('action',[
- z.object({action:z.literal('status'),id:z.string().uuid(),status:z.enum(['pending','done','active','archived'])}),
- z.object({action:z.literal('memo'),id:z.string().uuid(),memo:z.string().max(400)})
-]);
-const legacySchema=z.object({id:z.string().uuid(),status:z.enum(['pending','done','active','archived'])});
+import {itemPatchSchema} from '@/lib/items-schema';
 
 export async function PATCH(req:NextRequest){
  const db=await serverDb();
@@ -14,12 +9,12 @@ export async function PATCH(req:NextRequest){
  if(!user)return NextResponse.json({error:'Unauthorized'},{status:401});
  let json:unknown;
  try{json=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400})}
- const legacy=legacySchema.safeParse(json);
- const parsed=schema.safeParse(legacy.success?{action:'status',...legacy.data}:json);
+ const parsed=itemPatchSchema.safeParse(json);
  if(!parsed.success)return NextResponse.json({error:'Invalid payload'},{status:400});
  const input=parsed.data;
  if(input.action==='status'){
-   const {data,error}=await db.from('dashboard_items').update({status:input.status}).eq('id',input.id).eq('user_id',user.id).select().single();
+   // 정산·할 일의 pending↔done 만. 보관된 행(삭제한 할 일)은 늦게 온 체크로 되살리지 않는다.
+   const {data,error}=await db.from('dashboard_items').update({status:input.status}).eq('id',input.id).eq('user_id',user.id).in('kind',['settlement','task']).neq('status','archived').select().single();
    if(error||!data)return NextResponse.json({error:'Update failed'},{status:400});
    return NextResponse.json({item:data});
  }

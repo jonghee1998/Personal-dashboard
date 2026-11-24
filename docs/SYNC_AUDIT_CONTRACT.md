@@ -2,7 +2,7 @@
 Status: implementation committed; Supabase migration and live integration must be verified.
 
 ## Migration
-The table is defined in `supabase/migrations/20261112000100_sync_runs.sql`. Empty development DB: apply every file in `supabase/migrations/` in name order. Existing production DB: applied state is unconfirmed — the operator decides with the check procedure in `supabase/README.md` and applies only what is needed. It adds an audit table only, with RLS; it does not change existing business records. Until then GET/POST /api/sync-runs returns 503. Ordinary dashboard reads/ingest are independent of this table.
+The table is defined in `supabase/migrations/20261112000100_sync_runs.sql`. Empty development DB: apply every file in `supabase/migrations/` in name order. Existing production DB: applied state is unconfirmed — the operator decides with the check procedure in `supabase/README.md` and applies only what is needed. It adds an audit table only, with RLS; it does not change existing business records. Until then POST /api/sync-runs returns 503 (GET 은 6단계 ④에서 삭제, 405). Ordinary dashboard reads/ingest are independent of this table.
 
 ## Collector flow
 1. Assign a UUID run_id for each collection execution. Keep a dataset/source pair consistent across all chunks. Include run_id, source_system, as_of, verified_at and the required provenance in all ingest rows. Use validate_only before production writes.
@@ -10,7 +10,7 @@ The table is defined in `supabase/migrations/20261112000100_sync_runs.sql`. Empt
 3. For a collection failure, send status=failed, received_count=0, rejected_count=0, an error_code, expected_count=null if unknown, source_as_of/collected_at=null when unknown. Do not create any fake item. For partial, report actual expected/received/rejected counts, nullable expected if unknown, and error_code. A quarantined run has not been released as verified data; current API does not implement a staging store, so do not submit it to ingest.
 4. For success, source_as_of and collected_at required, expected_count=received_count, rejected_count=0. The server compares the number of persisted records matching run_id/dataset/source with expected_count. This counts stored records including tombstones; it is not independent verification of the source. The report does not overwrite business records.
 5. Final run records are immutable, exact retries return the stored record, changed reports require a new run ID. This is final reporting, not streaming progress. Do not claim source verification based solely on a successful report.
-6. GET /api/sync-runs uses authenticated dashboard session and returns own latest 200 runs; no collector credentials in browser. UI integration follows migration and API QA.
+6. GET 은 6단계 ④에서 삭제(405). 실행 기록 요약은 /api/dashboard 응답의 syncHealth(대시보드 상태 요약, app/api/dashboard/route.ts 47~54행)로 본다. No collector credentials in browser.
 
 Example (fictional schema example, not production data):
 ```json
