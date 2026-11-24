@@ -20,10 +20,11 @@ export function fakeExistingRun() {
   };
 }
 
-/** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지 */
+/** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지, f6 재전송·실행 키 충돌 */
 export const INGEST_RUN_OK = '00000000-0000-4000-8000-0000000000f3';
 export const INGEST_RUN_COMMIT_FAIL = '00000000-0000-4000-8000-0000000000f4';
 export const INGEST_RUN_PAGED = '00000000-0000-4000-8000-0000000000f5';
+export const INGEST_RUN_REPLAY = '00000000-0000-4000-8000-0000000000f6';
 /** 이 접두사의 external_id 는 가짜 dashboard_ingest_existing 이 기존 행으로 돌려준다(한 페이지 FAKE_PAGE_ROWS 개). */
 export const PAGED_EXTERNAL_PREFIX = 'txn-page-';
 export const PAGED_UPDATED_AT = '2026-01-01T00:00:00+00:00';
@@ -102,13 +103,45 @@ export function fakePatchItems(items, query, accept, body) {
   return {status: 200, body: object ? out[0] : out};
 }
 
+/** 가짜 commit 이 f6 실행을 커밋하면 runs(Map, 키 run_id)에 남길 실행 기록. 이미 있으면 덮어쓰지 않는다. */
+export function rememberReplayRun(runs, args, out) {
+  const run = args?.p_run;
+  if (!(runs instanceof Map) || !run || run.run_id !== INGEST_RUN_REPLAY || out.status !== 200 || runs.has(run.run_id)) return;
+  runs.set(run.run_id, {
+    user_id: args.p_user, run_id: run.run_id, dataset: run.dataset, source_system: run.source_system,
+    status: run.status, error_code: run.error_code ?? null, expected_count: run.item_count, payload_digest: run.payload_digest,
+    commit_source: 'ingest_v2', accepted_count: out.body.items.length,
+    source_as_of: run.source_as_of ?? null, collected_at: run.collected_at ?? null,
+  });
+}
+
+/** 가짜 GET dashboard_sync_runs(f6): select 를 뺀 모든 필터가 기록과 맞아야 반환. user_id·dataset·source_system 필터가 빠지면 []. */
+export function fakeReplayRunLookup(runs, query, accept) {
+  const params = new URLSearchParams(query);
+  const empty = {status: 200, body: []};
+  if (!(runs instanceof Map)) return empty;
+  if (!['user_id', 'dataset', 'source_system'].every(k => params.has(k))) return empty;
+  const row = runs.get(INGEST_RUN_REPLAY);
+  if (!row) return empty;
+  for (const [k, v] of params) {
+    if (k === 'select') continue;
+    const f = parseFilter(v);
+    if (!f || !f(row[k])) return empty;
+  }
+  return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? {...row} : [{...row}]};
+}
+
 /** 가짜 서버 응답 결정 → {status, body}. body: 요청 본문(JSON 이면 객체).
- *  ctx: {authorization: Authorization 헤더, items: 메모리 행(fakePatchItems 가 바꿈)}. ctx 없으면 순수 함수. */
+ *  ctx: {authorization: Authorization 헤더, items: 메모리 행(fakePatchItems 가 바꿈), runs: f6 실행 기록 Map(선택)}.
+ *  ctx 없으면 순수 함수(f6 기록을 저장하지 않고 조회는 항상 []). */
 export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}) {
   const validSession = ctx.authorization === `Bearer ${VALID_ACCESS_TOKEN}`;
   if (method === 'GET' && path === '/auth/v1/user' && validSession) return {status: 200, body: FAKE_AUTH_USER};
   if (method === 'PATCH' && path === '/rest/v1/dashboard_items' && validSession && Array.isArray(ctx.items)) {
     return fakePatchItems(ctx.items, query, accept, body);
+  }
+  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${INGEST_RUN_REPLAY}`)) {
+    return fakeReplayRunLookup(ctx.runs, query, accept);
   }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
     const row = fakeExistingRun();
@@ -120,7 +153,11 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
   }
   if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_existing') return {status: 200, body: fakeExistingPage(body)};
   if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_candidates') return {status: 200, body: {rows: [], next_after: null}};
-  if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_commit') return fakeCommitResponse(body);
+  if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_commit') {
+    const out = fakeCommitResponse(body);
+    rememberReplayRun(ctx.runs, body, out);
+    return out;
+  }
   if (path.startsWith('/rest/v1/')) {
     return {status: 401, body: {code: 'PGRST301', message: FAKE_PGRST_MESSAGE, details: FAKE_PGRST_DETAILS, hint: null}};
   }
@@ -131,7 +168,7 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
  *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200, 수신 검사용 경로(fakeSupabaseResponse 참고)는 200·503.
  *  requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지, calls 는 요청 본문(JSON)과 응답 상태까지 기록한다. */
 export async function startFakeSupabase() {
-  const requests = [], queries = [], calls = [], items = fakeItemRows();
+  const requests = [], queries = [], calls = [], items = fakeItemRows(), runs = new Map();
   const server = createServer((req, res) => {
     const url = req.url || '';
     const q = url.indexOf('?');
@@ -143,7 +180,7 @@ export async function startFakeSupabase() {
     req.on('end', () => {
       let body;
       try { body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined; } catch { body = undefined; }
-      const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept, body, {authorization: req.headers.authorization, items});
+      const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept, body, {authorization: req.headers.authorization, items, runs});
       calls.push({method: req.method, path, query, body, status: out.status});
       res.writeHead(out.status, {'content-type': 'application/json'});
       res.end(JSON.stringify(out.body));
@@ -151,7 +188,7 @@ export async function startFakeSupabase() {
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const url = `http://127.0.0.1:${server.address().port}`;
-  return {url, requests, queries, calls, items, resetItems: () => { items.splice(0, items.length, ...fakeItemRows()); }, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
+  return {url, requests, queries, calls, items, runs, resetItems: () => { items.splice(0, items.length, ...fakeItemRows()); }, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
 }
 
 /** next start 자식 프로세스에 넘길 가짜 환경변수 */
