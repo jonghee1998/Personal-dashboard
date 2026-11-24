@@ -98,7 +98,7 @@
 
 #### `/api/backfill/control` 되돌리기를 없앨 때 이미 적용된 배치의 롤백 보장
 
-되돌리기는 DB 함수 `dashboard_backfill_rollback` 이 한다 (`supabase/migrations/20261112_atomic_backfill.sql:82-103`). 이 함수는 배치 행의 `after_rows` 에 저장된 바뀌기 전 메타데이터(`before`)로 되돌린다(`:95-98`). 단 적용 뒤에 그 행이 한 번이라도 바뀌었으면 `BACKFILL_ROLLBACK_STALE` 로 멈춘다(`:91-94`). 즉 **API 를 지워도 롤백 정보는 DB 에 있다.** 그래서 이렇게 한다.
+되돌리기는 DB 함수 `dashboard_backfill_rollback` 이 한다 (`supabase/migrations/20261112000200_atomic_backfill.sql:82-103`). 이 함수는 배치 행의 `after_rows` 에 저장된 바뀌기 전 메타데이터(`before`)로 되돌린다(`:95-98`). 단 적용 뒤에 그 행이 한 번이라도 바뀌었으면 `BACKFILL_ROLLBACK_STALE` 로 멈춘다(`:91-94`). 즉 **API 를 지워도 롤백 정보는 DB 에 있다.** 그래서 이렇게 한다.
 
 **대체 수단 (API 삭제 뒤에도 남김):**
 1. 테이블 `dashboard_backfill_batches` 와 함수 `dashboard_backfill_rollback` 은 **API 를 지우는 6단계에서 DROP 하지 않는다.** 소유자가 Supabase SQL 편집기(서비스 권한)에서 `select public.dashboard_backfill_rollback('<사용자UUID>','<배치UUID>','<plan_digest>');` 로 직접 부를 수 있다(값은 예시 자리표시).
@@ -121,15 +121,15 @@
 
 | 종류 | 이름 | 위치 | 판정 | 이유 |
 |---|---|---|---|---|
-| 테이블 | `dashboard_items` | `supabase/schema.sql:2-9` | **다시** | 본 데이터. 그대로 쓰되 상태 체크·정책을 손본다 |
-| 테이블 | `dashboard_sync_runs` | `supabase/migrations/20261112_sync_runs.sql:3-23` | **살릴** | 실행 기록. v2 수신이 같은 트랜잭션에서 쓴다 |
-| 테이블 | `dashboard_backfill_batches` | `supabase/migrations/20261112_atomic_backfill.sql:2-17` | **지울(조건부)** | 일회성. 롤백 정보 보관 때문에 9단계 뒤 DROP |
-| 함수 | `set_updated_at` + 트리거 | `supabase/schema.sql:11-13` | **살릴** | 수정 시각 자동 기록 |
+| 테이블 | `dashboard_items` | `supabase/migrations/20261112000000_baseline.sql:2-9` | **다시** | 본 데이터. 그대로 쓰되 상태 체크·정책을 손본다 |
+| 테이블 | `dashboard_sync_runs` | `supabase/migrations/20261112000100_sync_runs.sql:3-23` | **살릴** | 실행 기록. v2 수신이 같은 트랜잭션에서 쓴다 |
+| 테이블 | `dashboard_backfill_batches` | `supabase/migrations/20261112000200_atomic_backfill.sql:2-17` | **지울(조건부)** | 일회성. 롤백 정보 보관 때문에 9단계 뒤 DROP |
+| 함수 | `set_updated_at` + 트리거 | `supabase/migrations/20261112000000_baseline.sql:11-13` | **살릴** | 수정 시각 자동 기록 |
 | 함수 | `dashboard_backfill_inventory` | `…atomic_backfill.sql:24-30` | **지울** | 백필 전용 |
 | 함수 | `dashboard_backfill_apply` | `…atomic_backfill.sql:32-80` | **지울** | 백필 전용. 표 전체 잠금(`:41`) |
 | 함수 | `dashboard_backfill_rollback` | `…atomic_backfill.sql:82-103` | **지울(조건부)** | 2절 조건 충족 전까지 남김 |
-| 정책 | "read own items" (select) | `supabase/schema.sql:17` | **살릴** | 자기 행만 읽기 |
-| 정책 | "update own items" (update) | `supabase/schema.sql:18` | **다시** | 모든 컬럼 수정 허용(6절) |
+| 정책 | "read own items" (select) | `supabase/migrations/20261112000000_baseline.sql:17` | **살릴** | 자기 행만 읽기 |
+| 정책 | "update own items" (update) | `supabase/migrations/20261112000000_baseline.sql:18` | **다시** | 모든 컬럼 수정 허용(6절) |
 | 정책 | "read own sync runs" (select) | `…sync_runs.sql:27` | **살릴** | 쓰기는 revoke(`:29`) |
 
 기타: 인덱스 `dashboard_items_user_kind_date`(`schema.sql:10`), `dashboard_sync_runs_latest`(`sync_runs.sql:24`) 는 살린다. `dashboard_backfill_batches` 는 RLS 를 켜고 정책 없이 모든 권한을 revoke 한 뒤 service_role 에만 줬다(`atomic_backfill.sql:18-20`). 백필 함수 3개도 service_role 만 실행할 수 있다(`:29-30,79-80,102-103`).
@@ -261,7 +261,7 @@ if ((public.dashboard_backfill_inventory(u)->0)-'metadata'-'updated_at')<>(befor
 
 **RLS 우회 경로**
 - service role 쓰는 모든 경로(위 목록)는 RLS 를 우회한다. 이 경로들은 `DASHBOARD_USER_ID`(수집기) 또는 세션 사용자 ID(items POST, control)로 `user_id` 를 직접 넣어서 막는다.
-- "update own items" 정책(`supabase/schema.sql:18`)은 **모든 컬럼** 수정을 허용한다. 로그인한 사용자는 공개 키 + 세션으로 PostgREST 에 직접 요청해 자기 행의 금액·kind·메타데이터를 바꿀 수 있다. 1인용이라 위험은 낮지만, 수신 데이터 무결성 규칙(`lib/ingest-integrity.ts`)을 건너뛰는 길이다. → 6단계에서 화면 수정은 API 만 쓰게 하고, 정책을 상태·메모만 바꾸는 함수로 좁힐지 결정(RLS 변경이라 지시 필요).
+- "update own items" 정책(`supabase/migrations/20261112000000_baseline.sql:18`)은 **모든 컬럼** 수정을 허용한다. 로그인한 사용자는 공개 키 + 세션으로 PostgREST 에 직접 요청해 자기 행의 금액·kind·메타데이터를 바꿀 수 있다. 1인용이라 위험은 낮지만, 수신 데이터 무결성 규칙(`lib/ingest-integrity.ts`)을 건너뛰는 길이다. → 6단계에서 화면 수정은 API 만 쓰게 하고, 정책을 상태·메모만 바꾸는 함수로 좁힐지 결정(RLS 변경이라 지시 필요).
 - 백필 함수는 `security invoker` + service_role 만 실행(`atomic_backfill.sql:25,29-30` 등). 클라이언트 실행 불가를 SQL 테스트가 확인한다(`tests/atomic-backfill.test.sql:19-20`).
 - control 은 같은 출처 검사(`app/api/backfill/control/route.ts:24`) + 소유자 UUID 일치(`:12`) + 실행 스위치(`:26`). 지울 때까지 유지.
 

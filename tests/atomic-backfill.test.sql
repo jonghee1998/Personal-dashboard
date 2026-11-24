@@ -3,11 +3,15 @@
 create schema auth;
 create table auth.users(id uuid primary key);
 create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
-create role anon;
-create role authenticated;
-create role service_role bypassrls;
-\ir ../supabase/schema.sql
-\ir ../supabase/migrations/20261112_atomic_backfill.sql
+-- Roles are cluster-wide; tests/db/auth-stub.sql may already have created them in another DB.
+do $$
+begin
+ if not exists (select 1 from pg_roles where rolname='anon') then create role anon nologin; end if;
+ if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
+ if not exists (select 1 from pg_roles where rolname='service_role') then create role service_role nologin bypassrls; end if;
+end $$;
+\ir ../supabase/migrations/20261112000000_baseline.sql
+\ir ../supabase/migrations/20261112000200_atomic_backfill.sql
 insert into auth.users values ('00000000-0000-4000-8000-000000000001');
 insert into public.dashboard_items(id,user_id,kind,external_id,title,amount,currency,event_date,metadata)
 values
@@ -34,7 +38,7 @@ begin
  if public.dashboard_backfill_inventory(u)<>snap then raise exception 'failed apply changed data'; end if;
  v:=public.dashboard_backfill_apply(u,b,digest,1);
  if v->>'applied_count'<>'1' then raise exception 'count'; end if;
- if (public.dashboard_backfill_inventory(u)->0-'metadata'-'updated_at')<>(before1-'metadata'-'updated_at') then raise exception 'business fields changed'; end if;
+ if ((public.dashboard_backfill_inventory(u)->0)-'metadata'-'updated_at')<>(before1-'metadata'-'updated_at') then raise exception 'business fields changed'; end if;
  if public.dashboard_backfill_inventory(u)->0->'metadata'->>'memo'<>'keep me' then raise exception 'memo lost'; end if;
  if public.dashboard_backfill_inventory(u)->1<>before2 then raise exception 'unresolved changed'; end if;
  v:=public.dashboard_backfill_rollback(u,b,digest);
