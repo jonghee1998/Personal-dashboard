@@ -220,6 +220,35 @@ test('CLI: 종료 코드와 값 비노출', (t) => {
   assert.equal(r.code, 1);
 });
 
+test('BACKFILL_APPLY_ENABLED: 켜진 값은 위반, 없음·빈 값·false 는 통과', () => {
+  for (const v of ['true', 'TRUE', ' 1 ', 'yes']) {
+    assert.deepEqual(namesOf(check({...dev(), BACKFILL_APPLY_ENABLED: v})), ['BACKFILL_APPLY_ENABLED'], v);
+  }
+  for (const v of ['', 'false', 'FALSE', ' False ']) {
+    assert.deepEqual(check({...dev(), BACKFILL_APPLY_ENABLED: v}), [], JSON.stringify(v));
+  }
+  assert.deepEqual(check(dev()), []);
+});
+
+test('CLI --compare: 운영 파일에만 켜진 BACKFILL_APPLY_ENABLED 는 종료 코드 1, 값 비노출', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'check-env-'));
+  t.after(() => rmSync(dir, {recursive: true, force: true}));
+  const flag = 'synthetic-flag-on-A';
+  const devF = join(dir, 'dev.env');
+  const opsF = join(dir, 'ops.env');
+  writeFileSync(devF, toFile(dev()));
+  writeFileSync(opsF, toFile({...ops(), BACKFILL_APPLY_ENABLED: flag}));
+  const r = spawnSync(process.execPath, [script, '--compare', devF, opsF], {encoding: 'utf8', env: {PATH: process.env.PATH}});
+  const stdout = r.stdout || '';
+  const stderr = r.stderr || '';
+  assert.equal(r.status, 1);
+  assert.match(stderr, /운영 BACKFILL_APPLY_ENABLED/);
+  const lines = stderr.split('\n').filter((l) => l.includes('BACKFILL_APPLY_ENABLED'));
+  assert.ok(lines.length > 0);
+  for (const l of lines) assert.ok(!l.includes(flag), '플래그 값이 줄에 노출됨');
+  assertNoLeak(stdout + stderr, [devF, opsF, dir, flag]);
+});
+
 test('npm run check-env 스크립트가 등록되어 있다', () => {
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
   assert.equal(pkg.scripts['check-env'], 'node scripts/check-env.mjs');

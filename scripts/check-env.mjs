@@ -9,6 +9,9 @@
 // --compare 비교 대상: NEXT_PUBLIC_SUPABASE_URL(정규화 후), SUPABASE_SERVICE_ROLE_KEY, PICKLE_INGEST_TOKEN,
 //   DASHBOARD_USER_ID(양쪽 모두 UUID 형식일 때만, 대소문자 무시). 개발과 운영이 같으면 위반.
 //
+// 단일 점검 규칙 하나: BACKFILL_APPLY_ENABLED 가 있고 공백 제거 값이 빈 문자열도 'false'(대소문자 무시)도 아니면 위반
+//   (백필 API 는 삭제됨. 없는 것이 정상이며 필수 이름이 아니다). 값은 출력하지 않는다.
+//
 // 필수 이름 목록과 예시(자리표시자) 값은 저장소의 .env.example 에서 'NAME=' 줄을 읽어 정한다.
 //
 // 지원하는 env 파일 문법:
@@ -114,6 +117,10 @@ export function checkEnv(env,requiredNames,examples={}){
   if(serverVals.includes(v))add(n,'공개 변수 값이 서버 키 또는 수신 토큰과 같음');
  }
  if(has(env,SERVER_NAMES[0])&&has(env,SERVER_NAMES[1])&&env[SERVER_NAMES[0]]===env[SERVER_NAMES[1]])add(SERVER_NAMES[1],'SUPABASE_SERVICE_ROLE_KEY 와 같은 값');
+ if(typeof env.BACKFILL_APPLY_ENABLED==='string'){
+  const f=env.BACKFILL_APPLY_ENABLED.trim();
+  if(f!==''&&f.toLowerCase()!=='false')add('BACKFILL_APPLY_ENABLED','켜져 있음(백필 API 는 삭제됨, 비우거나 지울 것)');
+ }
  return out;
 }
 
