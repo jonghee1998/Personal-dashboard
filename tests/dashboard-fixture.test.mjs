@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {existsSync, readFileSync} from 'node:fs';
+import {existsSync, readdirSync, readFileSync} from 'node:fs';
+import {join} from 'node:path';
 import {isDashboardSnapshot, monitoredSources, registeredCoverageDay, seoulDay} from '../lib/dashboard-freshness.ts';
 import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW} from '../scripts/screens/dashboard-fixture.mjs';
 import {firstDomDifference} from '../scripts/screens/dom-skeleton.mjs';
@@ -77,7 +78,27 @@ test('app/page.tsx 는 force-dynamic 이고 env 검사·getUser·/login 이동�
   assert.ok(src.includes("if(!user)redirect('/login');"));
 });
 
-test('화면 검사 스크립트는 /demo 를 쓰지 않는다', () => {
+// 지운 /demo 는 run.mjs 의 404 확인 요청 한 곳에서만 쓴다(화면 검사 대상으로 쓰지 않는다).
+const DEMO_404_FETCH = "fetch(`${BASE}/demo`, {redirect: 'manual'})";
+test('화면 검사 스크립트는 /demo 를 404 확인 말고는 쓰지 않는다', () => {
   for (const f of ['run.mjs', 'api-auth.mjs', 'api-log.mjs', 'api-ingest.mjs', 'api-items.mjs', 'dashboard-fixture.mjs', 'dom-skeleton.mjs'])
-    assert.ok(!readFileSync(`scripts/screens/${f}`, 'utf8').includes('/demo'), f);
+    assert.ok(!readFileSync(`scripts/screens/${f}`, 'utf8').replaceAll(DEMO_404_FETCH, '').replaceAll('GET /demo', '').includes('/demo'), f);
+  assert.equal(readFileSync('scripts/screens/run.mjs', 'utf8').split(DEMO_404_FETCH).length - 1, 1, 'run.mjs 에 GET /demo 404 확인이 한 번 있어야 함');
+});
+
+const sourceFiles = dir => readdirSync(dir, {recursive: true}).map(String).filter(f => /\.tsx?$/.test(f)).map(f => join(dir, f));
+test('데모 경로·데이터·옛 화면이 지워졌고 데모 분기 이름이 남지 않았다', () => {
+  for (const p of ['app/demo', 'lib/demo-data.ts', 'components/dashboard.tsx']) assert.equal(existsSync(p), false, p);
+  const files = ['app', 'components', 'lib'].flatMap(sourceFiles);
+  assert.ok(files.includes(join('components', 'demo-dashboard.tsx')));
+  for (const f of files) {
+    const src = readFileSync(f, 'utf8');
+    for (const name of ['isDemo', 'demoData', 'demo-data', 'SAMPLE_UPDATED_AT', 'demoBanner']) assert.ok(!src.includes(name), `${f}: ${name}`);
+  }
+});
+
+test('헤더는 운영 문구만 쓴다', () => {
+  const src = readFileSync('components/demo-dashboard.tsx', 'utf8');
+  for (const text of ['DB 저장 · ', '원본 기준 · ', 'aria-label="로그아웃"', 'const pointLogDate=pointToday();']) assert.ok(src.includes(text), text);
+  for (const text of ['샘플 업데이트', '샘플 기준', '샘플 초기화', '운영 대시보드로 이동', 'resetDemo']) assert.ok(!src.includes(text), text);
 });

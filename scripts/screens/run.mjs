@@ -202,6 +202,13 @@ try {
     finally { await context.close(); }
   }
 
+  // 지운 데모 경로는 404
+  try {
+    const res = await fetch(`${BASE}/demo`, {redirect: 'manual'});
+    if (res.status === 404) console.log('PASS GET /demo 404');
+    else fail('GET /demo', [`상태 ${res.status} (기대 404)`]);
+  } catch (e) { fail('GET /demo', [e.message.split('\n')[0]]); }
+
   for (const [w, h] of VIEWPORTS) {
     const label = `${w}x${h}`;
     const {context, page} = await sessionPage(browser, w, h);
