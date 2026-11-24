@@ -11,6 +11,8 @@ Tests:
 import unittest
 from unittest.mock import MagicMock
 import json
+import os
+from unittest import mock
 from scripts.ingest_gate import (
     bind_and_verify_ingest_payload,
     transmit_gated_ingest,
@@ -20,6 +22,9 @@ from scripts.ingest_gate import (
 class TestDailyRecoveryPipeline(unittest.TestCase):
 
     def setUp(self):
+        patcher = mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": "https://dashboard.example.invalid"})
+        patcher.start()
+        self.addCleanup(patcher.stop)
         # Initial authoritative state (e.g. 1,234P)
         self.initial_authoritative_rows = [
             {
