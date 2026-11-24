@@ -36,7 +36,7 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
    finally{readInFlight.current=false;setLoading(false);}
  },[isDemo]);
  useEffect(()=>{if(isDemo)return;void refresh();const id=setInterval(()=>void refresh(),60000);return()=>clearInterval(id)},[refresh,isDemo]);
- useEffect(()=>{if(isDemo)return;void browserDb().auth.getUser().then(r=>setUserEmail(r.data.user?.email??''))},[isDemo]);
+ useEffect(()=>{if(isDemo)return;try{void browserDb().auth.getUser().then(r=>setUserEmail(r.data.user?.email??''),()=>setUserEmail(''))}catch{setUserEmail('')}},[isDemo]);
  const items=useMemo(()=>rawItems.filter(visibleDashboardItem),[rawItems]);
  const by=(k:Kind)=>items.filter(x=>x.kind===k);
  const updateTime=(key:string)=>dashboardTimestamp(isDemo?SAMPLE_UPDATED_AT:updates[key]);

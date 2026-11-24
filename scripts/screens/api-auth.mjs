@@ -267,8 +267,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   try {
     const end = Date.now() + 60_000;
     for (;;) {
-      try { if ((await fetch(`${BASE}/demo`)).status === 200) break; } catch {}
-      if (Date.now() > end) throw new Error('/demo 가 60초 안에 200 을 주지 않았습니다');
+      try { if ((await fetch(`${BASE}/login`)).status === 200) break; } catch {}
+      if (Date.now() > end) throw new Error('/login 이 60초 안에 200 을 주지 않았습니다');
       await new Promise(r => setTimeout(r, 1000));
     }
     failed = (await checkApiAuth(BASE, fake)).problems.length > 0;
