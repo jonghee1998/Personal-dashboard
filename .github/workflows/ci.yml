@@ -73,7 +73,8 @@ jobs:
           if-no-files-found: ignore
 
   # DB 연동 테스트: 실제 PostgreSQL(가짜 데이터)에 supabase/migrations 를 순서대로 적용하고 tests/db/*.test.sql 을 실행한다.
-  # tests/db/auth-stub.sql(있으면)을 먼저 적용해 Supabase auth 스키마를 흉내 낸다. tests/db 가 없으면 건너뛴다. 비밀값 없음.
+  # tests/db/auth-stub.sql(있으면)을 먼저 적용해 Supabase auth 스키마를 흉내 낸다. tests/atomic-backfill.test.sql 도 별도 DB 에서 실행.
+  # tests/db 가 없으면 잡 전체를 건너뛴다. 비밀값 없음.
   db:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -106,3 +107,8 @@ jobs:
           for f in $(ls supabase/migrations/*.sql | sort); do echo "apply $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
           [ -f supabase/seed.sql ] && psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
           for t in $(ls tests/db/*.test.sql 2>/dev/null | sort); do echo "test $t"; psql -v ON_ERROR_STOP=1 -q -f "$t"; done
+          # 백필 원자성 테스트는 자기 DB 를 따로 만든다 (dashboard-qa 와 같은 파일, PR 에서도 확인)
+          if [ -f tests/atomic-backfill.test.sql ]; then
+            createdb backfill_test
+            psql -d backfill_test -v ON_ERROR_STOP=1 -q -f tests/atomic-backfill.test.sql
+          fi
