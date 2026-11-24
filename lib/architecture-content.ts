@@ -10,7 +10,7 @@ export const architectureSections=[
  {no:'04',kicker:'배포·비밀값',title:'비밀 키는 Vercel 서버에만 둔다'},
  {no:'05',kicker:'데이터 흐름',title:'검증을 통과한 데이터만 저장된다'},
  {no:'06',kicker:'화면',title:'다섯 탭이 같은 조회 결과를 나눠 본다'},
- {no:'07',kicker:'API',title:'API 8개 중 4개는 정리 예정'},
+ {no:'07',kicker:'API',title:'API 4개: 수집기 2개, 화면 2개'},
  {no:'08',kicker:'안전장치',title:'키·데이터·DB 접근을 따로 막는다'},
  {no:'09',kicker:'개발 방식',title:'계획→구현→검수→반영을 AI가 돈다'}
 ] as const satisfies readonly ArchitectureSection[];
@@ -35,7 +35,7 @@ export type TargetRow={area:string;now:string;target:string;phase:string};
 export const targetRows:readonly TargetRow[]=[
  {area:'저장소',now:'공개 저장소 하나',target:'코드만 · 데이터 없음',phase:'완료'},
  {area:'AI 팀',now:'PM·구현·검수·CI',target:'운영계·운영 DB 접근 없음',phase:'완료'},
- {area:'수신 API',now:'8개',target:'수신 1개 + 조회',phase:'6단계'},
+ {area:'수신 API',now:'4개',target:'수신 1개 + 조회',phase:'6단계'},
  {area:'DB',now:'운영 1개',target:'개발 / 운영 분리',phase:'5단계'},
  {area:'배포',now:'옛 저장소 연결',target:'개발계 / 운영계',phase:'8단계'},
  {area:'테스트',now:'단위 + 화면',target:'개발 DB 연동 추가',phase:'5단계'},
@@ -57,8 +57,7 @@ export const vercelEnv:readonly EnvRow[]=[
  {name:'NEXT_PUBLIC_SUPABASE_ANON_KEY',use:'로그인·RLS 범위 조회',scope:'공개'},
  {name:'SUPABASE_SERVICE_ROLE_KEY',use:'서버 쓰기(adminDb), RLS 우회',scope:'서버 전용'},
  {name:'PICKLE_INGEST_TOKEN',use:'수집기 Bearer 토큰 검증 (32자 이상)',scope:'서버 전용'},
- {name:'DASHBOARD_USER_ID',use:'수집 데이터 소유자 UUID',scope:'서버 전용'},
- {name:'BACKFILL_APPLY_ENABLED',use:"백필 실행 스위치 ('true' 일 때만)",scope:'서버 전용',note:'.env.example 에 없음'}
+ {name:'DASHBOARD_USER_ID',use:'수집 데이터 소유자 UUID',scope:'서버 전용'}
 ];
 
 /** GitHub Actions secrets referenced by .github/workflows. None of them reach Supabase. */
@@ -85,23 +84,19 @@ export const screenRows=[
  {tab:'구조',shows:'이 화면 (정적, 데이터를 읽지 않음)'}
 ] as const;
 
-export type ApiRow={path:string;methods:string;caller:string;auth:string;cleanup?:boolean};
+export type ApiRow={path:string;methods:string;caller:string;auth:string};
 /** Every app/api/**\/route.ts. tests/architecture-content.test.mjs compares this with the filesystem. */
 export const apiRows:readonly ApiRow[]=[
  {path:'/api/ingest',methods:'POST',caller:'피클AI 수집기',auth:'Bearer 토큰'},
  {path:'/api/sync-runs',methods:'POST',caller:'POST 수집기(실행 보고, 9단계까지 호환)',auth:'Bearer 토큰'},
  {path:'/api/dashboard',methods:'GET',caller:'대시보드 화면',auth:'로그인 세션'},
- {path:'/api/items',methods:'PATCH · POST · DELETE',caller:'대시보드 화면 (상태·메모·할 일)',auth:'로그인 세션'},
- {path:'/api/reconcile/transactions',methods:'POST',caller:'수집기 (읽기 전용 대조)',auth:'Bearer 토큰',cleanup:true},
- {path:'/api/backfill/preview',methods:'POST',caller:'수집기 (미리보기, DB 쓰기 없음)',auth:'Bearer 토큰',cleanup:true},
- {path:'/api/backfill/stage',methods:'POST',caller:'수집기 (배치 등록)',auth:'Bearer 토큰',cleanup:true},
- {path:'/api/backfill/control',methods:'GET · POST',caller:'소유자 (적용·되돌리기)',auth:'세션 + 소유자 UUID 일치 · 같은 출처 · 실행 스위치',cleanup:true}
+ {path:'/api/items',methods:'PATCH · POST · DELETE',caller:'대시보드 화면 (상태·메모·할 일)',auth:'로그인 세션'}
 ];
 
 export const safeguardRows=[
  {name:'RLS',desc:'dashboard_items·sync_runs 는 본인 행만 조회, 화면 쓰기는 items 수정만. 백필 배치 테이블은 service_role 전용.'},
  {name:'service role 키',desc:'lib/supabase-server.ts 의 adminDb 에서만 사용. 브라우저(lib/supabase.ts)는 anon 키만.'},
- {name:'ingest 토큰',desc:'수집기 API 5개가 lib/collector-auth.ts 한 곳에서 검사: 32자 미만 거부, timingSafeEqual 비교. 틀리면 401.'},
+ {name:'ingest 토큰',desc:'수집기 API 2개(/api/ingest, /api/sync-runs)가 lib/collector-auth.ts 한 곳에서 검사: 32자 미만 거부, timingSafeEqual 비교. 틀리면 401.'},
  {name:'공개 저장소',desc:'코드·테스트·문서에 실데이터 금지. CI 가 추가된 줄을 개인정보 검사.'},
  {name:'AI 개발',desc:'운영 DB 접근 금지. 테스트는 가짜 데이터·모의 객체로만.'}
 ] as const;

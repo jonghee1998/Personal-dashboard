@@ -182,11 +182,13 @@ export function validSessionCookie(fakeUrl) {
   return sessionCookie(fakeUrl, VALID_ACCESS_TOKEN);
 }
 
-const TOKEN_ROUTES = ['/api/ingest', '/api/sync-runs', '/api/reconcile/transactions', '/api/backfill/preview', '/api/backfill/stage'];
+const TOKEN_ROUTES = ['/api/ingest', '/api/sync-runs'];
 const SESSION_ROUTES = [
   ['GET', '/api/dashboard'], ['PATCH', '/api/items'], ['POST', '/api/items'], ['DELETE', '/api/items'],
-  ['GET', '/api/backfill/control'],
 ];
+/** 6단계 ⑤에서 지운 일회성 API. 올바른 인증을 보내도 404, 세션 확인·데이터 요청 없음 */
+export const REMOVED_TOKEN_ROUTES = ['/api/reconcile/transactions', '/api/backfill/preview', '/api/backfill/stage'];
+export const REMOVED_SESSION_ROUTES = [['GET', '/api/backfill/control'], ['POST', '/api/backfill/control']];
 
 /** 검사 목록. expect: 기대 상태 코드, maxData: rest/v1 허용 건수(항상 0), authUser: /auth/v1/user 조건 */
 export function apiAuthCases(origin, cookie) {
@@ -201,12 +203,13 @@ export function apiAuthCases(origin, cookie) {
   for (const [method, path] of SESSION_ROUTES) {
     cases.push({name: `쿠키 없음 ${method} ${path}`, method, path, headers: method === 'GET' ? {} : {...json, origin}, expect: 401});
   }
-  // 출처 경로: Origin 검사가 세션 확인보다 먼저인지(외부 Origin 이면 /auth/v1/user 도 부르지 않음)
-  const control = '/api/backfill/control';
-  cases.push({name: `쿠키 없음 같은 Origin POST ${control}`, method: 'POST', path: control, headers: {...json, origin}, expect: 401, authUser: 'zero'});
-  cases.push({name: `쿠키 없음 Origin 없음 POST ${control}`, method: 'POST', path: control, headers: json, expect: 403, authUser: 'zero'});
-  cases.push({name: `합성 세션 외부 Origin POST ${control}`, method: 'POST', path: control, headers: {...json, cookie, origin: 'https://attacker.example.invalid'}, expect: 403, authUser: 'zero'});
-  cases.push({name: `합성 세션 같은 Origin POST ${control}`, method: 'POST', path: control, headers: {...json, cookie, origin}, expect: 401, authUser: 'some'});
+  // 없어진 경로: 일회성 API 4개는 6단계 ⑤에서 삭제 → 올바른 토큰·합성 세션이 있어도 404
+  for (const path of REMOVED_TOKEN_ROUTES) {
+    cases.push({name: `없어진 경로 올바른 토큰 POST ${path}`, method: 'POST', path, headers: {...json, authorization: `Bearer ${FAKE_TOKEN}`}, expect: 404, authUser: 'zero'});
+  }
+  for (const [method, path] of REMOVED_SESSION_ROUTES) {
+    cases.push({name: `없어진 경로 합성 세션 ${method} ${path}`, method, path, headers: method === 'GET' ? {cookie} : {...json, cookie, origin}, expect: 404, authUser: 'zero'});
+  }
   // 없어진 경로: GET /api/sync-runs 는 6단계 ④에서 삭제 → 쿠키가 있어도 405, 세션 확인·데이터 요청 없음
   const removed = '/api/sync-runs';
   cases.push({name: `없어진 경로 쿠키 없음 GET ${removed}`, method: 'GET', path: removed, headers: {}, expect: 405, authUser: 'zero'});
