@@ -28,11 +28,9 @@ from verify_report_invariants import (
     InvariantError
 )
 
-ALLOWED_INGEST_ENDPOINTS = {
-    "https://dashboard.example.invalid/api/ingest",
-    "https://dashboard.example.invalid/api/sync-runs",
-    "https://dashboard.example.invalid/api/backfill/preview",
-}
+INGEST_BASE_URL_ENV = "DASHBOARD_INGEST_BASE_URL"
+ALLOWED_INGEST_PATHS = ("/api/ingest", "/api/sync-runs", "/api/backfill/preview")
+INGEST_PATH = "/api/ingest"
 
 class IngestGateError(InvariantError):
     pass
@@ -40,7 +38,7 @@ class IngestGateError(InvariantError):
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     """Refuses any HTTP redirect to prevent silent token or payload leakage."""
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        raise IngestGateError(f"HTTP_REDIRECT_FORBIDDEN: redirects are not permitted ({code} -> {newurl})")
+        raise IngestGateError("HTTP_REDIRECT_FORBIDDEN")
 
 def canonical_json_bytes(obj: Any) -> bytes:
     """Produces deterministic UTF-8 bytes for cryptographic digest binding."""
@@ -49,12 +47,42 @@ def canonical_json_bytes(obj: Any) -> bytes:
 def compute_payload_digest(items: List[Dict[str, Any]]) -> str:
     return hashlib.sha256(canonical_json_bytes(items)).hexdigest()
 
+def get_ingest_origin() -> str:
+    """Reads and validates DASHBOARD_INGEST_BASE_URL. Errors carry fixed codes only (never the value)."""
+    raw = os.environ.get(INGEST_BASE_URL_ENV)
+    if raw is None or not raw.strip():
+        raise IngestGateError("INGEST_BASE_URL_REQUIRED")
+    value = raw.strip()
+    if "?" in value or "#" in value or "\\" in value:
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    if any(ch.isspace() or ord(ch) < 33 or ord(ch) == 127 for ch in value):
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    prefix = "https://"
+    if value[:len(prefix)].lower() != prefix:
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    rest = value[len(prefix):]
+    slash = rest.find("/")
+    authority, path = (rest, "") if slash < 0 else (rest[:slash], rest[slash:])
+    if path not in ("", "/"):
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    if not authority or "@" in authority or "[" in authority or "]" in authority:
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    host, sep, port = authority.partition(":")
+    if not host or host.startswith(".") or ":" in port:
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    if sep and (not (port.isascii() and port.isdigit()) or not 1 <= int(port) <= 65535):
+        raise IngestGateError("INGEST_BASE_URL_INVALID")
+    return "https://" + host.lower() + (":" + port if sep else "")
+
+def allowed_endpoints() -> set:
+    origin = get_ingest_origin()
+    return {origin + p for p in ALLOWED_INGEST_PATHS}
+
 def validate_endpoint_url(url: str) -> None:
     if not isinstance(url, str) or not url.strip():
-        raise IngestGateError("ENDPOINT_URL_REQUIRED: endpoint_url must be non-empty string")
-    clean_url = url.strip()
-    if clean_url not in ALLOWED_INGEST_ENDPOINTS:
-        raise IngestGateError(f"UNAUTHORIZED_ENDPOINT: {clean_url!r} is not in allowlist: {ALLOWED_INGEST_ENDPOINTS}")
+        raise IngestGateError("ENDPOINT_URL_REQUIRED")
+    if url.strip() not in allowed_endpoints():
+        raise IngestGateError("UNAUTHORIZED_ENDPOINT")
 
 def bind_and_verify_ingest_payload(
     domain: str,
@@ -153,7 +181,8 @@ def transmit_gated_ingest(
     """
     # Fail-closed step 1: Validate destination URL allowlist
     validate_endpoint_url(endpoint_url)
-    if endpoint_url != "https://dashboard.example.invalid/api/ingest":
+    endpoint_url = endpoint_url.strip()
+    if endpoint_url != get_ingest_origin() + INGEST_PATH:
         raise IngestGateError("INGEST_ENDPOINT_REQUIRED")
 
     if not isinstance(token, str) or not token.strip():

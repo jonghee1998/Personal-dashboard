@@ -21,7 +21,7 @@ This repository is the **single source of truth for software development and int
 
 ## Integration API
 
-- Production ingest: `POST https://dashboard.example.invalid/api/ingest`
+- 수집기 실행 전 `DASHBOARD_INGEST_BASE_URL` 설정(https origin), 실제 POST 경로 `/api/ingest`
 - Header: `Authorization: Bearer <PICKLE_INGEST_TOKEN>`
 - Header: `Content-Type: application/json`
 - Request body: `examples/pickle-payload.json`
