@@ -10,7 +10,10 @@ DB 스키마는 `supabase/migrations/` 의 파일만이 기준이다. 파일 이
 
 ## 개발 DB
 
-빈 DB 에 처음부터 위 순서대로 **전부** 적용한다. CI 의 `db` 잡이 같은 일을 한다: 일회용 PostgreSQL 에 `tests/db/auth-stub.sql`(Supabase 의 auth 스키마·역할·기본 권한을 흉내 내는 테스트 전용 파일, Supabase 에 적용 금지) → `supabase/migrations/*.sql` 이름순 → `tests/db/*.test.sql` 순서로 실행한다.
+빈 DB 에 처음부터 위 순서대로 **전부** 적용한다. CI 의 `db` 잡이 같은 일을 한다: 일회용 PostgreSQL 에 `tests/db/auth-stub.sql`(Supabase 의 auth 스키마·역할·기본 권한을 흉내 내는 테스트 전용 파일, Supabase 에 적용 금지) → `supabase/migrations/*.sql` 이름순 → `supabase/seed.sql` → `tests/db/*.test.sql` 순서로 실행한다.
+
+- `seed.sql` 은 **개발·테스트 DB 전용 가짜 데이터**다(운영 DB 적용 금지). 고정 사용자 A(`…0000a1`)·B(`…0000b1`), kind 별 1~2개의 `dashboard_items`(`친구A`·`합성가맹점A` 등, `metadata.environment='development'`, `is_synthetic=true`), `dashboard_sync_runs` 1행. 모든 insert 가 충돌 시 do nothing 이라 재실행해도 성공한다.
+- `tests/db/10~60_*.test.sql` 은 RLS, 클라이언트 쓰기 권한, upsert, `updated_at` 트리거, 체크 제약, 시드 재적용을 확인한다. 데이터를 바꾸는 테스트는 `begin … rollback` 안에서만 바꾼다.
 
 ## 운영 DB — 적용 상태 미확인
 
