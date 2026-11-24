@@ -1,0 +1,75 @@
+// docs/DEPLOY.md(8단계 배포 전 점검표)의 필수 내용과 순서를 확인한다.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync, existsSync} from 'node:fs';
+import {join, dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const read = (p) => readFileSync(join(root, p), 'utf8');
+const doc = read('docs/DEPLOY.md');
+
+const has = (s) => assert.ok(doc.includes(s), `DEPLOY.md 에 '${s}' 가 없음`);
+/** 줄 맨 앞이 marker 로 시작하는 첫 줄의 위치 */
+const lineStart = (marker) => {
+  const m = doc.match(new RegExp(`^${marker}`, 'm'));
+  assert.ok(m, `'${marker}' 로 시작하는 줄이 없음`);
+  return m.index;
+};
+
+test('.env.example 의 모든 이름이 나온다', () => {
+  const names = read('.env.example').split(/\r?\n/).map((l) => l.match(/^([A-Z_][A-Z0-9_]*)=/)?.[1]).filter(Boolean);
+  assert.ok(names.length >= 5);
+  for (const n of names) has(n);
+});
+
+test('마이그레이션 4번이 5번보다 앞에 나오고 두 파일이 실제로 있다', () => {
+  const a = '20261124000000_ingest_commit.sql', b = '20261124000100_ingest_support.sql';
+  has(a); has(b);
+  assert.ok(doc.indexOf(a) < doc.indexOf(b));
+  for (const f of [a, b]) assert.ok(existsSync(join(root, 'supabase/migrations', f)), f);
+});
+
+test('필수 용어가 나온다', () => {
+  for (const s of [
+    'npm run check-env', '--compare', 'chmod 600', '저장소 밖',
+    'ORCH_AUTO', '자동 모드', 'awaiting_merge',
+    'Preview', 'Production', 'Development', '미사용', '수집기',
+    'has_function_privilege', 'pg_get_functiondef', 'pg_get_constraintdef', 'commit_source', 'is_nullable', 'column_default', 'dashboard_norm_id',
+    '부분 적용', '배포 보류', 'targetRows', 'architecture.json',
+  ]) has(s);
+});
+
+test('배포 후 확인 절은 200 만이 아니라 저장 건수·화면으로 확인한다', () => {
+  const start = doc.search(/^## .*배포 후 확인/m);
+  assert.ok(start >= 0, '배포 후 확인 절이 없음');
+  const rest = doc.slice(start + 3);
+  const next = rest.search(/^## /m);
+  const section = next >= 0 ? rest.slice(0, next) : rest;
+  for (const s of ['v1', '200', 'validate_only', 'upserted', '새로고침', '/api/sync-runs']) {
+    assert.ok(section.includes(s), `배포 후 확인 절에 '${s}' 가 없음`);
+  }
+});
+
+test('배포 순서: 연결 보류 → 대조·DB 확인 → 연결·배포, env 파일은 대조 뒤 삭제', () => {
+  const p1 = lineStart('①'), p4 = lineStart('④'), p5 = lineStart('⑤'), p6 = lineStart('⑥'), p8 = lineStart('⑧');
+  const line1 = doc.slice(p1, doc.indexOf('\n', p1));
+  assert.ok(line1.includes('보류'), '① 줄에 보류가 없음');
+  assert.ok(p4 > p1 && p5 > p1);
+  assert.ok(p8 > p4 && p8 > p5 && p8 > p6);
+  const del = doc.indexOf('성공·실패 모두');
+  assert.ok(del > p4 && del < p5, 'env 파일 삭제 문장은 ④ 뒤, ⑤ 앞이어야 함');
+});
+
+test('운영 주소·키 모양 문자열이 없다', () => {
+  assert.ok(!/https?:\/\//.test(doc), 'URL 이 있음');
+  assert.ok(!doc.includes('supabase.co'));
+  assert.ok(!doc.includes('vercel.app'));
+  assert.ok(!/eyJ/.test(doc), 'JWT 모양 문자열이 있음');
+});
+
+test('.gitignore 가 저장소 안 env 파일을 막고 .env.example 은 허용한다', () => {
+  const lines = read('.gitignore').split(/\r?\n/).map((l) => l.trim());
+  assert.ok(lines.includes('.env.*'));
+  assert.ok(lines.includes('!.env.example'));
+});

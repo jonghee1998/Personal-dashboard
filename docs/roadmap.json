@@ -213,19 +213,19 @@
       "id": "8",
       "title": "배포 분리",
       "status": "doing",
-      "note": "나: Vercel 새 저장소 연결 · AI: 개발계/운영계 설정"
+      "note": "나: Vercel 새 저장소 연결 · AI: 개발계/운영계 설정 · AI 몫 완료(check-env, DEPLOY.md), 운영자 확인 대기(자동 모드 끄고 진행)"
     },
     {
       "id": "9",
       "title": "피클AI 전환",
       "status": "todo",
-      "note": "나: 피클AI 설정 변경 · AI: 새 규격 수신 확인"
+      "note": "나: 피클AI 설정 변경 · AI: 새 규격 수신 확인 · 선행: 8단계 운영 배포 후 확인"
     },
     {
       "id": "10",
       "title": "옛 저장소 정리",
       "status": "todo",
-      "note": "나: private_dashboard 삭제"
+      "note": "나: private_dashboard 삭제 · 선행: 8단계 운영 배포 후 확인"
     },
     {
       "id": "11",
