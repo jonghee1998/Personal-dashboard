@@ -55,3 +55,5 @@ select to_regprocedure('public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],j
 객체가 있다는 것과 그 마이그레이션 적용 이력은 별개다. 이력은 운영자가 따로 대조한다.
 
 없는 객체에 해당하는 파일만, 내용을 확인한 뒤 필요할 때 적용한다. 있는 객체의 정의가 파일과 다르면 덮어쓰지 말고 먼저 차이를 확인한다.
+
+배포할 때는 [docs/DEPLOY.md](../docs/DEPLOY.md) 의 배포 전 점검표를 따른다.
