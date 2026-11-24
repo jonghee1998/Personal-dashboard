@@ -69,7 +69,7 @@ test('데이터 훅: 401 → /login, 스냅샷 검사, 60초 주기, 중복 읽�
 });
 
 test('화면 셸은 fetch 를 직접 부르지 않는다', () => {
-  assert.ok(!read('components/demo-dashboard.tsx').includes('fetch('));
+  assert.ok(!read('components/dashboard/dashboard-shell.tsx').includes('fetch('));
 });
 
 test('components·app·lib 에 데모 분기 이름이 없다', () => {

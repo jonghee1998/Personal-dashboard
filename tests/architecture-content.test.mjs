@@ -80,7 +80,7 @@ test('static content contains no URLs or secret-looking values',()=>{
 });
 
 test('dashboard registers the architecture tab outside the data-loading branch',()=>{
- const src=readFileSync(join(root,'components','demo-dashboard.tsx'),'utf8');
+ const src=readFileSync(join(root,'components','dashboard','dashboard-shell.tsx'),'utf8');
  assert.match(src,/\['architecture','구조',''\]/);
  assert.match(src,/tab==='architecture'\?<ArchitectureScreen\/>:loading\?/);
  assert.match(src,/tab!=='architecture'&&<small className="pageUpdateTime"/);

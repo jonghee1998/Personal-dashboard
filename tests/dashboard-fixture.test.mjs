@@ -90,7 +90,7 @@ const sourceFiles = dir => readdirSync(dir, {recursive: true}).map(String).filte
 test('데모 경로·데이터·옛 화면이 지워졌고 데모 분기 이름이 남지 않았다', () => {
   for (const p of ['app/demo', 'lib/demo-data.ts', 'components/dashboard.tsx']) assert.equal(existsSync(p), false, p);
   const files = ['app', 'components', 'lib'].flatMap(sourceFiles);
-  assert.ok(files.includes(join('components', 'demo-dashboard.tsx')));
+  assert.ok(files.includes(join('components', 'dashboard', 'dashboard-shell.tsx')));
   for (const f of files) {
     const src = readFileSync(f, 'utf8');
     for (const name of ['isDemo', 'demoData', 'demo-data', 'SAMPLE_UPDATED_AT', 'demoBanner']) assert.ok(!src.includes(name), `${f}: ${name}`);
@@ -98,7 +98,12 @@ test('데모 경로·데이터·옛 화면이 지워졌고 데모 분기 이름�
 });
 
 test('헤더는 운영 문구만 쓴다', () => {
-  const src = readFileSync('components/demo-dashboard.tsx', 'utf8');
-  for (const text of ['DB 저장 · ', '원본 기준 · ', 'aria-label="로그아웃"', 'const pointLogDate=pointToday();']) assert.ok(src.includes(text), text);
+  const src = readFileSync('components/dashboard/dashboard-shell.tsx', 'utf8');
+  for (const text of ['DB 저장 · ', '원본 기준 · ', 'aria-label="로그아웃"']) assert.ok(src.includes(text), text);
   for (const text of ['샘플 업데이트', '샘플 기준', '샘플 초기화', '운영 대시보드로 이동', 'resetDemo']) assert.ok(!src.includes(text), text);
+});
+
+test('혜택 포인트 로그는 오늘 날짜를 사용한다', () => {
+  const src = readFileSync('components/dashboard/benefits-tab.tsx', 'utf8');
+  assert.ok(src.includes('const pointLogDate=pointToday();'));
 });

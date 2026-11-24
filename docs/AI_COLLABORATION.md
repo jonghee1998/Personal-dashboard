@@ -35,7 +35,7 @@ This repository is the **single source of truth for software development and int
 - Field updates (v1 and v2): each item updates only the keys it sends; omitted optional fields (`description`, `amount`, `category`, `source`, `event_date`, `due_date`, `url`) keep their stored value, and an explicit `null` writes null. v1 always sends `currency`, `status`, `metadata` (schema defaults). Earlier batch upserts wrote null for a key that only other items in the same batch sent; that no longer happens. See docs/INGEST_V2.md ⑦.
 - If the stored row changed between the ingest checks and the write, the request fails with `409 {"code":"CONCURRENT_CHANGE"}`; resend the batch.
 - Existing completed settlements and tasks are preserved against normal resync by a best-effort merge. **Concurrent ingest and user status changes can race.** Do not assume strict transactional safety yet.
-- The `/demo` page uses fabricated, client-local records and **never calls the production ingest or update APIs**.
+- 화면 검사는 `npm run screens`가 합성 세션과 가짜 `/api/dashboard` 응답으로 `/`를 본다.
 - The UI currently refreshes production data every 60 seconds.
 - v2 규격: docs/INGEST_V2.md (`"version": 2` 본문, 같은 `POST /api/ingest`). 운영 반영은 8단계(운영 DB 마이그레이션 적용 후); 그 전까지는 v1 사용
 

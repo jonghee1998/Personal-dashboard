@@ -7,7 +7,7 @@
 import {spawn} from 'node:child_process';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
-import {chromium} from '@playwright/test';
+import {chromium, expect} from '@playwright/test';
 import {createInterface} from 'node:readline';
 import {checkApiAuth, fakeAppEnv, startFakeSupabase, validSessionCookie} from './api-auth.mjs';
 import {checkApiLogs} from './api-log.mjs';
@@ -232,6 +232,65 @@ async function boundary(browser, name, routes, fn) {
     if (errs.length) fail(name, errs); else console.log(`PASS ${name}`);
   } catch (e) { fail(name, [e.message.split('\n')[0]]); }
   finally { await context.close(); }
+}
+
+async function checkTabInteractions(browser) {
+  const run = (name, check) => boundary(browser, name, {dashboard: okDashboard()}, async page => {
+    const errs = await openDashboard(page);
+    if (errs.length) return errs;
+    await check(page);
+    return [];
+  });
+  const detail = page => page.locator('article.newsDetail');
+  const category = page => page.locator('.newsCategoryToggle', {hasText: FIXTURE_NEWS_CATEGORY});
+  const article = page => page.locator('.newsListButton', {hasText: FIXTURE_TEXT.news});
+  const openHomeNews = async page => {
+    await page.locator('button.newsNavCard').click();
+    await expect(category(page)).toBeVisible();
+    await expect(detail(page)).toHaveCount(0);
+    await expect(category(page)).toHaveAttribute('aria-expanded', 'false');
+    await category(page).click();
+    await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
+    await article(page).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+  };
+
+  await run('금융 메모 초안 유지', async page => {
+    await clickTab(page, '금융');
+    await page.locator('.financeSeg button', {hasText: '메모'}).click();
+    const entry = page.locator('.memoEntry', {hasText: FIXTURE_TEXT.merchant});
+    await entry.locator('button.memoRead').click();
+    const draft = entry.getByRole('textbox', {name: FIXTURE_TEXT.merchant + ' 메모', exact: true});
+    await draft.fill('합성메모초안A');
+    await clickTab(page, '홈');
+    await clickTab(page, '금융');
+    await expect(draft).toHaveValue('합성메모초안A');
+  });
+
+  await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
+
+  await run('기록 뉴스 검색 결과 → 바로 상세', async page => {
+    await clickTab(page, '기록');
+    await page.getByRole('searchbox', {name: '통합 기록 검색'}).fill(FIXTURE_TEXT.news);
+    await page.locator('.calendarSearchResult', {hasText: FIXTURE_TEXT.news}).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+  });
+
+  await run('뉴스 상세 → 홈 → 뉴스 목록·분류 펼침 유지', async page => {
+    await openHomeNews(page);
+    await clickTab(page, '홈');
+    await clickTab(page, '뉴스');
+    await expect(detail(page)).toHaveCount(0);
+    await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
+    await expect(article(page)).toBeVisible();
+  });
+
+  await run('기록 탭 옛 안내 문구 없음', async page => {
+    await clickTab(page, '기록');
+    const note = page.locator('p.calendarDemoNote');
+    await expect(note).toBeVisible();
+    await expect(note).not.toContainText(/가상 데이터|실제 데이터 저장은 아직 연결되지 않았어|🧪/);
+  });
 }
 
 async function checkDataBoundaries(browser) {
@@ -516,6 +575,7 @@ try {
     finally { await context.close(); }
   }
 
+  await checkTabInteractions(browser);
   await checkDataBoundaries(browser);
 
   const api =await checkApiAuth(BASE, fake);
