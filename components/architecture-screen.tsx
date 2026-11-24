@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import {architectureSections,summaryLines,vercelEnv,githubSecrets,flowSteps,screenRows,apiRows,safeguardRows,devLines} from '@/lib/architecture-content';
+import {architectureSections,targetDiagram,targetRows,summaryLines,vercelEnv,githubSecrets,flowSteps,screenRows,apiRows,safeguardRows,devLines} from '@/lib/architecture-content';
 
 // Static architecture overview. Reads no data, so it renders even while the dashboard is loading or failing.
 
@@ -21,8 +21,42 @@ function Box({x,y,w,h,lines,tone='plain'}:BoxProps){
 function Arrow({id,x1,y1,x2,y2}:{id:string;x1:number;y1:number;x2:number;y2:number}){
  return <line className="archArrow" x1={x1} y1={y1} x2={x2} y2={y2} markerEnd={`url(#${id})`}/>;
 }
+/** Bent arrow through the given points (x1,y1,x2,y2,...). Same style and marker as Arrow. */
+function ElbowArrow({id,points}:{id:string;points:readonly number[]}){
+ const d=points.reduce((acc,n,i)=>acc+(i%2===0?(i===0?'M':' L')+n:' '+n),'');
+ return <path className="archArrow" d={d} fill="none" markerEnd={`url(#${id})`}/>;
+}
 function ArrowHead({id}:{id:string}){
  return <defs><marker id={id} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" className="archArrowHead"/></marker></defs>;
+}
+
+function TargetDiagram(){
+ const id='archArrowTarget';
+ const t=targetDiagram;
+ // Columns: 개발 (left), 운영 (middle), users outside the arrow paths (right).
+ const DX=4,OX=100,UX=216,CW=88,UW=80,H=54,ROW1=102,ROW2=186;
+ const GX=58,GW=136,TW=31,TGAP=(GW-4*TW)/3;
+ const devC=DX+CW/2,opsC=OX+CW/2,elbowX=202;
+ return <figure className="archFigure">
+  <svg className="archSvg" viewBox="0 0 300 246" role="img" aria-label={t.ariaLabel}>
+   <ArrowHead id={id}/>
+   <Box x={GX} y={4} w={GW} h={40} lines={t.github} tone="accent"/>
+   {t.team.map((name,i)=><Box key={name} x={GX+i*(TW+TGAP)} y={52} w={TW} h={24} lines={[name]}/>)}
+   <text x={DX} y={93} className="archColLabel">{t.devLabel}</text>
+   <text x={OX} y={93} className="archColLabel">{t.opsLabel}</text>
+   <Box x={DX} y={ROW1} w={CW} h={H} lines={t.devApp}/>
+   <Box x={DX} y={ROW2} w={CW} h={H} lines={t.devDb}/>
+   <Box x={OX} y={ROW1} w={CW} h={H} lines={t.opsApp}/>
+   <Box x={OX} y={ROW2} w={CW} h={H} lines={t.opsDb} tone="deep"/>
+   <Box x={UX} y={ROW1} w={UW} h={H} lines={t.users}/>
+   <ElbowArrow id={id} points={[GX,24,devC,24,devC,ROW1-1]}/>
+   <ElbowArrow id={id} points={[GX+GW,24,elbowX,24,elbowX,ROW1+16,OX+CW+1,ROW1+16]}/>
+   <Arrow id={id} x1={UX} y1={ROW1+40} x2={OX+CW+1} y2={ROW1+40}/>
+   <Arrow id={id} x1={devC} y1={ROW1+H} x2={devC} y2={ROW2-1}/>
+   <Arrow id={id} x1={opsC} y1={ROW1+H} x2={opsC} y2={ROW2-1}/>
+  </svg>
+  <figcaption className="archLegend">{t.legend}</figcaption>
+ </figure>;
 }
 
 function SystemDiagram(){
@@ -67,8 +101,8 @@ function FlowDiagram(){
  </figure>;
 }
 
-function Table({head,rows}:{head:readonly string[];rows:readonly (readonly ReactNode[])[]}){
- return <table className="archTable">
+function Table({head,rows,className}:{head:readonly string[];rows:readonly (readonly ReactNode[])[];className?:string}){
+ return <table className={className?'archTable '+className:'archTable'}>
   <thead><tr>{head.map(h=><th key={h} scope="col">{h}</th>)}</tr></thead>
   <tbody>{rows.map((row,i)=><tr key={i}>{row.map((cell,j)=>j===0?<th key={j} scope="row">{cell}</th>:<td key={j}>{cell}</td>)}</tr>)}</tbody>
  </table>;
@@ -78,8 +112,13 @@ const Lines=({lines}:{lines:readonly string[]})=><div className="archLines">{lin
 const Tag=({children}:{children:ReactNode})=><span className="archTag">{children}</span>;
 
 export default function ArchitectureScreen(){
- const [s1,s2,s3,s4,s5,s6,s7,s8]=architectureSections;
+ // Section 01 is the target structure; s1..s8 keep their original content and show as 02..09.
+ const [target,s1,s2,s3,s4,s5,s6,s7,s8]=architectureSections;
  return <main className="archScreen">
+  <Section {...target}>
+   <TargetDiagram/>
+   <Table className="archTargetTable" head={['영역','지금','목표','단계']} rows={targetRows.map(r=>[r.area,r.now,r.target,r.phase])}/>
+  </Section>
   <Section {...s1}><Lines lines={summaryLines}/></Section>
   <Section {...s2}><SystemDiagram/></Section>
   <Section {...s3}>

@@ -3,16 +3,32 @@ import assert from 'node:assert/strict';
 import {readdirSync,readFileSync} from 'node:fs';
 import {join,relative,sep} from 'node:path';
 import * as content from '../lib/architecture-content.ts';
-import {architectureSections,apiRows,vercelEnv,githubSecrets,flowSteps} from '../lib/architecture-content.ts';
+import {architectureSections,apiRows,vercelEnv,githubSecrets,flowSteps,targetRows,targetDiagram} from '../lib/architecture-content.ts';
 
 const root=new URL('..',import.meta.url).pathname;
 const routeFiles=(dir)=>readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?routeFiles(join(dir,e.name)):e.name==='route.ts'?[join(dir,e.name)]:[]);
 const apiPaths=()=>routeFiles(join(root,'app','api')).map(f=>'/'+relative(join(root,'app'),f).split(sep).slice(0,-1).join('/')).sort();
 
-test('sections 01-08 appear in order with the required categories',()=>{
- assert.deepEqual(architectureSections.map(s=>s.no),['01','02','03','04','05','06','07','08']);
- assert.deepEqual(architectureSections.map(s=>s.kicker),['요약','아키텍처','배포·비밀값','데이터 흐름','화면','API','안전장치','개발 방식']);
+test('sections 01-09 appear in order with the required categories',()=>{
+ assert.deepEqual(architectureSections.map(s=>s.no),['01','02','03','04','05','06','07','08','09']);
+ assert.deepEqual(architectureSections.map(s=>s.kicker),['목표 구조','요약','아키텍처','배포·비밀값','데이터 흐름','화면','API','안전장치','개발 방식']);
  for(const s of architectureSections)assert.ok(s.title.length>0&&s.title.length<=30,s.title);
+});
+
+test('target table has 8 now→target rows with a phase per row',()=>{
+ assert.equal(targetRows.length,8);
+ assert.deepEqual(targetRows.map(r=>r.area),['저장소','AI 팀','수신 API','DB','배포','테스트','피클AI','화면']);
+ for(const r of targetRows){
+  for(const k of ['area','now','target','phase'])assert.ok(typeof r[k]==='string'&&r[k].trim().length>0,`${r.area}.${k}`);
+  assert.match(r.phase,/^(완료|[1-9][0-9]*단계)$/,r.area);
+ }
+});
+
+test('target diagram text names dev/ops areas and the legend',()=>{
+ assert.equal(targetDiagram.legend,'왼쪽 = AI가 만지는 개발 영역 · 진한 상자 = 실데이터(AI 접근 금지)');
+ assert.deepEqual(targetDiagram.github,['GitHub · AI 팀','코드만 · 데이터 없음']);
+ assert.ok(targetDiagram.ariaLabel.length>0);
+ assert.doesNotMatch(JSON.stringify(targetDiagram),/vercel\.app|supabase\.co/i);
 });
 
 test('API table lists every app/api/**/route.ts exactly once',()=>{
@@ -54,7 +70,7 @@ test('data flow uses the upsert conflict key from the ingest route',()=>{
 test('static content contains no URLs or secret-looking values',()=>{
  const text=JSON.stringify(content);
  assert.doesNotMatch(text,/https?:\/\//);
- assert.doesNotMatch(text,/supabase\.co|eyJ[A-Za-z0-9_-]{10,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+ assert.doesNotMatch(text,/supabase\.co|vercel\.app|eyJ[A-Za-z0-9_-]{10,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
 });
 
 test('dashboard registers the architecture tab outside the data-loading branch',()=>{
