@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "kind": "settlement",
+      "external_id": "settlement-20261114-001",
+      "title": "친구 정산",
+      "amount": 30000,
+      "status": "pending",
+      "due_date": "2026-11-14",
+      "category": "정산",
+      "metadata": {
+        "participants": 3
+      }
+    },
+    {
+      "kind": "transaction",
+      "external_id": "card-20261111-001",
+      "title": "점심",
+      "amount": 12500,
+      "status": "active",
+      "event_date": "2026-11-11",
+      "category": "식비",
+      "source": "카드"
+    },
+    {
+      "kind": "news",
+      "external_id": "news-20261111-001",
+      "title": "오늘의 주요 뉴스",
+      "description": "요약 텍스트",
+      "url": "https://example.com",
+      "event_date": "2026-11-11",
+      "status": "active"
+    }
+  ]
+}
