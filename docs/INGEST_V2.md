@@ -91,7 +91,8 @@
 
 - 항목 JSON 에 **있는 키만** 갱신하고, 없는 키는 기존 값을 유지한다(새 행은 열 기본값).
 - 명시적 `null` 은 null 로 쓴다.
-- v1 의 PostgREST 일괄 upsert 와 결과가 다를 수 있다(v1 은 배치 안 키 집합 기준으로 열을 채운다).
+- 이 규칙은 v1 에도 적용된다(계획 ③부터 v1 도 같은 DB 함수 `dashboard_ingest_commit` 으로 쓴다). 예전 PostgREST 일괄 upsert 는 한 배치에서 어떤 행만 보낸 키를 다른 행에서는 null 로 썼지만, 이제는 행마다 보낸 키만 갱신한다.
+- v1 은 스키마 기본값 때문에 `currency`·`status`·`metadata` 를 항상 보낸다. 선택 필드(`description`·`amount`·`category`·`source`·`event_date`·`due_date`·`url`)는 그 항목에 키가 있을 때만 갱신된다.
 
 ## ⑧ 운영 반영 조건(계획 ③ 인수 기준)
 

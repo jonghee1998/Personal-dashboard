@@ -31,6 +31,8 @@ This repository is the **single source of truth for software development and int
 - `title`: required string. `amount`: number, not a formatted currency string. `status`: `pending | done | active | archived`.
 - `event_date` and `due_date`: `YYYY-MM-DD`, when supplied.
 - Ingest currently upserts all supplied items, but **does not delete records omitted from subsequent batches**.
+- Field updates (v1 and v2): each item updates only the keys it sends; omitted optional fields (`description`, `amount`, `category`, `source`, `event_date`, `due_date`, `url`) keep their stored value, and an explicit `null` writes null. v1 always sends `currency`, `status`, `metadata` (schema defaults). Earlier batch upserts wrote null for a key that only other items in the same batch sent; that no longer happens. See docs/INGEST_V2.md ⑦.
+- If the stored row changed between the ingest checks and the write, the request fails with `409 {"code":"CONCURRENT_CHANGE"}`; resend the batch.
 - Existing completed settlements and tasks are preserved against normal resync by a best-effort merge. **Concurrent ingest and user status changes can race.** Do not assume strict transactional safety yet.
 - The `/demo` page uses fabricated, client-local records and **never calls the production ingest or update APIs**.
 - The UI currently refreshes production data every 60 seconds.
