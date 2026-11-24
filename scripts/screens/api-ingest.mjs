@@ -4,6 +4,7 @@
 // ⓕ v2 run f6 최초 → 200 ⓖ f6 동일 재전송 → 200 idempotent ⓗ f6 같은 run_id 다른 본문 → 409 RUN_ID_CONFLICT
 // ⓘ v2 run f7 별도 보고(commit_source 'report')가 먼저 기록 → 409 RUN_ID_CONFLICT
 // ⓙ v2 run f8 실패 보고(run.status 'failed'·items []) → 200 upserted 0.
+// ⓚ v2 모양·version "2"(문자열) → 400 Invalid payload·details 객체·version과 Cache-Control 없음·Supabase 호출 0건.
 // 값은 모두 가짜다. 이 파일은 lib/*.ts 를 import 하지 않는다(node 로 바로 실행). 본문이 v2 규칙을 통과하는지는
 // tests/api-ingest-screen.test.mjs 가 parseIngestV2 로 확인한다.
 import {readFileSync} from 'node:fs';
@@ -65,6 +66,10 @@ export function v2Body(runId) {
   return withItems(runId, [successExample().items[0]]);
 }
 
+export function stringVersionBody(runId = INGEST_RUN_OK) {
+  return {...v2Body(runId), version: '2'};
+}
+
 /** v2Body(runId) 와 같은 1항목이되 title 만 '합성가맹점B' 로 바꾼 본문(manifest 다시 계산 → payload_digest 가 다름) */
 export function v2ConflictBody(runId = INGEST_RUN_REPLAY) {
   return withItems(runId, [{...successExample().items[0], title: '합성가맹점B'}]);
@@ -104,6 +109,7 @@ export function apiIngestCases() {
     {id: 'i', name: 'v2 run f7 별도 보고가 먼저 기록 → 409 RUN_ID_CONFLICT', headers: auth, body: v2Body(INGEST_RUN_REPORT)},
     // j 는 문서 failed 예시(items []) 그대로, run_id 만 f8
     {id: 'j', name: 'v2 run f8 실패 보고 → 200 upserted 0', headers: auth, body: failedBody()},
+    {id: 'k', name: 'v2 모양·version "2"(문자열) → 400 Invalid payload', headers: auth, body: stringVersionBody()},
   ];
 }
 
@@ -176,8 +182,13 @@ export function judgeIngestCase(c, observed) {
     else if (mine[0].status !== 503) errs.push(`commit RPC 응답 ${mine[0].status} (기대 503)`);
     break;
   }
-  case 'd': {
-    status(401);
+  case 'd':
+  case 'k': {
+    status(c.id === 'k' ? 400 : 401);
+    if (c.id === 'k' && (!isObj(body) || body.error !== 'Invalid payload'
+      || !isObj(body.details) || Object.hasOwn(body, 'version'))) {
+      errs.push('응답 본문이 version 없는 {error:"Invalid payload", details: 객체} 가 아님');
+    }
     if (observed.cacheControl !== null && observed.cacheControl !== undefined) errs.push(`Cache-Control ${observed.cacheControl} (기대 없음)`);
     const data = calls.filter(x => x.path.startsWith('/rest/v1')).length;
     if (data) errs.push(`데이터 요청 rest/v1 ${data}건 (기대 0)`);
@@ -275,7 +286,7 @@ export function judgeIngestCase(c, observed) {
   return errs;
 }
 
-/** 열 경우를 차례로 실행(사례마다 그 요청 동안의 calls 만 잘라 판정하므로 f 의 호출이 g·h 판정에 섞이지 않는다) → {problems, results} */
+/** 검사 목록을 차례로 실행(사례마다 그 요청 동안의 calls 만 잘라 판정하므로 f 의 호출이 g·h 판정에 섞이지 않는다) → {problems, results} */
 export async function checkApiIngest(base, fake) {
   const problems = [], results = [];
   for (const c of apiIngestCases()) {
