@@ -1,3 +1,5 @@
+> 이 API 는 6단계 ⑤(2026-11)에 삭제됨. 기록용
+
 # Phase 2 — transaction identity and statement reconciliation (initial read-only implementation)
 
 This implementation deliberately does not change the meaning of existing amount fields or delete/merge legacy transactions.

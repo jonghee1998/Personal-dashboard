@@ -1,3 +1,5 @@
+> 이 API 는 6단계 ⑤(2026-11)에 삭제됨. 기록용
+
 # Transaction backfill preview v1
 POST /api/backfill/preview, existing ingest Bearer token. Read-only. No migration and no apply endpoint.
 

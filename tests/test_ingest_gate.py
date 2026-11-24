@@ -72,6 +72,28 @@ class TestIngestGate(unittest.TestCase):
         for p in ALLOWED_INGEST_PATHS:
             validate_endpoint_url(ORIGIN + p)  # Should not raise
 
+    def test_allowlist_is_exactly_ingest_and_sync_runs(self):
+        self.assertEqual(ALLOWED_INGEST_PATHS, ("/api/ingest", "/api/sync-runs"))
+        validate_endpoint_url(ORIGIN + "/api/ingest")
+        validate_endpoint_url(ORIGIN + "/api/sync-runs")
+
+    def test_removed_backfill_preview_rejected_without_network(self):
+        with self.assertRaises(IngestGateError) as ctx:
+            validate_endpoint_url(ORIGIN + "/api/backfill/preview")
+        self.assertEqual(str(ctx.exception), "UNAUTHORIZED_ENDPOINT")
+        mock_opener = MagicMock()
+        with self.assertRaises(IngestGateError) as ctx:
+            transmit_gated_ingest(
+                ORIGIN + "/api/backfill/preview",
+                "test-token",
+                "points",
+                self.synthetic_points_manifest,
+                self.synthetic_points_items,
+                opener=mock_opener
+            )
+        self.assertEqual(str(ctx.exception), "UNAUTHORIZED_ENDPOINT")
+        self.assertEqual(mock_opener.open.call_count, 0)
+
     def test_allowlist_rejects_foreign_host(self):
         with self.assertRaises(IngestGateError) as ctx:
             validate_endpoint_url("https://malicious-site.com/api/ingest")
