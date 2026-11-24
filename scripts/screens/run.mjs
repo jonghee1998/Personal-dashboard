@@ -7,6 +7,7 @@ import {createInterface} from 'node:readline';
 import {checkApiAuth, fakeAppEnv, startFakeSupabase} from './api-auth.mjs';
 import {checkApiLogs} from './api-log.mjs';
 import {checkApiIngest} from './api-ingest.mjs';
+import {checkApiItems} from './api-items.mjs';
 
 const PORT = process.env.PORT || '3100';
 const SCREENS_DIR = process.env.SCREENS_DIR || '.screens';
@@ -121,6 +122,9 @@ try {
   const ingestCheck = await checkApiIngest(BASE, fake);
   if (ingestCheck.problems.length) { failed = true; console.log(`FAIL api 수신 검사 ${ingestCheck.problems.length}건`); }
   else console.log(`PASS api 수신 검사 ${ingestCheck.results.length}건`);
+  const itemsCheck = await checkApiItems(BASE, fake);
+  if (itemsCheck.problems.length) { failed = true; console.log(`FAIL api 항목 검사 ${itemsCheck.problems.length}건`); }
+  else console.log(`PASS api 항목 검사 ${itemsCheck.results.length}건`);
 } catch (e) {
   failed = true;
   console.error(e.message);
