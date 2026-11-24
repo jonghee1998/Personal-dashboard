@@ -198,15 +198,15 @@
     {
       "id": "6",
       "title": "데이터 수신 재설계",
-      "status": "doing",
-      "note": "AI: 수신 API 통합, 일회성 API 3개 정리, 피클AI 규격 v2",
-      "ref": 23
+      "status": "done",
+      "note": "AI: 인증 공통화·실패 로그(#23), v2 규격·수신 DB 함수(#28), API 연결(#32), 정리(#37), 일회성 API 삭제(#42)",
+      "ref": 42
     },
     {
       "id": "7",
-      "title": "화면 정리·디자인",
+      "title": "화면 코드 정리",
       "status": "todo",
-      "note": "AI: 다섯 탭 유지, 데모 제거, 디자인 개선 · 나: 화면 확인"
+      "note": "AI: DIAGNOSIS 7-1~7-4·7-6(화면 테스트를 데모에서 떼기, demo-dashboard 분리, 데모 삭제, 이름 정리) · 화면 모양은 그대로, 디자인은 하지 않음"
     },
     {
       "id": "8",
@@ -225,6 +225,12 @@
       "title": "옛 저장소 정리",
       "status": "todo",
       "note": "나: private_dashboard 삭제"
+    },
+    {
+      "id": "11",
+      "title": "디자인 개선(나중)",
+      "status": "todo",
+      "note": "사용자가 요청할 때 시작(DIAGNOSIS 7-5). 자동 모드는 이 단계를 고르지 않음 · 나: 화면 확인"
     }
   ]
 }
