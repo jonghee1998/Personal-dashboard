@@ -212,7 +212,7 @@
 
 ## ⑩ 관련 문서
 
-- [AI_COLLABORATION.md](AI_COLLABORATION.md) Integration API 절(v1)
+- [AI_COLLABORATION.md](AI_COLLABORATION.md) Integration API 절(v1, v2 전환 시점·별도 보고 금지)
 - [DIAGNOSIS.md](DIAGNOSIS.md) (2)절 — 읽기·쓰기 사이 경쟁 문제
 - [SYNC_AUDIT_CONTRACT.md](SYNC_AUDIT_CONTRACT.md) — v1 실행 보고
 
