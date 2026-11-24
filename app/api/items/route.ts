@@ -23,11 +23,10 @@ export async function PATCH(req:NextRequest){
    if(error||!data)return NextResponse.json({error:'Update failed'},{status:400});
    return NextResponse.json({item:data});
  }
- const {data:existing,error:readError}=await db.from('dashboard_items').select('id,kind,metadata').eq('id',input.id).eq('user_id',user.id).single();
- if(readError||!existing||existing.kind!=='transaction')return NextResponse.json({error:'Transaction not found'},{status:404});
- const metadata=(existing.metadata&&typeof existing.metadata==='object'&&!Array.isArray(existing.metadata))?existing.metadata as Record<string,unknown>:{};
- const {data,error}=await db.from('dashboard_items').update({metadata:{...metadata,memo:input.memo.trim()}}).eq('id',input.id).eq('user_id',user.id).eq('kind','transaction').select().single();
- if(error||!data)return NextResponse.json({error:'Memo save failed'},{status:400});
+ // 한 UPDATE 로 metadata.memo 만 바꾼다(읽고 다시 쓰는 사이 다른 쓰기를 덮어쓰지 않음). 본인 거래가 아니면 null.
+ const {data,error}=await db.rpc('dashboard_item_set_memo',{p_id:input.id,p_memo:input.memo.trim()});
+ if(error)return NextResponse.json({error:'Memo save failed'},{status:400});
+ if(data==null)return NextResponse.json({error:'Transaction not found'},{status:404});
  return NextResponse.json({item:data});
 }
 
