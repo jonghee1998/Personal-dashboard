@@ -1,5 +1,5 @@
 -- 일회용 테스트 DB 전용. tests/db/auth-stub.sql → supabase/migrations/*.sql(이름순) 적용 뒤 실행된다.
--- 마이그레이션 3개가 만든 테이블·트리거·정책·권한이 있는지 확인한다. 없으면 raise.
+-- 마이그레이션들이 만든 테이블·트리거·정책·함수·권한이 있는지 확인한다. 없으면 raise.
 \set ON_ERROR_STOP on
 
 do $$
@@ -35,6 +35,17 @@ begin
   or to_regprocedure('public.dashboard_backfill_apply(uuid,uuid,text,integer)') is null
   or to_regprocedure('public.dashboard_backfill_rollback(uuid,uuid,text)') is null
  then raise exception 'missing backfill function'; end if;
+
+ -- 수신 커밋 함수 + 실행 기록 commit_source 열
+ if to_regprocedure('public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)') is null then raise exception 'missing ingest commit function'; end if;
+ if not exists (
+  select 1 from information_schema.columns
+  where table_schema='public' and table_name='dashboard_sync_runs' and column_name='commit_source' and is_nullable='NO' and column_default like '''report''%'
+ ) then raise exception 'missing dashboard_sync_runs.commit_source'; end if;
+ if has_function_privilege('authenticated','public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)','execute')
+  or has_function_privilege('anon','public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)','execute')
+ then raise exception 'client can run ingest commit'; end if;
+ if not has_function_privilege('service_role','public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)','execute') then raise exception 'service_role cannot run ingest commit'; end if;
 
  -- auth-stub 의 기본 권한 뒤에도 마이그레이션 안의 revoke 가 효과를 낸다
  if not has_table_privilege('authenticated','public.dashboard_items','select') then raise exception 'default privilege not applied'; end if;
