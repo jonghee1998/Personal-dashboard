@@ -34,6 +34,7 @@ This repository is the **single source of truth for software development and int
 - Existing completed settlements and tasks are preserved against normal resync by a best-effort merge. **Concurrent ingest and user status changes can race.** Do not assume strict transactional safety yet.
 - The `/demo` page uses fabricated, client-local records and **never calls the production ingest or update APIs**.
 - The UI currently refreshes production data every 60 seconds.
+- v2 규격: docs/INGEST_V2.md (③ 배포 전까지는 v1 사용)
 
 ## Issue format
 
