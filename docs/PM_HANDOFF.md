@@ -1,28 +1,21 @@
 # PM 인수인계
 
-_마지막 갱신: 2026-11-24 10시_
+_마지막 갱신: 2026-11-24 14시_
 
 ## 현재 상태
-- private_dashboard(비공개)에서 코드만 기록 없이 이사 완료. 실데이터 문서 제외, 테스트 실명 교체.
-- 엔진 설치 완료(PR #3): scripts/orch, 워크플로 7개, ci.yml(타입·테스트 100개·빌드·개인정보 검사), Secrets 3개, Codex 로그인.
-- CI 화면 테스트 잡 PR #4 대기(사용자 반영 필요).
-- 기존 문제: Dashboard data QA의 atomic-backfill 잡이 이사 전부터 실패(`tests/atomic-backfill.test.sql:42` integer "metadata") → 진단(6.1)에서 다룸.
+- 진행 단계 1~4 완료(이사, AI 팀 설치, 구조 화면 #2·#8, 코드 진단 #11 → docs/DIAGNOSIS.md). 5단계(개발 DB) 시작 전.
+- 2026-11-24: 진단에서 나온 개인 흔적(운영 주소, 실제 같은 금액·건수, 지명)을 가짜 값으로 바꾸고 main 기록을 새로 만듦(force push, 사용자 승인). 옛 브랜치는 cleanup-branches 로 정리 중.
+- 상황판 구조 탭은 이 저장소 docs/architecture.json 을 읽음(목적: 피클AI가 모은 내 지출·정산·뉴스·일정을 폰 하나로 보기).
+- 알려진 문제: 이 저장소에서 orchestrator 정기 실행(cron)이 한 번도 안 돎 → #2 가 수동 반영 뒤에도 '반영 승인 대기'로 남음. 수동 실행으로 정리, cron 등록 여부 확인 필요.
+- 계획 감사(Codex)가 정규화된 계획의 model:null 을 오탐함 → ai-orchestrator plan-review.mjs 에서 null 제거 후 보여 주도록 고칠 것.
 
 ## 결정한 것
-- 저장소 Personal-dashboard 공개, 실데이터는 Supabase에만. AI는 운영 DB 접근 금지.
-- 화면 구성 유지, 디자인 변경 가능. 개발은 PM(Claude)이 엔진으로.
-- 기존 private_dashboard는 보관하지 않음. 이사 확인 후 사용자가 삭제.
-- 상황판에는 데이터 없이 홈에 에이전트별 작업만 표시(ai-orchestrator #303 진행 중).
-- 계획 → 감사 → 승인(orch:go) → 작업 순서를 지킴. Codex 감사 불가 시 Opus.
-
-## 계획
-- #1 엔진 설치: 완료. #2 구조 탭(지금 앱 상세 01~08 + 화면 테스트 도구): 반영 완료(PR #7).
-- #8 구조 탭에 목표 구조 상세판(01 목표 구조, 기존 02~09): 감사 OK, `orch:go` 대기.
-- ai-orchestrator #303(지금 일하는 AI·카드 접기·화면 링크) 완료, #308(프로젝트 카드에 진행 단계 할 일/전체 + 연결 Issue 자동 완료) 진행 중.
-- 진행 단계 10개는 `docs/roadmap.json` `phases`(ref = 계획 Issue 번호). 연결 안 된 단계는 PM이 상태 갱신.
-- 사용자 원칙: 화면·구조는 먼저 보여주고 검사받은 뒤 작업.
+- 공개 저장소, 실데이터는 Supabase 에만. AI 는 운영 DB 접근 금지. 화면 구성 유지, 디자인 변경 가능.
+- 새 프로젝트 표준 절차는 ai-orchestrator docs/NEW_PROJECT.md 를 따른다(기본 환경 → 진행 단계 → 구조 확인 → 작업).
+- 스위치는 상황판에서 모든 프로젝트에 일괄 적용.
+- 사용자에게 무언가 요청할 때는 항상 링크를 함께 준다.
 
 ## 다음 할 일
-1. 사용자: #8 `orch:go`, Vercel `ORCH_REPOS`에 이 저장소 추가.
-2. PM: #2 끝났으니 phases 3단계 done 반영(#308 반영 후엔 자동), 4단계 코드 진단 계획 작성 → 감사 → 승인 요청.
-3. Codex 리뷰 한도 소진 상태 → 검수는 Opus 대체 중.
+1. 5단계: 사용자 개발용 Supabase 생성(https://supabase.com/dashboard/new) → PM 계획(진단 5-1~5-7: SQL 테스트 괄호, 마이그레이션 기준선, 개발 DB 적용, 가짜 시드, DB 연동·API 인증 테스트, 남은 주소 환경변수화).
+2. 6·7단계는 DIAGNOSIS.md (7)절 할 일 표대로 계획.
+3. 9단계 전까지 v1 수신 호환 유지(DIAGNOSIS.md 끝 표).
