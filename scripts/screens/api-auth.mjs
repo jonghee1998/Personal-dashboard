@@ -21,12 +21,13 @@ export function fakeExistingRun() {
 }
 
 /** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지, f6 재전송·실행 키 충돌,
- *  f7 별도 보고(report)가 먼저 기록된 실행 */
+ *  f7 별도 보고(report)가 먼저 기록된 실행, f8 실패 보고(run.status 'failed'·items []) */
 export const INGEST_RUN_OK = '00000000-0000-4000-8000-0000000000f3';
 export const INGEST_RUN_COMMIT_FAIL = '00000000-0000-4000-8000-0000000000f4';
 export const INGEST_RUN_PAGED = '00000000-0000-4000-8000-0000000000f5';
 export const INGEST_RUN_REPLAY = '00000000-0000-4000-8000-0000000000f6';
 export const INGEST_RUN_REPORT = '00000000-0000-4000-8000-0000000000f7';
+export const INGEST_RUN_FAILED = '00000000-0000-4000-8000-0000000000f8';
 /** parseIngestV2(v2Body(INGEST_RUN_REPORT), NOW).payloadDigest 를 한 번 계산해 적은 값(이 파일은 lib 를 import 하지 않는다).
  *  tests/api-ingest-report.test.mjs 가 같은지 확인한다. */
 export const REPORT_PAYLOAD_DIGEST = 'dbd9504e5ddaad475c923a7f8700cbfbe55c01fd114d2623df3675d2173b8504';
@@ -178,7 +179,7 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
     return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? row : [row]};
   }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs'
-    && new URLSearchParams(query).getAll('run_id').some(v => [INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED].some(id => v === `eq.${id}`))) {
+    && new URLSearchParams(query).getAll('run_id').some(v => [INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_FAILED].some(id => v === `eq.${id}`))) {
     return {status: 200, body: []};
   }
   if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_existing') return {status: 200, body: fakeExistingPage(body)};
