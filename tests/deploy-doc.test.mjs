@@ -49,6 +49,13 @@ test('배포 후 확인 절은 200 만이 아니라 저장 건수·화면으로 
   for (const s of ['v1', '200', 'validate_only', 'upserted', '새로고침', '/api/sync-runs']) {
     assert.ok(section.includes(s), `배포 후 확인 절에 '${s}' 가 없음`);
   }
+  assert.ok(
+    section.split(/\r?\n/).some((l) => l.includes('개발 토큰') && l.includes('401')),
+    "배포 후 확인 절에 '개발 토큰' 과 '401' 이 함께 있는 줄이 없음",
+  );
+  for (const s of ['collector_auth_failed', 'mismatch', '요청 ID']) {
+    assert.ok(section.includes(s), `배포 후 확인 절에 '${s}' 가 없음`);
+  }
 });
 
 test('배포 순서: 연결 보류 → 대조·DB 확인 → 연결·배포, env 파일은 대조 뒤 삭제', () => {
