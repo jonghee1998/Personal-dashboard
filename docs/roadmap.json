@@ -191,15 +191,16 @@
     {
       "id": "5",
       "title": "개발 DB 연결",
-      "status": "doing",
-      "note": "AI: 스키마·가짜 데이터·연동 테스트를 CI Postgres로 완료(#15) · 남은 것: 개발 DB 방식 확정",
+      "status": "done",
+      "note": "AI: 스키마·가짜 데이터·연동 테스트(CI Postgres로 대체, 무료 한도) · 나: 결정",
       "ref": 15
     },
     {
       "id": "6",
       "title": "데이터 수신 재설계",
-      "status": "todo",
-      "note": "AI: 수신 API 통합, 일회성 API 3개 정리, 피클AI 규격 v2"
+      "status": "doing",
+      "note": "AI: 수신 API 통합, 일회성 API 3개 정리, 피클AI 규격 v2",
+      "ref": 23
     },
     {
       "id": "7",
