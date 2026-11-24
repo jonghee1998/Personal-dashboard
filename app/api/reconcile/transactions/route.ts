@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
+import {logApiFailure} from '@/lib/api-log';
 import {z} from 'zod';
 import {adminDb} from '@/lib/supabase-server';
 import {reconcileStatement} from '@/lib/transaction-reconciliation';
@@ -18,7 +19,7 @@ export async function POST(req:NextRequest){
  const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
  if(!collector.ok){console.error(collectorAuthFailureLog('/api/reconcile/transactions',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
  const userId=process.env.DASHBOARD_USER_ID;
- if(!userId||!z.string().uuid().safeParse(userId).success)return NextResponse.json({error:'Server not configured'},{status:503,headers});
+ if(!userId||!z.string().uuid().safeParse(userId).success){logApiFailure('/api/reconcile/transactions','config');return NextResponse.json({error:'Server not configured'},{status:503,headers});}
  let body:unknown;try{body=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400,headers});}
  const parsed=schema.safeParse(body);if(!parsed.success)return NextResponse.json({error:'Invalid statement manifest',details:parsed.error.flatten()},{status:422,headers});
  try{
@@ -26,12 +27,12 @@ export async function POST(req:NextRequest){
   while(true){
    let q=db.from('dashboard_items').select('*').eq('user_id',userId).eq('kind','transaction').neq('status','archived').order('id',{ascending:true}).limit(500);
    if(after)q=q.gt('id',after);
-   const {data,error}=await q;if(error||!data)return NextResponse.json({error:'Transaction read failed'},{status:503,headers});
+   const {data,error}=await q;if(error||!data){logApiFailure('/api/reconcile/transactions','read',error);return NextResponse.json({error:'Transaction read failed'},{status:503,headers});}
    rows.push(...data);if(data.length<500)break;
    after=data[data.length-1].id;
   }
   const v=parsed.data;
   const result=reconcileStatement(rows.filter(row=>visibleDashboardItem(row as any)&&!isReportedSyntheticId(row.external_id)) as any,v.rows,v.scope,v.expected_count,v.expected_total);
   return NextResponse.json(result,{headers});
- }catch{return NextResponse.json({error:'Reconciliation unavailable'},{status:503,headers});}
+ }catch(e){logApiFailure('/api/reconcile/transactions','unexpected',e);return NextResponse.json({error:'Reconciliation unavailable'},{status:503,headers});}
 }
