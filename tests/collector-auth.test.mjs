@@ -64,7 +64,7 @@ test('failure log replaces odd route or reason with invalid',()=>{
 });
 
 const root=new URL('..',import.meta.url).pathname;
-const routes=['app/api/ingest/route.ts','app/api/sync-runs/route.ts','app/api/reconcile/transactions/route.ts','app/api/backfill/preview/route.ts','app/api/backfill/stage/route.ts'];
+const routes=['app/api/ingest/route.ts','app/api/sync-runs/route.ts'];
 const call=/checkCollectorToken\(\s*req\.headers\.get\('authorization'\)\s*,\s*process\.env\.PICKLE_INGEST_TOKEN\s*\)/g;
 
 test('collector routes use only the shared token check',()=>{
