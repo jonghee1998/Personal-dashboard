@@ -2,7 +2,7 @@ import {NextRequest,NextResponse} from 'next/server';
 import {checkCollectorToken,collectorAuthFailureLog} from '@/lib/collector-auth';
 import {logApiFailure} from '@/lib/api-log';
 import {z} from 'zod';
-import {adminDb,serverDb} from '@/lib/supabase-server';
+import {adminDb} from '@/lib/supabase-server';
 import {datasets} from '@/lib/sync-audit';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -23,13 +23,6 @@ const report=z.object({
  if(v.status!=='success'&&!v.error_code)ctx.addIssue({code:z.ZodIssueCode.custom,path:['error_code'],message:'Non-success report requires an error code'});
 });
 const headers={'Cache-Control':'no-store'};
-export async function GET(){
- const db=await serverDb();const {data:{user}}=await db.auth.getUser();
- if(!user)return NextResponse.json({error:'Unauthorized'},{status:401,headers});
- const {data,error}=await db.from('dashboard_sync_runs').select('*').eq('user_id',user.id).order('received_at',{ascending:false}).limit(200);
- if(error)return NextResponse.json({error:'Sync audit unavailable; migration required or database unavailable'},{status:503,headers});
- return NextResponse.json({runs:data??[],verification:'collector_report_and_database_count_not_independent_source_verification'},{headers});
-}
 export async function POST(req:NextRequest){
  const collector=checkCollectorToken(req.headers.get('authorization'),process.env.PICKLE_INGEST_TOKEN);
  if(!collector.ok){console.error(collectorAuthFailureLog('/api/sync-runs',collector.reason));return NextResponse.json({error:'Unauthorized'},{status:401,headers});}
