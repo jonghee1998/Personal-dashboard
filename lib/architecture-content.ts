@@ -4,15 +4,44 @@
 export type ArchitectureSection={no:string;kicker:string;title:string};
 
 export const architectureSections=[
- {no:'01',kicker:'요약',title:'수집기가 쓰고, 나는 폰으로 본다'},
- {no:'02',kicker:'아키텍처',title:'쓰기는 토큰, 읽기는 로그인 세션'},
- {no:'03',kicker:'배포·비밀값',title:'비밀 키는 Vercel 서버에만 둔다'},
- {no:'04',kicker:'데이터 흐름',title:'검증을 통과한 데이터만 저장된다'},
- {no:'05',kicker:'화면',title:'다섯 탭이 같은 조회 결과를 나눠 본다'},
- {no:'06',kicker:'API',title:'API 8개 중 4개는 정리 예정'},
- {no:'07',kicker:'안전장치',title:'키·데이터·DB 접근을 따로 막는다'},
- {no:'08',kicker:'개발 방식',title:'계획→구현→검수→반영을 AI가 돈다'}
+ {no:'01',kicker:'목표 구조',title:'AI는 개발 쪽, 실데이터는 운영 쪽에만'},
+ {no:'02',kicker:'요약',title:'수집기가 쓰고, 나는 폰으로 본다'},
+ {no:'03',kicker:'아키텍처',title:'쓰기는 토큰, 읽기는 로그인 세션'},
+ {no:'04',kicker:'배포·비밀값',title:'비밀 키는 Vercel 서버에만 둔다'},
+ {no:'05',kicker:'데이터 흐름',title:'검증을 통과한 데이터만 저장된다'},
+ {no:'06',kicker:'화면',title:'다섯 탭이 같은 조회 결과를 나눠 본다'},
+ {no:'07',kicker:'API',title:'API 8개 중 4개는 정리 예정'},
+ {no:'08',kicker:'안전장치',title:'키·데이터·DB 접근을 따로 막는다'},
+ {no:'09',kicker:'개발 방식',title:'계획→구현→검수→반영을 AI가 돈다'}
 ] as const satisfies readonly ArchitectureSection[];
+
+/** Text for the target-structure diagram (01). Names only: no real domains, URLs or key values. */
+export const targetDiagram={
+ ariaLabel:'목표 구조: GitHub 저장소와 AI 팀(PM 계획·점검, 구현, 검수, CI)은 코드만 다루고 데이터가 없다. GitHub 에서 왼쪽 개발 영역의 Vercel 개발계(PR 미리보기, AI 테스트)와 Supabase 개발 DB(가짜 데이터만)로, 오른쪽 운영 영역의 Vercel 운영계(반영 10개마다 배포)와 Supabase 운영 DB(실데이터, 본인 행만 RLS)로 이어진다. 피클AI 는 토큰으로 운영계 POST /api/ingest 에 보내고, 내 폰은 로그인 후 운영계에서 조회한다. AI 는 운영계와 운영 DB 에 접근하지 않는다.',
+ legend:'왼쪽 = AI가 만지는 개발 영역 · 진한 상자 = 실데이터(AI 접근 금지)',
+ devLabel:'개발',
+ opsLabel:'운영',
+ github:['GitHub · AI 팀','코드만 · 데이터 없음'],
+ team:['PM','구현','검수','CI'],
+ devApp:['Vercel','개발계','PR 미리보기'],
+ devDb:['Supabase','개발 DB','가짜 데이터만'],
+ opsApp:['Vercel','운영계','반영 10개마다'],
+ opsDb:['Supabase','운영 DB','실데이터 · RLS'],
+ users:['피클AI','내 폰','토큰 · 로그인']
+} as const;
+
+export type TargetRow={area:string;now:string;target:string;phase:string};
+/** Now → target. phase is the step number on the progress board, or '완료'. */
+export const targetRows:readonly TargetRow[]=[
+ {area:'저장소',now:'공개 저장소 하나',target:'코드만 · 데이터 없음',phase:'완료'},
+ {area:'AI 팀',now:'PM·구현·검수·CI',target:'운영계·운영 DB 접근 없음',phase:'완료'},
+ {area:'수신 API',now:'8개',target:'수신 1개 + 조회',phase:'6단계'},
+ {area:'DB',now:'운영 1개',target:'개발 / 운영 분리',phase:'5단계'},
+ {area:'배포',now:'옛 저장소 연결',target:'개발계 / 운영계',phase:'8단계'},
+ {area:'테스트',now:'단위 + 화면',target:'개발 DB 연동 추가',phase:'5단계'},
+ {area:'피클AI',now:'Issue + API',target:'API v2 만',phase:'9단계'},
+ {area:'화면',now:'데모 섞임',target:'다섯 탭 정리',phase:'7단계'}
+];
 
 export const summaryLines=[
  '피클AI 수집기가 카드·뉴스·혜택·일정 데이터를 POST /api/ingest 로 보낸다.',
