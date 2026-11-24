@@ -1,12 +1,13 @@
 // 빌드된 앱(next start)의 수신(/api/ingest) 검사. run.mjs 가 checkApiLogs 뒤에 checkApiIngest 를 부른다.
 // 가짜 Supabase 서버(api-auth.mjs)의 RPC·실행 조회 경로를 써서 v1·v2 응답과 DB 함수 호출 본문을 확인한다.
 // ⓐ v1 → 200 ⓑ v2 → 200 ⓒ v2 커밋 RPC 503 → 503 Ingest unavailable ⓓ 토큰 없는 v2 → 401 ⓔ 500건·키셋 페이지 3회
-// ⓕ v2 run f6 최초 → 200 ⓖ f6 동일 재전송 → 200 idempotent ⓗ f6 같은 run_id 다른 본문 → 409 RUN_ID_CONFLICT.
+// ⓕ v2 run f6 최초 → 200 ⓖ f6 동일 재전송 → 200 idempotent ⓗ f6 같은 run_id 다른 본문 → 409 RUN_ID_CONFLICT
+// ⓘ v2 run f7 별도 보고(commit_source 'report')가 먼저 기록 → 409 RUN_ID_CONFLICT.
 // 값은 모두 가짜다. 이 파일은 lib/*.ts 를 import 하지 않는다(node 로 바로 실행). 본문이 v2 규칙을 통과하는지는
 // tests/api-ingest-screen.test.mjs 가 parseIngestV2 로 확인한다.
 import {readFileSync} from 'node:fs';
 import {
-  FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY,
+  FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, INGEST_RUN_REPORT,
   PAGED_EXTERNAL_PREFIX, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
 } from './api-auth.mjs';
 
@@ -83,6 +84,8 @@ export function apiIngestCases() {
     {id: 'f', name: 'v2 run f6 최초 → 200', headers: auth, body: v2Body(INGEST_RUN_REPLAY)},
     {id: 'g', name: 'v2 run f6 동일 재전송 → 200 idempotent', headers: auth, body: v2Body(INGEST_RUN_REPLAY)},
     {id: 'h', name: 'v2 run f6 다른 본문 → 409 RUN_ID_CONFLICT', headers: auth, body: v2ConflictBody()},
+    // i 는 가짜 서버가 commit_source 'report' 로 이미 가진 f7 기록과 키·digest 가 같은 본문(source_system 은 바꾸지 않는다)
+    {id: 'i', name: 'v2 run f7 별도 보고가 먼저 기록 → 409 RUN_ID_CONFLICT', headers: auth, body: v2Body(INGEST_RUN_REPORT)},
   ];
 }
 
@@ -102,15 +105,15 @@ export function judgeIngestCase(c, observed) {
     return isObj(commits[0].body) ? commits[0].body : (errs.push('commit RPC 본문이 JSON 객체가 아님'), null);
   };
   const runKey = isObj(c.body) && isObj(c.body.run) ? c.body.run : {};
-  const isReplayLookup = x => {
+  const isReplayLookup = (x, runId = INGEST_RUN_REPLAY) => {
     if (x.method !== 'GET' || x.path !== RUNS_PATH) return false;
     const p = new URLSearchParams(x.query);
-    return p.getAll('user_id').includes(`eq.${FAKE_USER_ID}`) && p.getAll('run_id').includes(`eq.${INGEST_RUN_REPLAY}`)
+    return p.getAll('user_id').includes(`eq.${FAKE_USER_ID}`) && p.getAll('run_id').includes(`eq.${runId}`)
       && p.getAll('dataset').includes(`eq.${runKey.dataset}`) && p.getAll('source_system').includes(`eq.${runKey.source_system}`);
   };
-  // ⓐ 네 필터(user_id·run_id=f6·dataset·source_system)를 모두 가진 실행 조회가 1건 이상
-  const fourFilterLookup = () => {
-    if (!calls.some(isReplayLookup)) errs.push('실행 조회에 user_id·run_id(f6)·dataset·source_system 네 필터가 모두 있는 요청이 없음');
+  // ⓐ 네 필터(user_id·run_id(기본 f6)·dataset·source_system)를 모두 가진 실행 조회가 1건 이상
+  const fourFilterLookup = (runId = INGEST_RUN_REPLAY) => {
+    if (!calls.some(x => isReplayLookup(x, runId))) errs.push(`실행 조회에 user_id·run_id(${runId.slice(-2)})·dataset·source_system 네 필터가 모두 있는 요청이 없음`);
   };
   // ⓑ 항목 상태 RPC(existing·candidates)가 각각 0건 — 재전송·충돌 판정이 항목 상태 검사보다 먼저(lib/ingest-service.ts '(라)')
   const noItemLookups = () => {
@@ -189,7 +192,7 @@ export function judgeIngestCase(c, observed) {
     if (!isObj(body) || !isObj(body.run) || JSON.stringify(Object.keys(body.run).sort()) !== JSON.stringify(Object.keys(expectedRun).sort())
       || Object.keys(expectedRun).some(k => body.run[k] !== expectedRun[k])) errs.push(`응답 run 이 ${JSON.stringify(expectedRun)} 가 아님`);
     fourFilterLookup();
-    const lookupAt = calls.findIndex(isReplayLookup);
+    const lookupAt = calls.findIndex(x => isReplayLookup(x));
     const commitAt = calls.findIndex(x => x.method === 'POST' && x.path === COMMIT_RPC);
     if (lookupAt >= 0 && commitAt >= 0 && lookupAt > commitAt) errs.push('네 필터 실행 조회가 commit 보다 뒤에 있음');
     const args = oneCommit();
@@ -217,12 +220,20 @@ export function judgeIngestCase(c, observed) {
     noCommit(); noItemLookups(); fourFilterLookup();
     break;
   }
+  case 'i': {
+    // 키·digest 가 같아도 commit_source 가 'report' 이면 앱은 재전송으로 보지 않고 409 (lib/ingest-service.ts judgeRunRecord)
+    status(409); noStore();
+    const want = conflictExample();
+    if (JSON.stringify(body) !== JSON.stringify(want)) errs.push(`응답 본문이 문서 conflict-response 예시 ${JSON.stringify(want)} 와 다름`);
+    noCommit(); noItemLookups(); fourFilterLookup(INGEST_RUN_REPORT);
+    break;
+  }
   default: errs.push(`알 수 없는 경우 ${c.id}`);
   }
   return errs;
 }
 
-/** 여덟 경우를 차례로 실행(사례마다 그 요청 동안의 calls 만 잘라 판정하므로 f 의 호출이 g·h 판정에 섞이지 않는다) → {problems, results} */
+/** 아홉 경우를 차례로 실행(사례마다 그 요청 동안의 calls 만 잘라 판정하므로 f 의 호출이 g·h 판정에 섞이지 않는다) → {problems, results} */
 export async function checkApiIngest(base, fake) {
   const problems = [], results = [];
   for (const c of apiIngestCases()) {

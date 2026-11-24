@@ -228,7 +228,7 @@
 
 - 피클AI 설정을 v2 본문(①·②)으로 바꾼다. 경로는 같은 `POST /api/ingest`, 토큰도 같은 Bearer 토큰을 쓴다.
 - v2 는 항목과 실행 기록을 한 번에 저장하므로(③·⑤), v2 로 보내는 실행은 `/api/sync-runs` 로 따로 보고하지 않도록 피클AI 의 별도 실행 보고를 끈다.
-- 같은 실행 키가 `/api/sync-runs` 로 먼저 기록되면(`commit_source` 'report') v2 는 `409 RUN_ID_CONFLICT` 가 된다(⑤).
+- 같은 실행 키가 `/api/sync-runs` 로 먼저 기록되면(`commit_source` 'report') v2 는 `409 RUN_ID_CONFLICT` 가 된다(⑤). 빌드된 앱 수신 검사(`scripts/screens/api-ingest.mjs` 경우 i)가 가짜 Supabase 서버의 'report' 기록(run_id f7)으로 이 409 를 확인한다.
 
 ### (3) 첫 v2 수신 판정
 

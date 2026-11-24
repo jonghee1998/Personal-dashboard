@@ -20,11 +20,16 @@ export function fakeExistingRun() {
   };
 }
 
-/** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지, f6 재전송·실행 키 충돌 */
+/** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지, f6 재전송·실행 키 충돌,
+ *  f7 별도 보고(report)가 먼저 기록된 실행 */
 export const INGEST_RUN_OK = '00000000-0000-4000-8000-0000000000f3';
 export const INGEST_RUN_COMMIT_FAIL = '00000000-0000-4000-8000-0000000000f4';
 export const INGEST_RUN_PAGED = '00000000-0000-4000-8000-0000000000f5';
 export const INGEST_RUN_REPLAY = '00000000-0000-4000-8000-0000000000f6';
+export const INGEST_RUN_REPORT = '00000000-0000-4000-8000-0000000000f7';
+/** parseIngestV2(v2Body(INGEST_RUN_REPORT), NOW).payloadDigest 를 한 번 계산해 적은 값(이 파일은 lib 를 import 하지 않는다).
+ *  tests/api-ingest-report.test.mjs 가 같은지 확인한다. */
+export const REPORT_PAYLOAD_DIGEST = 'dbd9504e5ddaad475c923a7f8700cbfbe55c01fd114d2623df3675d2173b8504';
 /** 이 접두사의 external_id 는 가짜 dashboard_ingest_existing 이 기존 행으로 돌려준다(한 페이지 FAKE_PAGE_ROWS 개). */
 export const PAGED_EXTERNAL_PREFIX = 'txn-page-';
 export const PAGED_UPDATED_AT = '2026-01-01T00:00:00+00:00';
@@ -117,11 +122,16 @@ export function rememberReplayRun(runs, args, out) {
 
 /** 가짜 GET dashboard_sync_runs(f6): select 를 뺀 모든 필터가 기록과 맞아야 반환. user_id·dataset·source_system 필터가 빠지면 []. */
 export function fakeReplayRunLookup(runs, query, accept) {
+  if (!(runs instanceof Map)) return {status: 200, body: []};
+  return lookupRunRow(runs.get(INGEST_RUN_REPLAY), query, accept);
+}
+
+/** 실행 기록 조회 공통 규칙: user_id·dataset·source_system 필터가 빠지거나, row 가 없거나, select 를 뺀 필터가 하나라도
+ *  기록과 맞지 않으면(모르는 연산자 포함) []. 모두 맞으면 object Accept 면 객체, 아니면 [객체]. */
+function lookupRunRow(row, query, accept) {
   const params = new URLSearchParams(query);
   const empty = {status: 200, body: []};
-  if (!(runs instanceof Map)) return empty;
   if (!['user_id', 'dataset', 'source_system'].every(k => params.has(k))) return empty;
-  const row = runs.get(INGEST_RUN_REPLAY);
   if (!row) return empty;
   for (const [k, v] of params) {
     if (k === 'select') continue;
@@ -131,9 +141,26 @@ export function fakeReplayRunLookup(runs, query, accept) {
   return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? {...row} : [{...row}]};
 }
 
+/** 별도 보고(commit_source 'report')가 먼저 기록한 f7 실행. v2Body(INGEST_RUN_REPORT) 와 commit_source 만 다르다
+ *  (키·status·error_code·expected_count·payload_digest 가 그 본문과 같으므로 앱 판정은 commit_source 때문에만 409). */
+export function fakeReportRun() {
+  return {
+    user_id: FAKE_USER_ID, run_id: INGEST_RUN_REPORT, dataset: 'transactions', source_system: 'samsungcard',
+    status: 'success', error_code: null, expected_count: 1, payload_digest: REPORT_PAYLOAD_DIGEST,
+    commit_source: 'report', accepted_count: 1,
+    source_as_of: '2026-01-01T09:00:00+09:00', collected_at: '2026-01-01T09:10:00+09:00',
+  };
+}
+
+/** 가짜 GET dashboard_sync_runs(f7): fakeReplayRunLookup 과 같은 규칙으로 fakeReportRun() 을 조회한다(ctx 불필요, 순수). */
+export function fakeReportRunLookup(query, accept) {
+  return lookupRunRow(fakeReportRun(), query, accept);
+}
+
 /** 가짜 서버 응답 결정 → {status, body}. body: 요청 본문(JSON 이면 객체).
  *  ctx: {authorization: Authorization 헤더, items: 메모리 행(fakePatchItems 가 바꿈), runs: f6 실행 기록 Map(선택)}.
- *  ctx 없으면 순수 함수(f6 기록을 저장하지 않고 조회는 항상 []). */
+ *  ctx 없으면 순수 함수(f6 기록을 저장하지 않고 조회는 항상 []).
+ *  f7 조회는 ctx 와 상관없이 commit_source 'report' 기록(fakeReportRunLookup). commit 은 f7 을 기억하지 않는다. */
 export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}) {
   const validSession = ctx.authorization === `Bearer ${VALID_ACCESS_TOKEN}`;
   if (method === 'GET' && path === '/auth/v1/user' && validSession) return {status: 200, body: FAKE_AUTH_USER};
@@ -142,6 +169,9 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
   }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${INGEST_RUN_REPLAY}`)) {
     return fakeReplayRunLookup(ctx.runs, query, accept);
+  }
+  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${INGEST_RUN_REPORT}`)) {
+    return fakeReportRunLookup(query, accept);
   }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
     const row = fakeExistingRun();
