@@ -20,12 +20,54 @@ export function fakeExistingRun() {
   };
 }
 
-/** 가짜 서버 응답 결정(순수 함수) → {status, body} */
-export function fakeSupabaseResponse(method, path, query, accept) {
+/** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지 */
+export const INGEST_RUN_OK = '00000000-0000-4000-8000-0000000000f3';
+export const INGEST_RUN_COMMIT_FAIL = '00000000-0000-4000-8000-0000000000f4';
+export const INGEST_RUN_PAGED = '00000000-0000-4000-8000-0000000000f5';
+/** 이 접두사의 external_id 는 가짜 dashboard_ingest_existing 이 기존 행으로 돌려준다(한 페이지 FAKE_PAGE_ROWS 개). */
+export const PAGED_EXTERNAL_PREFIX = 'txn-page-';
+export const PAGED_UPDATED_AT = '2026-01-01T00:00:00+00:00';
+export const FAKE_PAGE_ROWS = 200;
+
+const fakeUuid = n => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+
+/** 가짜 dashboard_ingest_existing: PAGED_EXTERNAL_PREFIX 로 시작하는 p_external_ids 마다 updated_at 고정 행, id 순 키셋 페이지 */
+export function fakeExistingPage(args) {
+  const ids = Array.isArray(args?.p_external_ids) ? args.p_external_ids : [];
+  const rows = ids.filter(id => typeof id === 'string' && id.startsWith(PAGED_EXTERNAL_PREFIX))
+    .map(id => ({id: fakeUuid(Number(id.slice(PAGED_EXTERNAL_PREFIX.length)) || 0), user_id: FAKE_USER_ID, kind: 'transaction', external_id: id,
+      title: '합성가맹점A', currency: 'KRW', status: 'active', metadata: {}, created_at: PAGED_UPDATED_AT, updated_at: PAGED_UPDATED_AT}))
+    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .filter(r => args?.p_after == null || r.id > args.p_after);
+  const page = rows.slice(0, FAKE_PAGE_ROWS);
+  return {rows: page, next_after: rows.length > FAKE_PAGE_ROWS ? page[page.length - 1].id : null};
+}
+
+/** 가짜 dashboard_ingest_commit: f4 면 503 PostgREST 오류, 아니면 받은 행마다 item 을 돌려준다(p_run null 이면 run null). */
+export function fakeCommitResponse(args) {
+  const run = args?.p_run ?? null;
+  if (run && run.run_id === INGEST_RUN_COMMIT_FAIL) {
+    return {status: 503, body: {code: 'PGRST002', message: FAKE_PGRST_MESSAGE, details: FAKE_PGRST_DETAILS, hint: null}};
+  }
+  const rows = Array.isArray(args?.p_rows) ? args.p_rows : [];
+  const items = rows.map((r, i) => ({id: fakeUuid(9000 + i), kind: r.kind, external_id: r.external_id}));
+  return {status: 200, body: {ok: true, idempotent: false, items, upserted: items.length,
+    run: run ? {run_id: run.run_id, dataset: run.dataset, source_system: run.source_system, status: run.status, accepted_count: items.length} : null}};
+}
+
+/** 가짜 서버 응답 결정(순수 함수) → {status, body}. body: POST 요청 본문(JSON 이면 객체) */
+export function fakeSupabaseResponse(method, path, query, accept, body) {
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
     const row = fakeExistingRun();
     return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? row : [row]};
   }
+  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs'
+    && new URLSearchParams(query).getAll('run_id').some(v => [INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED].some(id => v === `eq.${id}`))) {
+    return {status: 200, body: []};
+  }
+  if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_existing') return {status: 200, body: fakeExistingPage(body)};
+  if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_candidates') return {status: 200, body: {rows: [], next_after: null}};
+  if (method === 'POST' && path === '/rest/v1/rpc/dashboard_ingest_commit') return fakeCommitResponse(body);
   if (path.startsWith('/rest/v1/')) {
     return {status: 401, body: {code: 'PGRST301', message: FAKE_PGRST_MESSAGE, details: FAKE_PGRST_DETAILS, hint: null}};
   }
@@ -33,23 +75,30 @@ export function fakeSupabaseResponse(method, path, query, accept) {
 }
 
 /** 받은 요청을 기록하고, 데이터 요청(rest/v1)은 PostgREST 모양 401, 그 밖은 401 로 거부하는 가짜 Supabase 서버.
- *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200. requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지 기록한다. */
+ *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200, 수신 검사용 경로(fakeSupabaseResponse 참고)는 200·503.
+ *  requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지, calls 는 요청 본문(JSON)과 응답 상태까지 기록한다. */
 export async function startFakeSupabase() {
-  const requests = [], queries = [];
+  const requests = [], queries = [], calls = [];
   const server = createServer((req, res) => {
     const url = req.url || '';
     const q = url.indexOf('?');
     const path = q < 0 ? url : url.slice(0, q), query = q < 0 ? '' : url.slice(q + 1);
     requests.push({method: req.method, path});
     queries.push({method: req.method, path, query});
-    req.resume();
-    const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept);
-    res.writeHead(out.status, {'content-type': 'application/json'});
-    res.end(JSON.stringify(out.body));
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => {
+      let body;
+      try { body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined; } catch { body = undefined; }
+      const out = fakeSupabaseResponse(req.method, path, query, req.headers.accept, body);
+      calls.push({method: req.method, path, query, body, status: out.status});
+      res.writeHead(out.status, {'content-type': 'application/json'});
+      res.end(JSON.stringify(out.body));
+    });
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const url = `http://127.0.0.1:${server.address().port}`;
-  return {url, requests, queries, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
+  return {url, requests, queries, calls, close:() => new Promise(r => { server.close(() => r()); server.closeAllConnections(); })};
 }
 
 /** next start 자식 프로세스에 넘길 가짜 환경변수 */

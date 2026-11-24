@@ -1,6 +1,6 @@
 # 피클AI 수신 규격 v2
 
-상태: 규격·검증 lib(`lib/ingest-v2.ts`)만 있음. API 연결은 계획 ③이며, ③ 배포 전까지 피클AI 는 v1 을 쓴다.
+상태: 계획 ③에서 `POST /api/ingest` 에 연결됨(`lib/ingest-service.ts` 의 `handleIngestV2`). 운영 반영은 8단계(운영 DB 마이그레이션 적용 후)이며, 그 전까지 피클AI 는 v1 을 쓴다.
 모든 예시는 가짜 값이다(실제 가맹점·이름·금액 아님).
 
 ## ① 경로·인증·버전 구분
@@ -83,15 +83,18 @@
 | 200 | `{version:2, upserted, items:[{id,kind,external_id}], run:{run_id,dataset,source_system,status,accepted_count}, idempotent:false}` (재전송이면 `idempotent:true, upserted:0, items:[]`) |
 | 400 | `Invalid JSON` |
 | 401 | 토큰 없음·불일치 |
-| 409 | `STALE_REPLAY`, `DUPLICATE_SOURCE_TRANSACTION`, `DELETE_TARGET_NOT_FOUND`, `CONCURRENT_CHANGE`, `RUN_ID_CONFLICT` |
-| 422 | ②의 code 와 항목 검증 code(`violations: [{index?, code, field}]`) |
-| 503 | 서버 설정 없음·DB 사용 불가 |
+| 409 | `RUN_ID_CONFLICT` → `{error:"Run id conflict", code:"RUN_ID_CONFLICT"}`, `CONCURRENT_CHANGE` → `{error:"Concurrent change; retry", code:"CONCURRENT_CHANGE"}`, 항목 충돌(`STALE_REPLAY`·`DELETE_TARGET_NOT_FOUND` → `{error:"Production integrity conflict", violations}`, `DUPLICATE_SOURCE_TRANSACTION` → `{error:"Duplicate source transaction", violations}`) |
+| 422 | `{error:"Ingest v2 validation failed", violations:[{index?, code, field}]}` — ②의 code 와 항목 검증 code |
+| 503 | 서버 설정 없음(`Server not configured`), DB 사용 불가(단계와 상관없이 `{error:"Ingest unavailable"}`) |
+
+- 버전 판별 전 응답(401, 설정 없음 503, 400 `Invalid JSON`)은 v1 과 같고 `Cache-Control` 헤더가 없다. 그 뒤의 v2 응답은 상태와 상관없이 모두 `Cache-Control: no-store` 다.
 
 ## ⑦ 필드 갱신
 
 - 항목 JSON 에 **있는 키만** 갱신하고, 없는 키는 기존 값을 유지한다(새 행은 열 기본값).
 - 명시적 `null` 은 null 로 쓴다.
-- 이 규칙은 v1 에도 적용된다(계획 ③부터 v1 도 같은 DB 함수 `dashboard_ingest_commit` 으로 쓴다). 예전 PostgREST 일괄 upsert 는 한 배치에서 어떤 행만 보낸 키를 다른 행에서는 null 로 썼지만, 이제는 행마다 보낸 키만 갱신한다.
+- v2 는 `rawItems` 에 키가 있는지로 판단한다: 생략한 `currency`·`status` 는 행 JSON 에 넣지 않으므로 기존 값이 남는다(새 행은 `KRW`·`active`). `status` 를 생략하면 기존 행 metadata 의 `dashboard_deleted`·`subscription_status` 도 유지된다.
+- (결정 A) 이 규칙은 v1 에도 적용된다(계획 ③부터 v1 도 같은 DB 함수 `dashboard_ingest_commit` 으로 쓴다). 예전 PostgREST 일괄 upsert 는 한 배치에서 어떤 행만 보낸 키를 다른 행에서는 null 로 썼지만, 이제는 행마다 보낸 키만 갱신한다.
 - v1 은 스키마 기본값 때문에 `currency`·`status`·`metadata` 를 항상 보낸다. 선택 필드(`description`·`amount`·`category`·`source`·`event_date`·`due_date`·`url`)는 그 항목에 키가 있을 때만 갱신된다.
 - 생략한 선택 필드는 기존 값이 남으므로, v1 은 기존 행을 읽은 뒤 저장될 실제 값(기존 행 + 받은 키, 예: 생략한 `category` 는 기존 값)으로 업무 규칙을 다시 검사하고 위반이면 같은 모양의 422 를 낸다(분류별 규칙 우회 방지).
 
@@ -105,6 +108,20 @@
 - (바) 행 만들기: `rawItems` 는 digest 와 '키가 왔는지'의 기준으로만 쓰고, 함수에 보내는 행은 지금 v1 과 같은 업무 변환을 거친다 — `normalizeIncomingStatus` 로 상태 정규화(deleted·구독 중단 상태를 DB 허용 상태로), 기존 거래 메모 보존, 정산·할 일의 완료 상태 보존, 보관(archived) 대상은 기존 업무 필드 유지(`app/api/ingest/route.ts` 59~73행 규칙). `metadata` 는 받은 metadata 에 보존할 키(memo 등)를 합친 값으로 보낸다. 인수 테스트: 기존 거래 메모 보존, status 생략 시 기존 상태 유지, deleted 요청 → archived 와 업무 필드 유지, 구독 중단 상태 정규화.
 - (사) 항목 상태 충돌(`STALE_REPLAY`·`DELETE_TARGET_NOT_FOUND`·`DUPLICATE_SOURCE_TRANSACTION`)을 409 로 돌려주기 직전에 실행 기록을 한 번 더 조회해 (라)의 재전송·충돌 규칙을 먼저 적용한다. 인수 테스트: 첫 조회에 기록 없음 → 그사이 같은 실행 커밋과 후속 갱신이 커밋됨 → 200 idempotent.
 - (아) 원천 거래 중복 검사(`strongTransactionKey`)는 실제로 저장될 유효 값으로 한다: `currency` 를 생략하면 기존 행의 통화(없으면 `KRW`), `status` 도 같은 방식. 인수 테스트: 기존 비KRW 행에 currency 를 생략해 갱신할 때 중복 판정이 저장 결과와 같은 키를 씀.
+
+### ⑧ 근거
+
+테스트 이름은 `tests/ingest-service.test.mjs` 의 `test('…')` 이름이다(따로 적은 것 제외).
+
+- (가) **8단계 배포 조건: `20261124000000`·`20261124000100` 마이그레이션 운영 적용 후 배포.** 활성화 전 동작: `v1 전용 경로에 v2 본문 → 400`. 활성화 후 동작: `scripts/screens/api-ingest.mjs` ⓑ(빌드된 앱에서 v2 → 200, 판정 단위 테스트 `tests/api-ingest-screen.test.mjs`).
+- (나) v1 commit 테스트 `v1 정상 2행 → 200 같은 모양, p_run null`(및 screens ⓐ: 빌드된 앱의 v1 commit 본문 `p_run` null), 그리고 `grep -c '\.upsert(' app/api/ingest/route.ts` → 0줄.
+- (다) `tests/db/80_ingest_support.test.sql` 2부(메모 원자 갱신)와 `app/api/items/route.ts` 메모 수정의 `rpc('dashboard_item_set_memo')`(`tests/items-memo.test.mjs`).
+- (라) `v2 (가) docs success 예시 → 200, commit p_run·digest 가 parse 결과와 같음`(실행 조회가 먼저), `v2 재전송: 다른 digest → 409 RUN_ID_CONFLICT, commit 0회`, `v2 commit_source 'report' 기록과 키 겹침 → 409 RUN_ID_CONFLICT`, `v2 failed 예시 → 200, commit p_rows [] (항목 검사 없음)`, `v2 DB 실패 → v2failure(run_lookup 첫·재조회, status_lookup, duplicate_lookup, write), deps 예외 → unexpected`, `v2 commit CONCURRENT_CHANGE → 409, 끼어든 쓰기도 409`.
+- (마) `v2 (마) 성공 → 뒤 실행이 같은 항목 변경 → 원본 재요청 → 200·items []·upserted 0·idempotent, commit 0회`.
+- (바) `v2 (바) 기존 거래 메모 보존, status 생략 시 행 JSON 에 status 없음·기존 상태 유지`, `v2 (바) deleted 요청 → archived + 업무 필드 유지 + dashboard_deleted true, 요청에 없던 metadata 키·memo 유지`, `v2 보관: 보관된 행에 status 생략·title 변경 → 행 JSON 에 status 없음, title 새 값, dashboard_deleted true 유지`, `v2 (바) 구독 중단(paused) → active + subscription_status, status 생략 갱신은 중단 표시 유지`, `buildRowsV2: rawItems 에 없는 키는 행 JSON 에 없음, 명시적 null 은 null`.
+- (사) `v2 (사) 첫 readRun 없음 → STALE_REPLAY → 두 번째 readRun 에 같은 실행 기록 → 200 idempotent`.
+- (아) `v2 (아) 기존 USD 행에 currency 생략 → 유효 통화 USD 로 중복 판정, 행 JSON 에 currency 없음`, `v2 원천 중복 공백: 기존 'apv-9' 와 새 항목 ' apv-9 ' → DUPLICATE_SOURCE_TRANSACTION, p_source_ids 에 'apv-9'`.
+- 최대 배치·키셋 페이지: screens ⓔ(500건, existing RPC 3회, `p_expected` 500개 모두 기존 `updated_at`).
 
 ## ⑨ 예시
 
@@ -188,9 +205,8 @@
 <!-- example:conflict-response -->
 ```json
 {
-  "version": 2,
   "error": "Run id conflict",
-  "violations": [{"code": "RUN_ID_CONFLICT", "field": "run.run_id"}]
+  "code": "RUN_ID_CONFLICT"
 }
 ```
 
