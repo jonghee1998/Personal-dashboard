@@ -1738,3 +1738,42 @@ html:has(.demoShell.conceptRefined),body:has(.demoShell.conceptRefined){
 .demoShell.conceptLight .dailyTotalAmounts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0}
 .demoShell.conceptLight .dailyTotalAmounts>strong{font-variant-numeric:tabular-nums;white-space:nowrap}
 .demoShell.conceptLight .dailyInstallmentTotal{color:#788b7a;font-size:11px;line-height:1.4;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* Architecture screen */
+/* Six nav items must fit at 360px: tighter horizontal padding only. */
+.demoShell.conceptLight .bottom{padding-left:4px;padding-right:4px}
+.demoShell.conceptLight .bottom button{padding:8px 1px}
+.demoShell.conceptLight .archNavIcon{display:block;width:22px;height:22px}
+.demoShell.conceptLight .archScreen{min-width:0}
+.demoShell.conceptLight .archSection{margin:19px 0}
+.demoShell.conceptLight .archHead{padding:0 2px}
+.demoShell.conceptLight .archKicker{display:block;color:#7b8a7f;font-size:11px;font-weight:650;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.demoShell.conceptLight h2.archTitle{margin:4px 0 0;font-size:17px;line-height:1.35}
+.demoShell.conceptLight .panel.archBody{margin:10px 0 0;min-width:0;overflow:hidden}
+.demoShell.conceptLight .archLines p{margin:0;color:#334b39;font-size:13px;line-height:1.6}
+.demoShell.conceptLight .archLines p+p{margin-top:6px}
+.demoShell.conceptLight .archFigure{margin:0}
+.demoShell.conceptLight .archSvg{display:block;width:100%;height:auto;max-width:100%}
+.demoShell.conceptLight .archBox rect{fill:var(--card);stroke:#b9c4b6;stroke-width:1}
+.demoShell.conceptLight .archBox.accent rect{fill:var(--accent);stroke:#7c9654}
+.demoShell.conceptLight .archBox.deep rect{fill:var(--deep);stroke:var(--deep)}
+.demoShell.conceptLight .archBox text{fill:var(--ink)}
+.demoShell.conceptLight .archBox.deep text{fill:#f1f7e6}
+.demoShell.conceptLight .archBoxMain{font-size:11.5px;font-weight:750}
+.demoShell.conceptLight .archBoxSub{font-size:10px;opacity:.82}
+.demoShell.conceptLight .archColLabel{fill:var(--muted);font-size:10px;font-weight:650}
+.demoShell.conceptLight .archArrow{stroke:#5f7460;stroke-width:1.4}
+.demoShell.conceptLight .archArrowHead{fill:#5f7460}
+.demoShell.conceptLight .archLegend{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.5}
+.demoShell.conceptLight .archTable{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-size:12px;line-height:1.45}
+.demoShell.conceptLight .archTable+.archTable{margin-top:16px}
+.demoShell.conceptLight .archTable thead th{color:var(--muted);font-size:10.5px;font-weight:600;padding:0 6px 7px 0;border-bottom:1px solid #cad6c8}
+.demoShell.conceptLight .archTable tbody th,.demoShell.conceptLight .archTable td{padding:8px 6px 8px 0;border-bottom:1px solid #e1e7dd;overflow-wrap:anywhere;vertical-align:top}
+.demoShell.conceptLight .archTable tbody th{font-weight:750;color:#1f3027}
+.demoShell.conceptLight .archTable td{color:#334b39}
+.demoShell.conceptLight .archTable tbody tr:last-child>*{border-bottom:0}
+.demoShell.conceptLight .archTable code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700}
+.demoShell.conceptLight .archMethods{display:block;color:var(--muted);font-size:10px;font-weight:500}
+.demoShell.conceptLight .archTag{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:6px;background:#eef3e6;border:1px solid #cfdcc5;color:#47694a;font-size:10px;font-weight:650;white-space:nowrap}
+.demoShell.conceptLight .archNote{color:var(--muted);font-size:11px;line-height:1.5}
+.demoShell.conceptLight p.archNote{margin:12px 0 0}
