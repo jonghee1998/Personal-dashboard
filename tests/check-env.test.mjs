@@ -118,6 +118,18 @@ test('비교 규칙', () => {
   assert.deepEqual(same({NEXT_PUBLIC_SUPABASE_URL: 'https://' + H.toUpperCase()}), ['NEXT_PUBLIC_SUPABASE_URL']);
   assert.deepEqual(same({SUPABASE_SERVICE_ROLE_KEY: dev().SUPABASE_SERVICE_ROLE_KEY}), ['SUPABASE_SERVICE_ROLE_KEY']);
   assert.deepEqual(same({PICKLE_INGEST_TOKEN: dev().PICKLE_INGEST_TOKEN}), ['PICKLE_INGEST_TOKEN']);
+
+  // DASHBOARD_USER_ID
+  assert.deepEqual(same({DASHBOARD_USER_ID: dev().DASHBOARD_USER_ID}), ['DASHBOARD_USER_ID']);
+  const lowerId = 'abcdefab-cdef-4abc-8def-' + 'abcdef'.repeat(2);
+  const upperId = lowerId.toUpperCase();
+  assert.notEqual(lowerId, upperId);
+  assert.deepEqual(namesOf(compareEnvs({...dev(), DASHBOARD_USER_ID: lowerId}, {...ops(), DASHBOARD_USER_ID: upperId})), ['DASHBOARD_USER_ID']);
+  assert.ok(!same({DASHBOARD_USER_ID: 'not-a-uuid'}).includes('DASHBOARD_USER_ID'));
+  assert.ok(!same({DASHBOARD_USER_ID: ''}).includes('DASHBOARD_USER_ID'));
+  const both = (v) => namesOf(compareEnvs({...dev(), DASHBOARD_USER_ID: v}, {...ops(), DASHBOARD_USER_ID: v}));
+  assert.ok(!both('not-a-uuid').includes('DASHBOARD_USER_ID'));
+  assert.ok(!both('').includes('DASHBOARD_USER_ID'));
 });
 
 test('파싱: 허용되는 문법', () => {
@@ -173,6 +185,11 @@ test('CLI: 종료 코드와 값 비노출', (t) => {
   r = run(['--compare', devF, sameF]);
   assert.equal(r.code, 1); assert.match(r.out, /NEXT_PUBLIC_SUPABASE_URL/); assert.match(r.out, /SUPABASE_SERVICE_ROLE_KEY/);
   assertNoLeak(r.out, [sameF, dir]);
+
+  const sameIdF = f('same-id.env', toFile({...ops(), DASHBOARD_USER_ID: dev().DASHBOARD_USER_ID}));
+  r = run(['--compare', devF, sameIdF]);
+  assert.equal(r.code, 1); assert.match(r.out, /DASHBOARD_USER_ID/);
+  assertNoLeak(r.out, [sameIdF, dir]);
 
   const rawLine = 'PICKLE_INGEST_TOKEN=$OTHER_VALUE_' + 'p'.repeat(12);
   const parseF = f('parse.env', toFile(dev()).replace(/PICKLE_INGEST_TOKEN=.*\n/, rawLine + '\n'));

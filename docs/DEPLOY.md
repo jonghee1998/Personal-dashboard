@@ -33,7 +33,7 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 브라우저·서버 | 달라야 함 (프로젝트가 다르면 자연히 다름) |
 | `SUPABASE_SERVICE_ROLE_KEY` | 서버만 | 달라야 함 (`check-env --compare` 가 검사) |
 | `PICKLE_INGEST_TOKEN` | 서버만(수신 API) | 달라야 함 (`check-env --compare` 가 검사) |
-| `DASHBOARD_USER_ID` | 서버만(수신 API) | 달라야 함 (각 Supabase 프로젝트의 사용자 ID) |
+| `DASHBOARD_USER_ID` | 서버만(수신 API) | 달라야 함 (`check-env --compare` 가 검사, 각 Supabase 프로젝트의 사용자 ID) |
 
 - 자동 모드가 켜져 있으면 최종 PR 이 사람 확인 없이 main 에 반영된다. 그래서 운영 Vercel 을 새 저장소 main 에 연결하면 **그 시점의 main(6단계 수신 함수를 쓰는 코드 포함)이 바로 운영에 배포**된다. 연결은 (2) 배포 순서의 마지막 단계에서만 한다.
 - `lib/supabase.ts` 5~6행과 `lib/supabase-server.ts` 5~6·26~30행은 배포 환경의 `NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_ANON_KEY`·`SUPABASE_SERVICE_ROLE_KEY` 를 그대로 쓴다. 즉 **Vercel 에 실제로 들어간 값이 곧 접속 대상**이다. 파일 값이 맞아도 Vercel 설정이 다르면 다른 DB 에 붙는다.

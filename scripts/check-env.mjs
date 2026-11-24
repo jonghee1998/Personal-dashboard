@@ -6,6 +6,9 @@
 //   npm run check-env -- --compare <개발 env 파일> <운영 env 파일>  두 파일을 각각 점검한 뒤 서로 비교
 //   npm run check-env                                        process.env 를 점검
 //
+// --compare 비교 대상: NEXT_PUBLIC_SUPABASE_URL(정규화 후), SUPABASE_SERVICE_ROLE_KEY, PICKLE_INGEST_TOKEN,
+//   DASHBOARD_USER_ID(양쪽 모두 UUID 형식일 때만, 대소문자 무시). 개발과 운영이 같으면 위반.
+//
 // 필수 이름 목록과 예시(자리표시자) 값은 저장소의 .env.example 에서 'NAME=' 줄을 읽어 정한다.
 //
 // 지원하는 env 파일 문법:
@@ -120,6 +123,8 @@ export function compareEnvs(devEnv,opsEnv){
  const a=normalizeSupabaseUrl(devEnv.NEXT_PUBLIC_SUPABASE_URL),b=normalizeSupabaseUrl(opsEnv.NEXT_PUBLIC_SUPABASE_URL);
  if(a!==null&&a===b)out.push({name:'NEXT_PUBLIC_SUPABASE_URL',rule:'개발과 운영이 같은 주소'});
  for(const n of SERVER_NAMES)if(has(devEnv,n)&&has(opsEnv,n)&&devEnv[n]===opsEnv[n])out.push({name:n,rule:'개발과 운영이 같은 값'});
+ const id='DASHBOARD_USER_ID';
+ if(has(devEnv,id)&&has(opsEnv,id)&&UUID_RE.test(devEnv[id])&&UUID_RE.test(opsEnv[id])&&devEnv[id].toLowerCase()===opsEnv[id].toLowerCase())out.push({name:id,rule:'개발과 운영이 같은 값'});
  return out;
 }
 
