@@ -275,3 +275,24 @@ test('기존 행 \\tapv-9\\n 과 새 항목 apv-9 → DUPLICATE_SOURCE_TRANSACTI
  assert.equal(out.status,409);assert.equal(out.body.violations[0].code,'DUPLICATE_SOURCE_TRANSACTION');
  assert.equal(commits(db),0);
 });
+
+test('category 생략 갱신은 기존 category 기준으로 규칙 검사(points 를 신청 메타로 덮어쓰기 차단)',async()=>{
+ const pointsMeta={...baseMeta,source_system:'samsungcard',verification_source:'card_approval_ledger',source_record_id:'pt-000001',provider:'삼성카드'};
+ const appMeta={...baseMeta,source_system:'application_receipt',verification_source:'official_receipt',receipt_id:'rcpt-000001',applied_at:'2026-01-01'};
+ const db=fakeDb([{kind:'benefit',external_id:'benefit-pt-1',title:'합성포인트A',category:'points',amount:100,event_date:'2026-01-01',metadata:pointsMeta}]);
+ const before=clone(db.rows.get('benefit:benefit-pt-1'));
+ const out=await run({items:[{kind:'benefit',external_id:'benefit-pt-1',title:'합성포인트A',metadata:appMeta}]},db);
+ assert.equal(out.status,422);assert.equal(out.body.error,'Production integrity validation failed');
+ const codes=out.body.violations.map(v=>v.code);
+ assert.ok(codes.includes('SOURCE_NOT_ALLOWED'));assert.ok(codes.includes('SOURCE_RECORD_ID_REQUIRED'));assert.ok(codes.includes('POINT_PROVIDER_NOT_ALLOWED'));
+ assert.ok(out.body.violations.every(v=>v.index===0));
+ assert.equal(commits(db),0);assert.deepEqual(db.rows.get('benefit:benefit-pt-1'),before);
+ // 같은 본문이라도 새 행이면 신청 규칙으로 통과
+ const fresh=fakeDb();
+ const ok=await run({items:[{kind:'benefit',external_id:'benefit-app-1',title:'합성신청A',metadata:appMeta}]},fresh);
+ assert.equal(ok.status,200);
+ // 기존 신청 행에 category 를 생략한 갱신은 통과하고 category 는 유지
+ const app=fakeDb([{kind:'benefit',external_id:'benefit-app-2',title:'합성신청B',category:'youth',metadata:appMeta}]);
+ const upd=await run({items:[{kind:'benefit',external_id:'benefit-app-2',title:'합성신청B 갱신',metadata:appMeta}]},app);
+ assert.equal(upd.status,200);assert.equal(app.rows.get('benefit:benefit-app-2').category,'youth');
+});

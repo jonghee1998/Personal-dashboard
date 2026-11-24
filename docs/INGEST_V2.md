@@ -93,6 +93,7 @@
 - 명시적 `null` 은 null 로 쓴다.
 - 이 규칙은 v1 에도 적용된다(계획 ③부터 v1 도 같은 DB 함수 `dashboard_ingest_commit` 으로 쓴다). 예전 PostgREST 일괄 upsert 는 한 배치에서 어떤 행만 보낸 키를 다른 행에서는 null 로 썼지만, 이제는 행마다 보낸 키만 갱신한다.
 - v1 은 스키마 기본값 때문에 `currency`·`status`·`metadata` 를 항상 보낸다. 선택 필드(`description`·`amount`·`category`·`source`·`event_date`·`due_date`·`url`)는 그 항목에 키가 있을 때만 갱신된다.
+- 생략한 선택 필드는 기존 값이 남으므로, v1 은 기존 행을 읽은 뒤 저장될 실제 값(기존 행 + 받은 키, 예: 생략한 `category` 는 기존 값)으로 업무 규칙을 다시 검사하고 위반이면 같은 모양의 422 를 낸다(분류별 규칙 우회 방지).
 
 ## ⑧ 운영 반영 조건(계획 ③ 인수 기준)
 

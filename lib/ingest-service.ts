@@ -71,6 +71,13 @@ export function buildRows(items:IngestItem[],current:Map<string,Row>,userId:stri
  });
 }
 
+// 저장 후 실제로 남을 값: 받은 항목에 없는 선택 필드는 기존 행 값을 쓴다.
+export function effectiveRecord(x:IngestItem,prior:Row):IngestItem{
+ const merged:Row={...x};
+ for(const f of optionalFields)if(!has(x,f)||x[f]===undefined){if(prior[f]!==undefined)merged[f]=prior[f];}
+ return merged as IngestItem;
+}
+
 const response=(status:number,body:object):IngestOutcome=>({kind:'response',status,body});
 const failure=(stage:IngestStage,err:unknown):IngestOutcome=>({kind:'failure',stage,err});
 
@@ -87,6 +94,14 @@ export async function handleIngest(body:unknown,userId:string,now:number,deps:In
  const existing=await deps.readExisting(userId,[...new Set(incoming.map(x=>x.external_id))]);
  if(existing.error)return failure('status_lookup',existing.error);
  const current=new Map<string,Row>((existing.data??[]).map(x=>[key(x as {kind:string;external_id:string}),x]));
+ // 생략한 선택 필드는 기존 값이 남으므로(결정 A), 저장될 실제 값(기존 행 + 받은 키)으로 규칙을 다시 검사한다.
+ // 그래야 category 등을 빼서 분류별 규칙(points·ai_subscription 등)을 피할 수 없다. 응답 모양은 위 422 와 같다.
+ const effectiveViolations=incoming.flatMap((x,index)=>{
+  const prior=current.get(key(x));
+  if(!prior)return [];
+  return validateProductionRecord(effectiveRecord(x,prior),now).map(error=>({index,...error}));
+ });
+ if(effectiveViolations.length)return response(422,{error:'Production integrity validation failed',violations:effectiveViolations});
  const conflicts=incoming.flatMap((x,index)=>{
   const prior=current.get(key(x));
   if(['archived','deleted'].includes(x.status)&&!prior)return [{index,code:'DELETE_TARGET_NOT_FOUND',field:'external_id'}];
