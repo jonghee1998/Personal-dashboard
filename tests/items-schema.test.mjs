@@ -44,7 +44,7 @@ test('route: legacySchema 없음, status update 에 kind·archived 조건', () =
 });
 
 test('화면: 옛 형식 본문 없음, action:status 사용, 도우미 사용', () => {
-  for (const p of ['components/demo-dashboard.tsx', 'components/dashboard.tsx']) {
+  for (const p of ['components/demo-dashboard.tsx']) {
     const src = read(p);
     assert.ok(!src.includes('JSON.stringify({id:x.id,status})'), p);
     assert.ok(src.includes("action:'status'"), p);

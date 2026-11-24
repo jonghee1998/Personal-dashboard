@@ -13,16 +13,14 @@ import type {SyncHealth} from '@/lib/dashboard-freshness';
 type Kind='transaction'|'settlement'|'news'|'benefit'|'task'|'event'|'journal';
 type Item={id:string;kind:Kind;title:string;description:string|null;amount:number|null;currency:string;status:string;category:string|null;source:string|null;due_date:string|null;event_date:string|null;url:string|null;metadata:Record<string,unknown>;updated_at?:string|null};
 const money=(n:number)=>'₩'+Math.round(n).toLocaleString('ko-KR');
-const SAMPLE_UPDATED_AT='2026-11-12T08:00:00+09:00';
 const tabs=[['home','홈','⌂'],['finance','금융','▤'],['news','뉴스','▣'],['benefits','혜택','✦'],['journal','기록','◷'],['architecture','구조','']] as const;
-export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
- const isDemo=demoData !== undefined;
- const [rawItems,setItems]=useState<Item[]>(()=>demoData ? demoData.map(item=>({...item})) : []),[tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[editingMemo,setEditingMemo]=useState<string|null>(null),[memoDraft,setMemoDraft]=useState(''),[loading,setLoading]=useState(!isDemo),[refreshing,setRefreshing]=useState(false),[refreshNotice,setRefreshNotice]=useState(''),[error,setError]=useState(''),[userEmail,setUserEmail]=useState(''),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false),[taskBusy,setTaskBusy]=useState(false),[taskRemoving,setTaskRemoving]=useState<string|null>(null),[updates,setUpdates]=useState<Record<string,string|null>>({}),[sourceUpdates,setSourceUpdates]=useState<Record<string,string|null>>({});
- const [hasSnapshot,setHasSnapshot]=useState(isDemo),[syncHealth,setSyncHealth]=useState<Record<string,SyncHealth>>({});
+export default function DemoDashboard(){
+ const [rawItems,setItems]=useState<Item[]>([]),[tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[editingMemo,setEditingMemo]=useState<string|null>(null),[memoDraft,setMemoDraft]=useState(''),[loading,setLoading]=useState(true),[refreshing,setRefreshing]=useState(false),[refreshNotice,setRefreshNotice]=useState(''),[error,setError]=useState(''),[userEmail,setUserEmail]=useState(''),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false),[taskBusy,setTaskBusy]=useState(false),[taskRemoving,setTaskRemoving]=useState<string|null>(null),[updates,setUpdates]=useState<Record<string,string|null>>({}),[sourceUpdates,setSourceUpdates]=useState<Record<string,string|null>>({});
+ const [hasSnapshot,setHasSnapshot]=useState(false),[syncHealth,setSyncHealth]=useState<Record<string,SyncHealth>>({});
  const readInFlight=useRef(false);
  const statusInFlight=useRef<Set<string>>(new Set()),[statusBusy,setStatusBusy]=useState<string[]>([]);
  const refresh=useCallback(async()=>{
-   if(isDemo||readInFlight.current)return false;
+   if(readInFlight.current)return false;
    readInFlight.current=true;
    try{
      const res=await fetch('/api/dashboard',{cache:'no-store'});
@@ -34,35 +32,30 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
      return true;
    }catch(e){setError(e instanceof Error?e.message:'연결 오류');return false;}
    finally{readInFlight.current=false;setLoading(false);}
- },[isDemo]);
- useEffect(()=>{if(isDemo)return;void refresh();const id=setInterval(()=>void refresh(),60000);return()=>clearInterval(id)},[refresh,isDemo]);
- useEffect(()=>{if(isDemo)return;try{void browserDb().auth.getUser().then(r=>setUserEmail(r.data.user?.email??''),()=>setUserEmail(''))}catch{setUserEmail('')}},[isDemo]);
+ },[]);
+ useEffect(()=>{void refresh();const id=setInterval(()=>void refresh(),60000);return()=>clearInterval(id)},[refresh]);
+ useEffect(()=>{try{void browserDb().auth.getUser().then(r=>setUserEmail(r.data.user?.email??''),()=>setUserEmail(''))}catch{setUserEmail('')}},[]);
  const items=useMemo(()=>rawItems.filter(visibleDashboardItem),[rawItems]);
  const by=(k:Kind)=>items.filter(x=>x.kind===k);
- const updateTime=(key:string)=>dashboardTimestamp(isDemo?SAMPLE_UPDATED_AT:updates[key]);
+ const updateTime=(key:string)=>dashboardTimestamp(updates[key]);
  const updateLabel=(key:string)=>updateTime(key)??(loading?'조회 중':'미등록');
- const sourceLabel=(key:string)=>dashboardTimestamp(isDemo?SAMPLE_UPDATED_AT:sourceUpdates[key])??(loading?'조회 중':'미확인');
- const sourceAlerts=monitoredSources.filter(spec=>!isDemo&&hasSnapshot&&(tab==='home'&&['transactions','news'].includes(spec.key)||tab==='finance'&&spec.key==='transactions'||tab==='benefits'&&['samsungPoints','naverPoints'].includes(spec.key)||tab==='news'&&spec.key==='news')&&syncHealth[spec.key]?.state!=='current');
+ const sourceLabel=(key:string)=>dashboardTimestamp(sourceUpdates[key])??(loading?'조회 중':'미확인');
+ const sourceAlerts=monitoredSources.filter(spec=>hasSnapshot&&(tab==='home'&&['transactions','news'].includes(spec.key)||tab==='finance'&&spec.key==='transactions'||tab==='benefits'&&['samsungPoints','naverPoints'].includes(spec.key)||tab==='news'&&spec.key==='news')&&syncHealth[spec.key]?.state!=='current');
  const healthText=(key:string)=>{const h=syncHealth[key];return h?.state==='failed'?'최근 수집 실패/불완전 · 기존 저장값 유지':h?.state==='delayed'?'오늘 원본 확인 지연 · 마지막 저장값 유지':'원본 확인 시각 미확인';};
  const amountKnown=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)||typeof value==='string'&&value.trim()!==''&&Number.isFinite(Number(value));
  const transactions=useMemo(()=>items.filter(x=>x.kind==='transaction'),[items]);
  const transactionAmountsKnown=transactions.length>0&&transactions.every(x=>amountKnown(x.amount));
- const coverageDay=registeredCoverageDay(isDemo?SAMPLE_UPDATED_AT:syncHealth.transactions?.last_source_at??null,transactions.map(x=>x.event_date));
+ const coverageDay=registeredCoverageDay(syncHealth.transactions?.last_source_at??null,transactions.map(x=>x.event_date));
  const settlements=by('settlement'),pending=settlements.filter(x=>x.status!=='done'),done=settlements.filter(x=>x.status==='done');
  const cardTotal=transactions.filter(x=>x.amount!==null&&x.amount>0).reduce((a,x)=>a+Number(x.amount),0);
  const pendingAmount=pending.reduce((a,x)=>a+Number(x.amount??0),0);
  const settledAmount=done.reduce((a,x)=>a+Number(x.amount??0),0);
  const points=by('benefit').filter(x=>x.category==='points').reduce((a,x)=>a+Number(x.amount??0),0);
  const tasks=by('task').filter(x=>x.status!=='archived'),taskComplete=tasks.filter(x=>x.status==='done').length;
- const change=async(x:Item,status:string)=>{if(isDemo){setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));return;}if(!beginStatusChange(statusInFlight.current,x.id))return;setStatusBusy([...statusInFlight.current]);setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));try{const res=await fetch('/api/items',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'status',id:x.id,status})});if(!res.ok)throw new Error('저장 실패')}catch{setItems(cur=>revertStatus(cur,x.id,status,x.status));setError('상태 저장에 실패했습니다')}finally{endStatusChange(statusInFlight.current,x.id);setStatusBusy([...statusInFlight.current])}};
+ const change=async(x:Item,status:string)=>{if(!beginStatusChange(statusInFlight.current,x.id))return;setStatusBusy([...statusInFlight.current]);setItems(old=>old.map(y=>y.id===x.id?{...y,status}:y));try{const res=await fetch('/api/items',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'status',id:x.id,status})});if(!res.ok)throw new Error('저장 실패')}catch{setItems(cur=>revertStatus(cur,x.id,status,x.status));setError('상태 저장에 실패했습니다')}finally{endStatusChange(statusInFlight.current,x.id);setStatusBusy([...statusInFlight.current])}};
  const addTask=async()=>{
    const title=taskDraft.trim();if(!title||taskBusy)return;
    setTaskBusy(true);setError('');
-   if(isDemo){
-     const id='demo-manual-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-     setItems(old=>[...old,{id,kind:'task',title,description:null,amount:null,currency:'KRW',status:'pending',category:'할 일',source:'직접 추가',due_date:null,event_date:null,url:null,metadata:{created_manually:true}}]);
-     setTaskDraft('');setTaskFormOpen(false);setTaskBusy(false);return;
-   }
    try{
      const response=await fetch('/api/items',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
      if(!response.ok)throw new Error('추가 실패');
@@ -74,7 +67,6 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  const removeTask=async(x:Item)=>{
    if(taskRemoving)return;
    setTaskRemoving(x.id);setError('');
-   if(isDemo){setItems(old=>old.filter(y=>y.id!==x.id));setTaskRemoving(null);return;}
    try{
      const response=await fetch('/api/items',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:x.id})});
      if(!response.ok)throw new Error('삭제 실패');
@@ -82,12 +74,10 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
    }catch{setError('할 일을 삭제하지 못했습니다. 다시 시도해 주세요.')}
    finally{setTaskRemoving(null)}
  };
- const signOut=async()=>{if(isDemo){window.location.href='/';return;}await browserDb().auth.signOut();window.location.href='/login'};
- const resetDemo=()=>{if(demoData)setItems(demoData.map(item=>({...item,metadata:{...item.metadata}})));setEditingMemo(null);setMemoDraft('');setFinanceView('transactions');setSelectedNewsId(null);};
+ const signOut=async()=>{await browserDb().auth.signOut();window.location.href='/login'};
  const manualRefresh=async()=>{
    if(refreshing)return;
    setRefreshing(true);setRefreshNotice('');
-   if(isDemo){resetDemo();setRefreshNotice('샘플 데이터 초기화 완료');setRefreshing(false);return;}
    try{if(await refresh())setRefreshNotice('DB 조회 완료 · 원본 확인 시각 참고');}
    finally{setRefreshing(false);}
  };
@@ -95,7 +85,6 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  const startMemo=(x:Item)=>{setFinanceView('memos');setEditingMemo(x.id);setMemoDraft(getMemo(x));};
  const saveMemoValue=async(x:Item,value:string)=>{
    const memo=value.trim();
-   if(isDemo){setItems(old=>old.map(y=>y.id===x.id?{...y,metadata:{...y.metadata,memo}}:y));return;}
    try{
      const res=await fetch('/api/items',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'memo',id:x.id,memo})});
      if(!res.ok)throw new Error('메모 저장 실패');
@@ -151,7 +140,7 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
    .map(([category,articles])=>[category,[...articles].sort((a,b)=>(b.event_date??'').localeCompare(a.event_date??''))] as const);
  const newsCategoryEmoji=(category:string)=>/AI|인공지능|다이제스트/i.test(category)?'✦':/기술|테크|개발|IT/i.test(category)?'⌘':/경제|금융|시장/.test(category)?'↗':/국제|세계/.test(category)?'◎':'▣';
  const pointEntries=benefits.filter(x=>x.category==='points');
- const pointLogDate=isDemo?'2026-11-12':pointToday();
+ const pointLogDate=pointToday();
  const asNumber=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)?value:typeof value==='string'&&value.trim()!==''&&Number.isFinite(Number(value))?Number(value):null;
  const pointReasons=(x:Item,direction:'up'|'down')=>pointChangeDisplay(x)[direction].reasons;
  const pointHistory=pointEntries.flatMap(x=>{
@@ -207,7 +196,7 @@ export default function DemoDashboard({demoData}:{demoData?: readonly Item[]}){
  const openNews=(id:string)=>{setSelectedNewsId(id);setTab('news');window.scrollTo({top:0,behavior:'smooth'});};
  const closeNews=()=>{setSelectedNewsId(null);window.scrollTo({top:0,behavior:'smooth'});};
  const getNewsBody=(x:Item)=>typeof x.metadata.full_body==='string'?x.metadata.full_body:(x.description??'기사 본문이 아직 제공되지 않았습니다.');
- return <div className="shell demoShell designPreview conceptLight">{isDemo&&<aside className="demoBanner"><strong>🧪 DEVELOPMENT · 가상 데이터</strong><span>Supabase와 피클AI에 연결되지 않습니다. 체크 상태도 저장되지 않아요.</span><button type="button" onClick={resetDemo}>샘플 초기화 ↻</button></aside>}<header className="top"><div className="topIdentity"><span className="brand"><span className="brandMark" aria-hidden="true">◈</span> PERSONAL OS <span className="brandEdition">/ STUDIO</span></span><h1>{tab==='home'?'대시보드':tabs.find(x=>x[0]===tab)?.[1]}</h1>{tab!=='architecture'&&<small className="pageUpdateTime" title={isDemo?'가상 데이터의 예시 갱신 시각':'DB에 마지막 저장된 시각 · 한국 시간'}>{isDemo?'샘플 업데이트':'DB 저장'} · {updateLabel(tab)}<br/>{isDemo?'샘플 기준':'원본 기준'} · {sourceLabel(tab)}</small>}</div><div className="topActions">{tab!=='architecture'&&<button type="button" className={"refreshButton"+(refreshing?" refreshing":"")} onClick={()=>void manualRefresh()} disabled={refreshing||loading} aria-label={refreshing?"새로고침 중":"새로고침"} title="새로고침"><span aria-hidden="true">↻</span></button>}<button className="profile" onClick={signOut} aria-label={isDemo?'운영 대시보드로 이동':'로그아웃'} title={isDemo?'운영 대시보드로 이동':userEmail+' 로그아웃'}>↗</button></div></header>{refreshNotice&&<p className="refreshNotice" role="status">{refreshNotice}</p>}{error&&<aside className="error">{error}{hasSnapshot?' · 마지막 조회값 유지 중':''}</aside>}{!error&&sourceAlerts.length>0&&<aside className="error" role="status">{sourceAlerts.map(spec=><div key={spec.key}>{spec.label} · {healthText(spec.key)}{syncHealth[spec.key]?.last_source_at?' ('+dashboardTimestamp(syncHealth[spec.key].last_source_at)+')':''}</div>)}</aside>}
+ return <div className="shell demoShell designPreview conceptLight"><header className="top"><div className="topIdentity"><span className="brand"><span className="brandMark" aria-hidden="true">◈</span> PERSONAL OS <span className="brandEdition">/ STUDIO</span></span><h1>{tab==='home'?'대시보드':tabs.find(x=>x[0]===tab)?.[1]}</h1>{tab!=='architecture'&&<small className="pageUpdateTime" title="DB에 마지막 저장된 시각 · 한국 시간">DB 저장 · {updateLabel(tab)}<br/>원본 기준 · {sourceLabel(tab)}</small>}</div><div className="topActions">{tab!=='architecture'&&<button type="button" className={"refreshButton"+(refreshing?" refreshing":"")} onClick={()=>void manualRefresh()} disabled={refreshing||loading} aria-label={refreshing?"새로고침 중":"새로고침"} title="새로고침"><span aria-hidden="true">↻</span></button>}<button className="profile" onClick={signOut} aria-label="로그아웃" title={userEmail+' 로그아웃'}>↗</button></div></header>{refreshNotice&&<p className="refreshNotice" role="status">{refreshNotice}</p>}{error&&<aside className="error">{error}{hasSnapshot?' · 마지막 조회값 유지 중':''}</aside>}{!error&&sourceAlerts.length>0&&<aside className="error" role="status">{sourceAlerts.map(spec=><div key={spec.key}>{spec.label} · {healthText(spec.key)}{syncHealth[spec.key]?.last_source_at?' ('+dashboardTimestamp(syncHealth[spec.key].last_source_at)+')':''}</div>)}</aside>}
  {tab==='architecture'?<ArchitectureScreen/>:loading?<div className="loading">데이터 불러오는 중…</div>:!hasSnapshot?<div className="loading">정상 데이터를 불러오지 못했습니다. 새로고침하면 다시 확인할 수 있습니다.</div>:<>
  {tab==='home'&&<main>
   <button type="button" className="navCard" onClick={()=>setTab('finance')} aria-label="이번 달 카드 지출 상세 보기, 금융 탭으로 이동">
