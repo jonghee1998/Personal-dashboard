@@ -120,14 +120,10 @@ test('logApiFailure writes exactly one apiFailureLog line',()=>{
 });
 
 // Static check: every 5xx response in a collector POST handler logs on the same line or the line above.
-// stage/route.ts returns NextResponse.json(o.body,{status:o.status,...}) for its 23505 branch (200 or 503);
-// that line can be 5xx too, so it is counted with the literal 5xx lines.
+// A computed status like {status:o.status,...} can be 5xx too, so it is counted with the literal 5xx lines.
 const routes=[
  ['app/api/ingest/route.ts',5],
  ['app/api/sync-runs/route.ts',5],
- ['app/api/reconcile/transactions/route.ts',3],
- ['app/api/backfill/preview/route.ts',5],
- ['app/api/backfill/stage/route.ts',4],
 ];
 const fivexx=/status:\s*(5\d\d|o\.status)\b/;
 function postFiveXxLines(source){

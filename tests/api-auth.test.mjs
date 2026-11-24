@@ -24,22 +24,36 @@ test('app origin is localhost on the same port (next start without -H)', () => {
   assert.equal(appOrigin('http://127.0.0.1:3100'), 'http://localhost:3100');
 });
 
-test('case list covers token, session and origin routes', () => {
+test('case list covers token, session and removed routes', () => {
   const cases = apiAuthCases('http://localhost:3100', 'c=1');
   const keys = new Set(cases.map(c => `${c.method} ${c.path}`));
-  for (const k of ['POST /api/ingest', 'POST /api/sync-runs', 'POST /api/reconcile/transactions', 'POST /api/backfill/preview',
-    'POST /api/backfill/stage', 'GET /api/dashboard', 'PATCH /api/items', 'POST /api/items', 'DELETE /api/items',
-    'GET /api/backfill/control', 'POST /api/backfill/control']) assert.ok(keys.has(k), k);
+  for (const k of ['POST /api/ingest', 'POST /api/sync-runs', 'GET /api/dashboard', 'PATCH /api/items', 'POST /api/items',
+    'DELETE /api/items']) assert.ok(keys.has(k), k);
   const removed = cases.filter(c => c.method === 'GET' && c.path === '/api/sync-runs');
   assert.equal(removed.length, 2);
   assert.equal(removed.filter(c => c.headers.cookie === 'c=1').length, 1);
   assert.equal(removed.filter(c => !c.headers.cookie).length, 1);
   for (const c of removed) assert.deepEqual([c.expect, c.authUser], [405, 'zero']);
-  const control = cases.filter(c => c.path === '/api/backfill/control' && c.method === 'POST');
-  const pick = (cookie, same) => control.find(c => !!c.headers.cookie === cookie && (c.headers.origin === 'http://localhost:3100') === same && c.headers.origin);
-  assert.deepEqual([pick(true, false).expect, pick(true, false).authUser], [403, 'zero']);
-  assert.deepEqual([pick(true, true).expect, pick(true, true).authUser], [401, 'some']);
-  assert.deepEqual([pick(false, true).expect, pick(false, true).authUser], [401, 'zero']);
+  // 6단계 ⑤에서 지운 일회성 API 4개: 경우 5개가 정확히 하나씩, 올바른 인증을 보내도 404·세션 확인 0건
+  const gone = [
+    ['POST', '/api/reconcile/transactions', 'token'], ['POST', '/api/backfill/preview', 'token'], ['POST', '/api/backfill/stage', 'token'],
+    ['GET', '/api/backfill/control', 'session'], ['POST', '/api/backfill/control', 'session'],
+  ];
+  const gonePaths = new Set(gone.map(([, path]) => path));
+  assert.equal(cases.filter(c => gonePaths.has(c.path)).length, gone.length);
+  for (const [method, path, auth] of gone) {
+    const hit = cases.filter(c => c.method === method && c.path === path);
+    assert.equal(hit.length, 1, `${method} ${path}`);
+    const [c] = hit;
+    assert.deepEqual([c.expect, c.authUser], [404, 'zero'], `${method} ${path}`);
+    if (auth === 'token') {
+      assert.equal(c.headers.authorization, `Bearer ${FAKE_TOKEN}`, `${method} ${path}`);
+      assert.equal(c.headers.cookie, undefined, `${method} ${path}`);
+    } else {
+      assert.equal(c.headers.cookie, 'c=1', `${method} ${path}`);
+      assert.equal(c.headers.authorization, undefined, `${method} ${path}`);
+    }
+  }
 });
 
 test('judge flags wrong status, data requests and auth-user call counts', () => {

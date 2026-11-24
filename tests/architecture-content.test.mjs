@@ -33,7 +33,7 @@ test('target diagram text names dev/ops areas and the legend',()=>{
 
 test('API table lists every app/api/**/route.ts exactly once',()=>{
  const files=apiPaths();
- assert.equal(files.length,8);
+ assert.equal(files.length,4);
  assert.deepEqual([...apiRows.map(r=>r.path)].sort(),files);
 });
 
@@ -45,9 +45,12 @@ test('API methods match the exported handlers of each route',()=>{
  }
 });
 
-test('one-off backfill and reconcile APIs are marked for cleanup',()=>{
- const cleanup=apiRows.filter(r=>r.cleanup).map(r=>r.path).sort();
- assert.deepEqual(cleanup,['/api/backfill/control','/api/backfill/preview','/api/backfill/stage','/api/reconcile/transactions']);
+test('no API is left marked for cleanup (one-off APIs removed in step 6-5)',()=>{
+ const cleanup=apiRows.filter(r=>r.cleanup).map(r=>r.path);
+ assert.deepEqual(cleanup,[]);
+ const screen=readFileSync(join(root,'components','architecture-screen.tsx'),'utf8');
+ assert.ok(!screen.includes('정리 예정'));
+ assert.ok(!vercelEnv.some(e=>e.name==='BACKFILL_APPLY_ENABLED'));
 });
 
 test('environment variables are names used by the code, server-only ones are not public',()=>{

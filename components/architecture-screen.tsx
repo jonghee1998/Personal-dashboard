@@ -128,7 +128,7 @@ export default function ArchitectureScreen(){
   </Section>
   <Section {...s4}><FlowDiagram/></Section>
   <Section {...s5}><Table head={['탭','보여주는 것']} rows={screenRows.map(r=>[r.tab,r.shows])}/></Section>
-  <Section {...s6}><Table head={['경로','호출 주체','인증']} rows={apiRows.map(r=>[<><code>{r.path}</code><small className="archMethods">{r.methods}</small>{r.cleanup&&<Tag>정리 예정</Tag>}</>,r.caller,r.auth])}/></Section>
+  <Section {...s6}><Table head={['경로','호출 주체','인증']} rows={apiRows.map(r=>[<><code>{r.path}</code><small className="archMethods">{r.methods}</small></>,r.caller,r.auth])}/></Section>
   <Section {...s7}><Table head={['장치','내용']} rows={safeguardRows.map(r=>[r.name,r.desc])}/></Section>
   <Section {...s8}><Lines lines={devLines}/></Section>
  </main>;
