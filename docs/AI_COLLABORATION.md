@@ -24,8 +24,9 @@ This repository is the **single source of truth for software development and int
 - 수집기 실행 전 `DASHBOARD_INGEST_BASE_URL` 설정(https origin), 실제 POST 경로 `/api/ingest`
 - Header: `Authorization: Bearer <PICKLE_INGEST_TOKEN>`
 - Header: `Content-Type: application/json`
-- Request body: `examples/pickle-payload.json`
-- Root structure: `{"items":[...]}` (1–100 records per request).
+- Request body: 지금(8단계 전)은 v1 — `examples/pickle-payload-v1.json`, v2 는 운영 반영 뒤 — `examples/pickle-payload.json`([INGEST_V2.md](INGEST_V2.md))
+- 예시는 형식 확인용 합성 값이다. 운영 전송 본문은 수집기가 실제로 검증한 원천 레코드로 만든다([examples/README.md](../examples/README.md)).
+- v1: Root structure: `{"items":[...]}` (1–100 records per request). v2 root structure: [INGEST_V2.md](INGEST_V2.md).
 - `kind`: `transaction | settlement | news | benefit | task | event | journal`.
 - `external_id`: stable, unique per item within the same `kind`; **do not generate new IDs on each sync**.
 - `title`: required string. `amount`: number, not a formatted currency string. `status`: `pending | done | active | archived`.

@@ -1,0 +1,40 @@
+{
+  "items": [
+    {
+      "kind": "transaction",
+      "external_id": "txn-v1-000001",
+      "title": "합성가맹점A",
+      "amount": 1000,
+      "status": "active",
+      "event_date": "2026-01-01",
+      "metadata": {
+        "environment": "production",
+        "is_synthetic": false,
+        "source_system": "samsungcard",
+        "verification_source": "card_approval_ledger",
+        "source_record_id": "apv-v1-000001",
+        "as_of": "2026-01-01T09:00:00+09:00",
+        "verified_at": "2026-01-01T09:05:00+09:00",
+        "run_id": "00000000-0000-4000-8000-000000000101"
+      }
+    },
+    {
+      "kind": "transaction",
+      "external_id": "txn-v1-000002",
+      "title": "합성가맹점B",
+      "amount": 2500,
+      "status": "active",
+      "event_date": "2026-01-01",
+      "metadata": {
+        "environment": "production",
+        "is_synthetic": false,
+        "source_system": "samsungcard",
+        "verification_source": "card_approval_ledger",
+        "source_record_id": "apv-v1-000002",
+        "as_of": "2026-01-01T09:00:00+09:00",
+        "verified_at": "2026-01-01T09:05:00+09:00",
+        "run_id": "00000000-0000-4000-8000-000000000101"
+      }
+    }
+  ]
+}
