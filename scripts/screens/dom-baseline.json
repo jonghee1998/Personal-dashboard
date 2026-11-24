@@ -1,0 +1,3119 @@
+{
+ "home": {
+  "tag": "div",
+  "className": "shell demoShell designPreview conceptLight",
+  "children": [
+   {
+    "tag": "header",
+    "className": "top",
+    "children": [
+     {
+      "tag": "div",
+      "className": "topIdentity",
+      "children": [
+       {
+        "tag": "span",
+        "className": "brand",
+        "children": [
+         {
+          "tag": "span",
+          "className": "brandMark",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "brandEdition",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "h1",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "pageUpdateTime",
+        "children": [
+         {
+          "tag": "br",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "className": "topActions",
+      "children": [
+       {
+        "tag": "button",
+        "className": "refreshButton",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "profile",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "main",
+    "className": "",
+    "children": [
+     {
+      "tag": "button",
+      "className": "navCard",
+      "children": [
+       {
+        "tag": "section",
+        "className": "metric primary",
+        "children": [
+         {
+          "tag": "div",
+          "className": "eyebrow",
+          "children": []
+         },
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "small",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel taskPanel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "sectionTitle taskPanelHeader",
+        "children": [
+         {
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "taskHeaderActions",
+          "children": [
+           {
+            "tag": "span",
+            "className": "taskCount",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "taskOpenButton",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "listitem taskListItem",
+        "children": [
+         {
+          "tag": "button",
+          "className": "check ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "itembody",
+          "children": [
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "taskDeleteButton",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "newsNavCard",
+      "children": [
+       {
+        "tag": "div",
+        "className": "sectionTitle",
+        "children": [
+         {
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "linkHint",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "newsPreviewItem",
+        "children": [
+         {
+          "tag": "b",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "small",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "nav",
+    "className": "bottom",
+    "children": [
+     {
+      "tag": "button",
+      "className": "active",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "archNavIcon",
+          "children": [
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "finance": {
+  "tag": "div",
+  "className": "shell demoShell designPreview conceptLight",
+  "children": [
+   {
+    "tag": "header",
+    "className": "top",
+    "children": [
+     {
+      "tag": "div",
+      "className": "topIdentity",
+      "children": [
+       {
+        "tag": "span",
+        "className": "brand",
+        "children": [
+         {
+          "tag": "span",
+          "className": "brandMark",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "brandEdition",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "h1",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "pageUpdateTime",
+        "children": [
+         {
+          "tag": "br",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "className": "topActions",
+      "children": [
+       {
+        "tag": "button",
+        "className": "refreshButton",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "profile",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "main",
+    "className": "",
+    "children": [
+     {
+      "tag": "div",
+      "className": "financeSummary",
+      "children": [
+       {
+        "tag": "div",
+        "className": "financeTotal",
+        "children": [
+         {
+          "tag": "section",
+          "className": "metric ",
+          "children": [
+           {
+            "tag": "div",
+            "className": "eyebrow",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "metricgrid",
+        "children": [
+         {
+          "tag": "section",
+          "className": "metric ",
+          "children": [
+           {
+            "tag": "div",
+            "className": "eyebrow",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "section",
+          "className": "metric ",
+          "children": [
+           {
+            "tag": "div",
+            "className": "eyebrow",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel dailySpendingPanel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "dailySpendingHeader",
+        "children": [
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "h2",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "dailyMonthNav",
+          "children": [
+           {
+            "tag": "button",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "dailyTotal",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "dailyTotalAmounts",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "dailyInstallmentTotal",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "dailyLineScroller",
+        "children": [
+         {
+          "tag": "div",
+          "className": "dailyLineCanvas",
+          "children": [
+           {
+            "tag": "svg",
+            "className": "",
+            "children": [
+             {
+              "tag": "defs",
+              "className": "",
+              "children": [
+               {
+                "tag": "lineargradient",
+                "className": "",
+                "children": [
+                 {
+                  "tag": "stop",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "stop",
+                  "className": "",
+                  "children": []
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "tag": "g",
+              "className": "",
+              "children": [
+               {
+                "tag": "line",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "text",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "g",
+              "className": "",
+              "children": [
+               {
+                "tag": "line",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "text",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "g",
+              "className": "",
+              "children": [
+               {
+                "tag": "line",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "text",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "circle",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit ",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "dailyHit active",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "dailyDetails",
+        "children": [
+         {
+          "tag": "div",
+          "className": "dailyDetailsHeader",
+          "children": [
+           {
+            "tag": "div",
+            "className": "",
+            "children": [
+             {
+              "tag": "strong",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "small",
+              "className": "",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "dailyTransactionWrap",
+          "children": [
+           {
+            "tag": "div",
+            "className": "dailyTransaction",
+            "children": [
+             {
+              "tag": "div",
+              "className": "",
+              "children": [
+               {
+                "tag": "strong",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "div",
+              "className": "dailyTransactionActions",
+              "children": [
+               {
+                "tag": "strong",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "button",
+                "className": "memoInlineButton",
+                "children": []
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "barrow",
+        "children": [
+         {
+          "tag": "div",
+          "className": "barheading",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "track",
+          "children": [
+           {
+            "tag": "div",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "seg",
+        "children": [
+         {
+          "tag": "button",
+          "className": "selected",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "listitem",
+        "children": [
+         {
+          "tag": "button",
+          "className": "check ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "itembody",
+          "children": [
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "seg financeSeg",
+        "children": [
+         {
+          "tag": "button",
+          "className": "selected",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "",
+        "children": [
+         {
+          "tag": "div",
+          "className": "categorySection",
+          "children": [
+           {
+            "tag": "button",
+            "className": "categoryHeading expenseCategoryToggle",
+            "children": [
+             {
+              "tag": "b",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "span",
+              "className": "expenseCategoryMeta",
+              "children": [
+               {
+                "tag": "span",
+                "className": "expenseCategoryChevron collapsed",
+                "children": []
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel aiSubscriptionPanel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "sectionTitle subscriptionSectionTitle",
+        "children": [
+         {
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "sectionUpdateMeta",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "aiSubscriptionTotal",
+        "children": [
+         {
+          "tag": "div",
+          "className": "eyebrow",
+          "children": []
+         },
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "small",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "aiSubscriptionRow",
+        "children": [
+         {
+          "tag": "div",
+          "className": "itembody aiSubscriptionIdentity",
+          "children": [
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "subscriptionPlan",
+            "children": []
+           },
+           {
+            "tag": "div",
+            "className": "subscriptionDates",
+            "children": [
+             {
+              "tag": "div",
+              "className": "subscriptionDateLine",
+              "children": [
+               {
+                "tag": "span",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "strong",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "aiSubscriptionPrice",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "subscriptionActive",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "nav",
+    "className": "bottom",
+    "children": [
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "active",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "archNavIcon",
+          "children": [
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "news": {
+  "tag": "div",
+  "className": "shell demoShell designPreview conceptLight",
+  "children": [
+   {
+    "tag": "header",
+    "className": "top",
+    "children": [
+     {
+      "tag": "div",
+      "className": "topIdentity",
+      "children": [
+       {
+        "tag": "span",
+        "className": "brand",
+        "children": [
+         {
+          "tag": "span",
+          "className": "brandMark",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "brandEdition",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "h1",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "pageUpdateTime",
+        "children": [
+         {
+          "tag": "br",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "className": "topActions",
+      "children": [
+       {
+        "tag": "button",
+        "className": "refreshButton",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "profile",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "main",
+    "className": "",
+    "children": [
+     {
+      "tag": "section",
+      "className": "panel newsCategoryPanel ",
+      "children": [
+       {
+        "tag": "div",
+        "className": "newsCategoryHeading",
+        "children": [
+         {
+          "tag": "button",
+          "className": "newsCategoryToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "newsCategoryLabel",
+            "children": [
+             {
+              "tag": "span",
+              "className": "newsCategorySymbol",
+              "children": []
+             },
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "strong",
+                "className": "newsCategoryName",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "newsCategoryChevron collapsed",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "nav",
+    "className": "bottom",
+    "children": [
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "active",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "archNavIcon",
+          "children": [
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "benefits": {
+  "tag": "div",
+  "className": "shell demoShell designPreview conceptLight",
+  "children": [
+   {
+    "tag": "header",
+    "className": "top",
+    "children": [
+     {
+      "tag": "div",
+      "className": "topIdentity",
+      "children": [
+       {
+        "tag": "span",
+        "className": "brand",
+        "children": [
+         {
+          "tag": "span",
+          "className": "brandMark",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "brandEdition",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "h1",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "pageUpdateTime",
+        "children": [
+         {
+          "tag": "br",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "className": "topActions",
+      "children": [
+       {
+        "tag": "button",
+        "className": "refreshButton",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "profile",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "main",
+    "className": "",
+    "children": [
+     {
+      "tag": "section",
+      "className": "panel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "sectionTitle",
+        "children": [
+         {
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "sectionUpdateMeta",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "pointOverview",
+        "children": [
+         {
+          "tag": "div",
+          "className": "eyebrow",
+          "children": []
+         },
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "small",
+          "className": "deltaUp",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "pointProviderHeading",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "pointProvider",
+        "children": [
+         {
+          "tag": "div",
+          "className": "itembody pointProviderIdentity",
+          "children": [
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "pointAmounts",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "deltaUp",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "pointReasonLines",
+          "children": [
+           {
+            "tag": "small",
+            "className": "pointLogDate",
+            "children": []
+           },
+           {
+            "tag": "div",
+            "className": "pointReasonLine pointIncreaseReason",
+            "children": [
+             {
+              "tag": "span",
+              "className": "pointReasonValue",
+              "children": []
+             },
+             {
+              "tag": "span",
+              "className": "pointReasonText",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "sectionTitle",
+        "children": [
+         {
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "sectionUpdateMeta",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "applicationCounts",
+        "children": [
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "applicationsScroll",
+        "children": [
+         {
+          "tag": "table",
+          "className": "applicationsTable",
+          "children": [
+           {
+            "tag": "thead",
+            "className": "",
+            "children": [
+             {
+              "tag": "tr",
+              "className": "",
+              "children": [
+               {
+                "tag": "th",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "th",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "th",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "th",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "th",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "tbody",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "p",
+        "className": "empty",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "nav",
+    "className": "bottom",
+    "children": [
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "active",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "archNavIcon",
+          "children": [
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "journal": {
+  "tag": "div",
+  "className": "shell demoShell designPreview conceptLight",
+  "children": [
+   {
+    "tag": "header",
+    "className": "top",
+    "children": [
+     {
+      "tag": "div",
+      "className": "topIdentity",
+      "children": [
+       {
+        "tag": "span",
+        "className": "brand",
+        "children": [
+         {
+          "tag": "span",
+          "className": "brandMark",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "brandEdition",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "h1",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "pageUpdateTime",
+        "children": [
+         {
+          "tag": "br",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "className": "topActions",
+      "children": [
+       {
+        "tag": "button",
+        "className": "refreshButton",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "profile",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "tag": "main",
+    "className": "lifeCalendar",
+    "children": [
+     {
+      "tag": "section",
+      "className": "calendarSearchPanel",
+      "children": [
+       {
+        "tag": "label",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "calendarSearchField",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "input",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "calendarFilters",
+        "children": [
+         {
+          "tag": "button",
+          "className": "active",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "calendarPanel",
+      "children": [
+       {
+        "tag": "div",
+        "className": "calendarHeader",
+        "children": [
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "calendarEyebrow",
+            "children": []
+           },
+           {
+            "tag": "h2",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarToday",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "calendarMonthNav",
+        "children": [
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarArrows",
+          "children": [
+           {
+            "tag": "button",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "button",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "calendarGrid",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarWeekday sunday",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarWeekday ",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay chosen today ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": [
+             {
+              "tag": "i",
+              "className": "calendarDot eventDot",
+              "children": []
+             },
+             {
+              "tag": "i",
+              "className": "calendarDot taskDot",
+              "children": []
+             },
+             {
+              "tag": "i",
+              "className": "calendarDot newsDot",
+              "children": []
+             },
+             {
+              "tag": "i",
+              "className": "calendarDot pointDot",
+              "children": []
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarDay ",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "calendarDots",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "calendarLegend",
+        "children": [
+         {
+          "tag": "span",
+          "className": "",
+          "children": [
+           {
+            "tag": "i",
+            "className": "calendarDot eventDot",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": [
+           {
+            "tag": "i",
+            "className": "calendarDot taskDot",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": [
+           {
+            "tag": "i",
+            "className": "calendarDot newsDot",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": [
+           {
+            "tag": "i",
+            "className": "calendarDot pointDot",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "calendarAgenda",
+      "children": [
+       {
+        "tag": "div",
+        "className": "calendarAgendaHeading",
+        "children": [
+         {
+          "tag": "div",
+          "className": "",
+          "children": [
+           {
+            "tag": "h2",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "strong",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "calendarAgendaEntry event",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarEntryIcon",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarEntryInfo",
+          "children": [
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "calendarAgendaEntry task",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarEntryIcon",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarEntryInfo",
+          "children": [
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarTaskToggle ",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "calendarAgendaEntry point",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarEntryIcon",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarEntryInfo",
+          "children": [
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "calendarPointAmount positive",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "calendarAgendaEntry news",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarEntryIcon",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarEntryInfo",
+          "children": [
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarNewsOpen",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "p",
+      "className": "calendarDemoNote",
+      "children": []
+     }
+    ]
+   },
+   {
+    "tag": "nav",
+    "className": "bottom",
+    "children": [
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "active",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": []
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "button",
+      "className": "",
+      "children": [
+       {
+        "tag": "span",
+        "className": "navicon",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "archNavIcon",
+          "children": [
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "rect",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "span",
+        "className": "",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}
