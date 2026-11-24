@@ -62,8 +62,11 @@ test('environment variables are names used by the code, server-only ones are not
 });
 
 test('data flow uses the upsert conflict key from the ingest route',()=>{
+ // The ingest route writes only through the DB function; the conflict key lives in its upsert.
  const ingest=readFileSync(join(root,'app','api','ingest','route.ts'),'utf8');
- assert.match(ingest,/onConflict:'user_id,kind,external_id'/);
+ assert.match(ingest,/rpc\('dashboard_ingest_commit'/);
+ const commit=readFileSync(join(root,'supabase','migrations','20261124000100_ingest_support.sql'),'utf8');
+ assert.match(commit,/on conflict \(user_id, kind, external_id\) do update/);
  assert.ok(flowSteps.some(s=>s.line2.includes('user_id + kind + external_id')));
 });
 

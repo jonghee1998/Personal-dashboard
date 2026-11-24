@@ -39,7 +39,7 @@ test('document examples parse', () => {
   assert.equal(f.run.status,'failed');
   assert.deepEqual(f.itemViolations,[]);
   const conflict=example('conflict-response');
-  assert.equal(conflict.violations[0].code,'RUN_ID_CONFLICT');
+  assert.deepEqual(conflict,{error:'Run id conflict',code:'RUN_ID_CONFLICT'});
 });
 
 const failedBody=()=>clone(example('failed'));

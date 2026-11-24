@@ -6,6 +6,7 @@ import {chromium} from '@playwright/test';
 import {createInterface} from 'node:readline';
 import {checkApiAuth, fakeAppEnv, startFakeSupabase} from './api-auth.mjs';
 import {checkApiLogs} from './api-log.mjs';
+import {checkApiIngest} from './api-ingest.mjs';
 
 const PORT = process.env.PORT || '3100';
 const SCREENS_DIR = process.env.SCREENS_DIR || '.screens';
@@ -117,6 +118,9 @@ try {
   const logCheck = await checkApiLogs(BASE, fake, serverLogs);
   if (logCheck.problems.length) { failed = true; console.log(`FAIL api 로그 검사 ${logCheck.problems.length}건`); }
   else console.log(`PASS api 로그 검사 ${logCheck.results.length}건`);
+  const ingestCheck = await checkApiIngest(BASE, fake);
+  if (ingestCheck.problems.length) { failed = true; console.log(`FAIL api 수신 검사 ${ingestCheck.problems.length}건`); }
+  else console.log(`PASS api 수신 검사 ${ingestCheck.results.length}건`);
 } catch (e) {
   failed = true;
   console.error(e.message);
