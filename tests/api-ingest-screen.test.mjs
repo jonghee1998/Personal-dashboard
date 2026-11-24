@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
+import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, v2ConflictBody, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
 import {
-  FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
+  FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
   fakeCommitResponse, fakeExistingPage, fakeSupabaseResponse, startFakeSupabase,
 } from '../scripts/screens/api-auth.mjs';
 import {parseIngestV2} from '../lib/ingest-v2.ts';
@@ -11,16 +11,26 @@ import {handleIngest, readAllPages, payload} from '../lib/ingest-service.ts';
 const NOW = Date.parse('2026-01-02T00:00:00+09:00');
 const cases = Object.fromEntries(apiIngestCases().map(c => [c.id, c]));
 
-test('검사 다섯 경우 a~e, run_id f3·f4·f5', () => {
-  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e']);
+test('검사 여덟 경우 a~h, run_id f3·f4·f5·f6', () => {
+  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']);
   assert.equal(cases.b.body.run.run_id, INGEST_RUN_OK);
   assert.equal(cases.c.body.run.run_id, INGEST_RUN_COMMIT_FAIL);
   assert.equal(cases.e.body.run.run_id, INGEST_RUN_PAGED);
   assert.ok(!cases.d.headers.authorization);
+  for (const id of ['f', 'g', 'h']) {
+    assert.equal(cases[id].body.run.run_id, INGEST_RUN_REPLAY, id);
+    assert.equal(cases[id].headers.authorization, `Bearer ${FAKE_TOKEN}`, id);
+  }
+  // g 는 f 와 같은 본문, h 는 title 만 다른 본문
+  assert.deepEqual(cases.g.body, cases.f.body);
+  assert.notDeepEqual(cases.h.body.items, cases.g.body.items);
+  assert.equal(cases.g.body.items[0].title, '합성가맹점A');
+  assert.equal(cases.h.body.items[0].title, '합성가맹점B');
+  assert.deepEqual({...cases.h.body.items[0], title: '합성가맹점A'}, cases.g.body.items[0]);
 });
 
 test('v2 본문은 parseIngestV2 를 통과(1항목·500항목), v1 본문은 v1 스키마 통과', () => {
-  for (const body of [v2Body(INGEST_RUN_OK), v2Body(INGEST_RUN_COMMIT_FAIL), pagedBody()]) {
+  for (const body of [v2Body(INGEST_RUN_OK), v2Body(INGEST_RUN_COMMIT_FAIL), pagedBody(), v2Body(INGEST_RUN_REPLAY), v2ConflictBody()]) {
     const r = parseIngestV2(structuredClone(body), NOW);
     assert.equal(r.ok, true, JSON.stringify(r.violations));
     assert.deepEqual(r.itemViolations, []);
@@ -73,9 +83,11 @@ test('가짜 서버는 요청 본문과 응답 상태를 calls 에 기록', asyn
 });
 
 // 가짜 서버 응답 함수를 그대로 쓰는 deps 로 handleIngest 를 돌려, 앱이 보낼 호출 기록(calls)을 만든 뒤 판정한다.
-async function simulate(c) {
+// ctx.runs(Map) 를 넘기면 가짜 commit 이 f6 실행을 기억하고 readRun 이 그 기록을 돌려준다(f→g→h 를 같은 runs 로 차례 실행).
+async function simulate(c, runs) {
   const calls = [];
-  const rpc = (path, body) => { const out = fakeSupabaseResponse('POST', path, '', 'application/json', body); calls.push({method: 'POST', path, query: '', body, status: out.status}); return out; };
+  const ctx = runs ? {runs} : {};
+  const rpc = (path, body) => { const out = fakeSupabaseResponse('POST', path, '', 'application/json', body, ctx); calls.push({method: 'POST', path, query: '', body, status: out.status}); return out; };
   const page = (fn, args) => readAllPages(async after => {
     const out = rpc(`/rest/v1/rpc/${fn}`, {...args, p_after: after, p_limit: 500});
     return out.status === 200 ? {data: out.body, error: null} : {data: null, error: out.body};
@@ -85,7 +97,7 @@ async function simulate(c) {
     readCandidates: (u, ids) => page('dashboard_ingest_candidates', {p_user: u, p_source_ids: ids}),
     readRun: async (u, k) => {
       const query = `select=*&user_id=eq.${u}&run_id=eq.${k.run_id}&dataset=eq.${k.dataset}&source_system=eq.${k.source_system}`;
-      const out = fakeSupabaseResponse('GET', '/rest/v1/dashboard_sync_runs', query, 'application/json');
+      const out = fakeSupabaseResponse('GET', '/rest/v1/dashboard_sync_runs', query, 'application/json', undefined, ctx);
       calls.push({method: 'GET', path: '/rest/v1/dashboard_sync_runs', query, status: out.status});
       return out.status === 200 ? {data: out.body[0] ?? null, error: null} : {data: null, error: out.body};
     },
@@ -128,6 +140,54 @@ test('판정: 어긋난 관찰은 실패', async () => {
   const commit = e.calls.find(x => x.path.endsWith('dashboard_ingest_commit'));
   const nulls = {...commit, body: {...commit.body, p_expected: commit.body.p_expected.map((x, i) => i === 0 ? {...x, updated_at: null} : x)}};
   assert.ok(judgeIngestCase(cases.e, {...e, calls: e.calls.map(x => x === commit ? nulls : x)}).length);
+});
+
+// f→g→h 를 같은 runs 로 차례 실행한 관찰
+async function simulateReplay() {
+  const runs = new Map();
+  const f = await simulate(cases.f, runs);
+  const g = await simulate(cases.g, runs);
+  const h = await simulate(cases.h, runs);
+  return {runs, f, g, h};
+}
+
+test('f·g·h: 같은 runs 로 f→g→h 차례 실행하면 판정 모두 통과', async () => {
+  const {runs, f, g, h} = await simulateReplay();
+  assert.equal(runs.size, 1);
+  assert.deepEqual(judgeIngestCase(cases.f, f), [], 'f');
+  assert.deepEqual(judgeIngestCase(cases.g, g), [], 'g');
+  assert.deepEqual(judgeIngestCase(cases.h, h), [], 'h');
+  // f 는 항목 상태 RPC 를 부르지만 g·h 의 calls 에는 섞이지 않는다
+  assert.ok(f.calls.some(x => x.path.endsWith('dashboard_ingest_existing')));
+  assert.ok(!g.calls.some(x => x.path.endsWith('dashboard_ingest_existing')));
+  assert.ok(!h.calls.some(x => x.path.endsWith('dashboard_ingest_existing')));
+  assert.equal(JSON.parse(g.bodyText).idempotent, true);
+});
+
+test('f·g·h 판정: 어긋난 관찰은 실패', async () => {
+  const {f, g, h} = await simulateReplay();
+  const commitCall = f.calls.find(x => x.path.endsWith('dashboard_ingest_commit'));
+  const existingCall = f.calls.find(x => x.path.endsWith('dashboard_ingest_existing'));
+  const candidatesCall = {method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_candidates', query: '', body: {p_user: FAKE_USER_ID, p_source_ids: ['apv-000001']}, status: 200};
+  const gBody = JSON.parse(g.bodyText);
+  // g
+  assert.ok(judgeIngestCase(cases.g, {...g, calls: [...g.calls, commitCall]}).length, 'g commit 1건');
+  assert.ok(judgeIngestCase(cases.g, {...g, bodyText: JSON.stringify({...gBody, idempotent: false})}).length, 'g idempotent false');
+  assert.ok(judgeIngestCase(cases.g, {...g, bodyText: JSON.stringify({...gBody, items: [{id: 'x'}]})}).length, 'g items 1개');
+  const noDataset = g.calls.map(x => x.method === 'GET' ? {...x, query: x.query.split('&').filter(p => !p.startsWith('dataset=')).join('&')} : x);
+  assert.ok(judgeIngestCase(cases.g, {...g, calls: noDataset}).length, 'g dataset 필터 누락');
+  assert.ok(judgeIngestCase(cases.g, {...g, calls: [...g.calls, existingCall]}).length, 'g existing RPC 1건');
+  assert.ok(judgeIngestCase(cases.g, {...g, calls: [...g.calls, candidatesCall]}).length, 'g candidates RPC 1건');
+  // h
+  assert.ok(judgeIngestCase(cases.h, {...h, status: 200}).length, 'h 200');
+  assert.ok(judgeIngestCase(cases.h, {...h, calls: [...h.calls, commitCall]}).length, 'h commit 있음');
+  assert.ok(judgeIngestCase(cases.h, {...h, calls: [...h.calls, existingCall]}).length, 'h existing RPC 있음');
+  assert.ok(judgeIngestCase(cases.h, {...h, cacheControl: null}).length, 'h no-store 없음');
+  // f 를 runs 가 이미 있는 상태(재전송)로 돌리면 실패
+  const runs = new Map();
+  await simulate(cases.f, runs);
+  const fAgain = await simulate(cases.f, runs);
+  assert.ok(judgeIngestCase(cases.f, fAgain).length, 'f 재전송 상태');
 });
 
 // f6: 가짜 commit 이 받은 p_run 을 실행 기록으로 기억하고, 네 필터(user_id·run_id·dataset·source_system)로 조회한다.
