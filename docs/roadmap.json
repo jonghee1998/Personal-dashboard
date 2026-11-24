@@ -192,7 +192,8 @@
       "id": "5",
       "title": "개발 DB 연결",
       "status": "doing",
-      "note": "나: 개발용 Supabase 생성 · AI: 스키마·가짜 데이터·연동 테스트"
+      "note": "AI: 스키마·가짜 데이터·연동 테스트를 CI Postgres로 완료(#15) · 남은 것: 개발 DB 방식 확정",
+      "ref": 15
     },
     {
       "id": "6",

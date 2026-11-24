@@ -1,26 +1,30 @@
 # PM 인수인계
 
-_마지막 갱신: 2026-11-24 14시_
+_마지막 갱신: 2026-11-24 16시_
 
 ## 현재 상태
-- 진행 단계 1~4 완료(이사, AI 팀 설치, 구조 화면 #2·#8, 코드 진단 #11 → docs/DIAGNOSIS.md). 5단계(개발 DB) 시작 전.
-- 2026-11-24: 진단에서 나온 개인 흔적(운영 주소, 실제 같은 금액·건수, 지명)을 가짜 값으로 바꾸고 main 기록을 새로 만듦(force push, 사용자 승인). 옛 브랜치는 cleanup-branches 로 정리 중.
-- 상황판 구조 탭은 이 저장소 docs/architecture.json 을 읽음(목적: 피클AI가 모은 내 지출·정산·뉴스·일정을 폰 하나로 보기).
-- 알려진 문제: 이 저장소에서 orchestrator 정기 실행(cron)이 한 번도 안 돎 → #2 가 수동 반영 뒤에도 '반영 승인 대기'로 남음. 수동 실행으로 정리, cron 등록 여부 확인 필요.
-- 계획 감사(Codex)가 정규화된 계획의 model:null 을 오탐함 → ai-orchestrator plan-review.mjs 에서 null 제거 후 보여 주도록 고칠 것.
+- 진행 단계 1~4 완료. 5단계 전반 완료: #15 → 최종 PR #20 반영(14:52). 반영한 것: SQL 테스트 괄호, 마이그레이션 기준선(`supabase/migrations/`), 가짜 시드, DB 테스트 6개(CI db 잡), API 인증 실제 호출 테스트, `ingest_gate.py` 주소 환경변수화(`DASHBOARD_INGEST_BASE_URL`).
+- main의 Dashboard data QA가 #20 이후 다시 통과한다.
+- 엔진 수정 #21(ai-orchestrator #324와 동일): orch/* PR이 닫히거나 Merge되면 `pull_request_target`으로 바로 완료·취소 처리하고, 순찰 시간을 7·27·47분으로 옮겼다. #20 Merge 2초 뒤 #15가 완료돼 동작을 확인했다.
+- cron 원인: 설정 문제가 아니라 GitHub가 정기 실행을 자주 건너뛴다. 완료 처리를 순찰에만 맡겨서 생긴 문제였고, 위 수정으로 해결했다.
+
+## 2026-11-24 운영 장애 (해결)
+- 피클AI 전송 500 `Status lookup failed`: 운영 Supabase(JH personal dashboard)가 무료 플랜 비활성으로 일시정지돼 있었다. 무료 활성 2개 한도 때문에 Restore가 막혀서, 개발용 프로젝트(personal-dashboard-dev 조직)를 일시정지한 뒤 운영 프로젝트를 복구했다.
+- 그다음 401 `Unauthorized`: 원인은 확인하지 못했다. 토큰을 새로 맞추고(피클AI가 생성 → Vercel `PICKLE_INGEST_TOKEN` 교체 → Redeploy) 200을 확인했다.
+- 피클AI는 `/api/ingest`에 직접 POST한다(`ingest_gate.py`는 쓰지 않음).
+- 운영 Vercel 프로젝트는 아직 옛 저장소 private_dashboard에 Git으로 연결돼 있다. 새 저장소에는 배포 기록이 없다.
 
 ## 결정한 것
 - 공개 저장소, 실데이터는 Supabase 에만. AI 는 운영 DB 접근 금지. 화면 구성 유지, 디자인 변경 가능.
-- 새 프로젝트 표준 절차는 ai-orchestrator docs/NEW_PROJECT.md 를 따른다(기본 환경 → 진행 단계 → 구조 확인 → 작업).
+- 새 프로젝트 표준 절차는 ai-orchestrator docs/NEW_PROJECT.md 를 따른다.
 - 스위치는 상황판에서 모든 프로젝트에 일괄 적용.
 - 사용자에게 무언가 요청할 때는 항상 링크를 함께 준다.
-
-## 진행 중 (2026-11-24 14시)
-- #15 5단계 전반(마이그레이션 정리·DB 연동 테스트·API 인증 테스트·수집 주소 환경변수화) 구현 중, 자동 반영 꺼짐 → 최종 PR 사용자 승인.
-- 개발용 Supabase 프로젝트는 사용자가 생성함(키 아직 미등록).
-- 토큰 절약: PM 감사 라운드 줄이기(계획을 처음부터 꼼꼼히), 쉬운 스텝은 Sonnet 지정.
+- 보호 경로(`.github/`, `scripts/orch/`) 변경은 PM이 브랜치 → PR로 올리고 사용자가 Merge한다(main 직접 push 금지).
+- private_dashboard는 8단계(Vercel 새 저장소 연결) 전까지 지우지 않는다.
 
 ## 다음 할 일
-1. 5단계: 사용자 개발용 Supabase 생성(https://supabase.com/dashboard/new) → PM 계획(진단 5-1~5-7: SQL 테스트 괄호, 마이그레이션 기준선, 개발 DB 적용, 가짜 시드, DB 연동·API 인증 테스트, 남은 주소 환경변수화).
-2. 6·7단계는 DIAGNOSIS.md (7)절 할 일 표대로 계획.
-3. 9단계 전까지 v1 수신 호환 유지(DIAGNOSIS.md 끝 표).
+1. 5단계 마무리: 개발 DB 방식을 확정한다. 제안은 CI Postgres로 대체하고(무료 2개 한도), 진짜 Supabase 확인은 8단계에서 하는 것. 사용자 확인 필요.
+2. `/api/ingest` 등 수신 API가 실패 원인을 남기지 않는다(`Status lookup failed`만 반환). 주소·키를 빼고 원인 코드만 서버 로그에 남기는 수정을 6단계 계획에 넣는다.
+3. 운영 Supabase가 다시 일시정지되지 않는지 확인한다. 무료 플랜은 요청이 없으면 일주일 뒤 멈춘다.
+4. 6·7단계는 DIAGNOSIS.md (7)절 할 일 표대로 계획한다(계획 작성 체크리스트 준수). 9단계 전까지 v1 수신 호환을 유지한다.
+5. 8단계: Vercel Git 연결을 새 저장소로 바꾼다. 새 main으로 운영 코드가 바뀌므로 계획 → 감사 → 승인을 거친다.
