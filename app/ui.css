@@ -4,7 +4,7 @@
 :root{--ui-bg:#FFFFFF;--ui-card:#FFFFFF;--ui-border:#EBEBEB;--ui-line:#F0F0F0;--ui-line2:#F2F2F2;--ui-text:#0B0B0C;--ui-sub:#6B6B6B;--ui-faint:#8C8C8C;--ui-accent:#2B59C3;--ui-accent-dark:#1F44A0;--ui-low:#4E8B6E;--ui-mid:#C08A2B;--ui-high:#C4513A;--ui-installment:#9A6A1E;--ui-sun:#C4513A;--ui-sat:#3B6EA8;--ui-r-card:16px;--ui-r-box:12px;--ui-r-btn:8px}
 html,body{background:#FFFFFF;color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
 html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;--accent:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
 .shell.uiV2.demoShell.designPreview.conceptLight button,.shell.uiV2.demoShell.designPreview.conceptLight input,.shell.uiV2.demoShell.designPreview.conceptLight textarea{font-family:inherit}
 .shell.uiV2.demoShell.designPreview.conceptLight h1,.shell.uiV2.demoShell.designPreview.conceptLight h2{color:var(--ui-text)}
 .shell.uiV2.demoShell.designPreview.conceptLight a{color:var(--ui-accent)}
