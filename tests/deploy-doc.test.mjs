@@ -82,7 +82,7 @@ test('배포 순서: 연결 보류 → 대조·DB 확인 → 연결·배포, env
   assert.ok(del > p4 && del < p5, 'env 파일 삭제 문장은 ④ 뒤, ⑤ 앞이어야 함');
 });
 
-test('배포 보류 조건에 백필 플래그·백필 표 결정 항목이 따로 있고, ⑤ 에 백필 표 확인 절차가 있다', () => {
+test('배포 보류 조건에 백필 플래그 항목은 하나 있고 백필 표 항목은 없으며, ⑤~⑥ 에 백필 표 확인이 없다', () => {
   const p5 = lineStart('⑤'), p6 = lineStart('⑥'), p7 = lineStart('⑦'), p8 = lineStart('⑧');
   assert.ok(p7 < p8, '⑦ 이 ⑧ 보다 앞이어야 함');
   const items = doc.slice(p7, p8).split(/\r?\n/).filter((l) => l.startsWith('- '));
@@ -92,17 +92,11 @@ test('배포 보류 조건에 백필 플래그·백필 표 결정 항목이 따�
   for (const s of ['켜져', '확인하지 못']) assert.ok(flag[0].includes(s), `플래그 항목에 '${s}' 가 없음`);
 
   const table = items.filter((l) => l.includes('dashboard_backfill_batches'));
-  assert.equal(table.length, 1, "⑦ 에 'dashboard_backfill_batches' 항목이 정확히 하나여야 함");
-  for (const s of ['확인하지 못', '기록하지 않', 'after_rows', '백업']) {
-    assert.ok(table[0].includes(s), `백필 표 항목에 '${s}' 가 없음`);
-  }
-  assert.notEqual(flag[0], table[0], '두 항목은 서로 다른 줄이어야 함');
+  assert.equal(table.length, 0, "⑦ 에 'dashboard_backfill_batches' 항목이 없어야 함(12단계에서 제거)");
 
   assert.ok(p5 < p6, '⑤ 가 ⑥ 보다 앞이어야 함');
   const db = doc.slice(p5, p6);
-  for (const s of ['backfill_table', 'staged', 'applied', 'after_rows']) {
-    assert.ok(db.includes(s), `⑤~⑥ 구간에 '${s}' 가 없음`);
-  }
+  assert.ok(!db.includes('backfill_table'), "⑤~⑥ 구간에 'backfill_table' 이 남아 있음");
 });
 
 test('운영 주소·키 모양 문자열이 없다', () => {

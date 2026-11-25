@@ -96,10 +96,10 @@ test('missing err is none; primitive err is unknown',()=>{
 
 test('output has exactly event, route, stage, code',()=>{
  const err=new Error('fake-message');err.code='PGRST301';err.details='fake-details';err.hint='fake-hint';err.cause=new Error('fake-cause');
- const line=apiFailureLog('/api/backfill/stage','existing_lookup',err);
+ const line=apiFailureLog('/api/ingest','existing_lookup',err);
  const o=parse(line);
  assert.deepEqual(Object.keys(o).sort(),['code','event','route','stage']);
- assert.deepEqual(o,{event:'api_failure',route:'/api/backfill/stage',stage:'existing_lookup',code:'PGRST301'});
+ assert.deepEqual(o,{event:'api_failure',route:'/api/ingest',stage:'existing_lookup',code:'PGRST301'});
  for(const s of ['fake-message','fake-details','fake-hint','fake-cause','at '])assert.ok(!line.includes(s),s);
  assert.ok(!line.includes('\n'));
 });

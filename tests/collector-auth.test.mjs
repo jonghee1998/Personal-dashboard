@@ -52,7 +52,7 @@ test('failure log is one JSON line with only event, route, reason',()=>{
  assert.ok(!line.includes(secret));
  assert.ok(!line.includes(header));
  for(const reason of ['server_secret_missing','server_secret_short','no_bearer','mismatch'])
-  assert.equal(JSON.parse(collectorAuthFailureLog('/api/backfill/stage',reason)).reason,reason);
+  assert.equal(JSON.parse(collectorAuthFailureLog('/api/ingest',reason)).reason,reason);
 });
 
 test('failure log replaces odd route or reason with invalid',()=>{
