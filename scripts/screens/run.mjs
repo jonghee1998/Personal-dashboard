@@ -2,6 +2,7 @@
 // /api/dashboard 는 브라우저에서 합성 응답(dashboard-fixture.mjs)으로 가로채고, 시계는 FIXTURE_NOW 로 고정한다.
 // 검사: 무세션 / → /login, 구조 탭(섹션·SVG·넘침·짝·겹침·잘림), 다섯 탭 대표 문구·가로 넘침, DOM 뼈대 기준선 비교,
 // 데이터 경계 검사(①~⑦: 조회 실패·401·지연, 상태·할 일·메모 쓰기와 중복 방지), api 인증·로그·수신·항목 검사.
+// 스크린샷(커밋별 비교 대상 목록은 expected.mjs): 탭 진입 화면 tab-<id>-<폭>.png(구조 탭 포함), 상태 화면 state-*-390.png.
 // 하나라도 실패하면 exit 1.
 // 기준선 갱신: npm run screens:baseline (= SCREENS_UPDATE_BASELINE=1, 화면 마크업을 일부러 바꿀 때만)
 import {spawn} from 'node:child_process';
@@ -79,6 +80,11 @@ async function openDashboard(page) {
 }
 
 const clickTab = (page, label) => page.locator('nav.bottom button', {hasText: label}).click();
+/**
+ * 비교용 스크린샷. 같은 코드를 두 번 찍어도 같도록 CSS 애니메이션·전환을 멈추고(animations: 'disabled')
+ * 입력 커서를 숨긴다(caret: 'hide'). 시계는 sessionPage·boundaryPage 의 setFixedTime 으로 고정돼 있다.
+ */
+const shot = (page, filename) => page.screenshot({path: join(SCREENS_DIR, filename), fullPage: true, animations: 'disabled', caret: 'hide'});
 const overflow = page => page.evaluate(() => ({sw: document.documentElement.scrollWidth, iw: window.innerWidth}));
 
 /** 기존 구조 탭 검사 → 문제 목록 */
@@ -132,6 +138,73 @@ async function checkComputedStyles(page) {
     });
     if (low.length) errs.push(`${id} 탭 글자 대비 4.5 미만: ${low.join(', ')}`);
   }
+  errs.push(...await checkDesignSpec(page));
+  return errs;
+}
+
+/** 디자인 사양(docs/DESIGN_V2.md) 계산값 대조: 탭 6개 그림자·그라데이션·글꼴, 금융 할부·단계색·요일색, 혜택 증감색, 홈 합계, 구조 탭 색 */
+async function checkDesignSpec(page) {
+  const errs = [];
+  const RGB = {text: 'rgb(11, 11, 12)', border: 'rgb(235, 235, 235)', accent: 'rgb(43, 89, 195)', accentDark: 'rgb(31, 68, 160)',
+    installment: 'rgb(154, 106, 30)', low: 'rgb(78, 139, 110)', mid: 'rgb(192, 138, 43)', high: 'rgb(196, 81, 58)',
+    sun: 'rgb(196, 81, 58)', sat: 'rgb(59, 110, 168)', white: 'rgb(255, 255, 255)'};
+  for (const [id, label] of [['home', '홈'], ['finance', '금융'], ['news', '뉴스'], ['benefits', '혜택'], ['journal', '기록'], ['architecture', '구조']]) {
+    await clickTab(page, label);
+    if (id === 'architecture') await page.locator('section.archSection').first().waitFor();
+    const r = await page.evaluate(() => {
+      const shell = document.querySelector('.shell.uiTheme');
+      const bad = [];
+      for (const el of [shell, ...shell.querySelectorAll('*')]) {
+        const cs = getComputedStyle(el);
+        if (cs.boxShadow !== 'none') bad.push(`${el.className?.baseVal ?? el.className} box-shadow`);
+        if (/gradient\(/.test(cs.backgroundImage)) bad.push(`${el.className?.baseVal ?? el.className} gradient`);
+      }
+      const cards = [...shell.querySelectorAll('main .panel')].map(el => getComputedStyle(el));
+      const s = getComputedStyle(shell);
+      return {bad: bad.slice(0, 5), font: s.fontFamily, numeric: s.fontVariantNumeric, bg: s.backgroundColor,
+        cards: cards.filter(c => c.borderTopColor !== 'rgb(235, 235, 235)' || c.borderTopLeftRadius !== '16px' || c.backgroundColor !== 'rgb(255, 255, 255)').length,
+        headerLine: getComputedStyle(shell.querySelector('header.top')).borderBottomColor};
+    });
+    if (r.bad.length) errs.push(`${id} 그림자·그라데이션: ${r.bad.join(', ')}`);
+    if (!/^"?Pretendard/.test(r.font)) errs.push(`${id} 글꼴 ${r.font}`);
+    if (!r.numeric.includes('tabular-nums')) errs.push(`${id} 숫자 ${r.numeric}`);
+    if (r.bg !== RGB.white) errs.push(`${id} 셸 배경 ${r.bg}`);
+    if (r.cards) errs.push(`${id} 카드 ${r.cards}개가 흰 바탕·#EBEBEB 테두리·16px 반경 아님`);
+    if (r.headerLine !== RGB.border) errs.push(`${id} 상단 구분선 ${r.headerLine}`);
+  }
+  const styles = (selector, props) => page.locator(selector).evaluateAll((list, props) =>
+    list.map(el => Object.fromEntries(props.map(p => [p, getComputedStyle(el)[p]]))), props);
+
+  await clickTab(page, '홈');
+  const split = await page.locator('.homeCycleSplit').textContent();
+  if (!/^\(일시불 .+ · 할부 .+\)$/.test(split ?? '')) errs.push(`홈 주기 합계 아래 '(일시불 X · 할부 Y)' 아님: ${split}`);
+  if (await page.locator('main').getByText(/오늘 일정|정산 받을 돈/).count()) errs.push('홈에 오늘 일정·정산 받을 돈 카드가 있음');
+  if (!await page.locator('.taskPanel .taskDeleteButton').count()) errs.push('홈 할 일 삭제 버튼 없음');
+
+  await clickTab(page, '금융');
+  const labels = await styles('.financeInstallment, .dailyInstallment', ['fontSize', 'color']);
+  if (!labels.length) errs.push('금융 할부 표기 없음');
+  for (const l of labels) if (l.fontSize !== '10px' || l.color !== RGB.installment) errs.push(`할부 표기 ${l.fontSize} ${l.color}`);
+  for (const tier of ['low', 'mid', 'high']) {
+    for (const c of await styles(`.financeCalendar .${tier}`, ['color'])) if (c.color !== RGB[tier]) errs.push(`달력 ${tier} ${c.color}`);
+  }
+  for (const [cls, want] of [['sunday', RGB.sun], ['saturday', RGB.sat]]) {
+    const list = await styles(`.financeCalendarGrid .${cls}`, ['color']);
+    if (!list.length || list.some(c => c.color !== want)) errs.push(`달력 ${cls} 색 ${list.map(c => c.color).join(',')}`);
+  }
+
+  await clickTab(page, '혜택');
+  for (const [cls, want] of [['deltaUp', RGB.accentDark], ['deltaDown', RGB.high]]) {
+    for (const c of await styles(`.pointsPanel .${cls}`, ['color'])) if (c.color !== want) errs.push(`혜택 ${cls} ${c.color}`);
+  }
+
+  await clickTab(page, '구조');
+  await page.locator('section.archSection').first().waitFor();
+  const fill = async selector => (await styles(selector, ['fill', 'stroke']))[0];
+  const plain = await fill('.archBox.plain rect'), accent = await fill('.archBox.accent rect'), deep = await fill('.archBox.deep rect');
+  if (plain?.fill !== RGB.white || plain?.stroke !== RGB.border) errs.push(`구조 상자 ${JSON.stringify(plain)}`);
+  if (accent?.fill !== RGB.accent) errs.push(`구조 강조 상자 ${JSON.stringify(accent)}`);
+  if (deep?.fill !== RGB.text) errs.push(`구조 진한 상자 ${JSON.stringify(deep)}`);
   return errs;
 }
 
@@ -181,7 +254,7 @@ async function checkArchitecture(page, label) {
       if (el.scrollWidth > el.clientWidth) out.clipped.push(`${el.className} ${el.scrollWidth}>${el.clientWidth}`);
     return out;
   }, [['02 · 요약', '피클AI 수집기가 카드·뉴스·혜택·일정 데이터를'], ['07 · API', '/api/ingest']]);
-  await page.screenshot({path: join(SCREENS_DIR, `arch-${label}.png`), fullPage: true});
+  await shot(page, `tab-architecture-${page.viewportSize().width}.png`);
   const errs = [];
   if (missing.length) errs.push(`섹션 머리 누락: ${missing.join(',')}`);
   if (svgs < 3) errs.push(`SVG ${svgs}개 (3개 이상 필요)`);
@@ -196,9 +269,33 @@ const visible = async (locator, timeout = 5_000) => {
   try { await locator.first().waitFor({state: 'visible', timeout}); return true; } catch { return false; }
 };
 
+/**
+ * clickTab 직후 탭 진입 초기 상태 확인(실패 시 throw): 하단 탭 선택 버튼 활성, networkidle, 탭 대표 요소 보임.
+ * 금융: .dailyChart·.financeCalendar 가 보이고 aria-pressed='true' 날짜 버튼이 하나이며 진입 기본값(FIXTURE_DAY) 그대로.
+ * 뉴스: 분류 펼치기 버튼이 보이고 기사 목록(.newsListButton)이 아직 없음.
+ */
+async function checkTabEntry(page, id, tabLabel) {
+  await expect(page.locator('nav.bottom button.active', {hasText: tabLabel})).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  const main = page.locator('div.shell.uiV2 > main');
+  if (id === 'home') await expect(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})).toBeVisible();
+  else if (id === 'finance') {
+    await expect(main.locator('.dailyChart')).toBeVisible();
+    await expect(main.locator('.financeCalendar')).toBeVisible();
+    const pressed = main.locator('.financeCalendar [aria-pressed="true"]');
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toHaveAttribute('data-date', FIXTURE_DAY);
+  } else if (id === 'news') {
+    await expect(main.locator(`.newsCategoryToggle[aria-label="${FIXTURE_NEWS_CATEGORY} 카테고리 펼치기"]`)).toBeVisible();
+    await expect(main.locator('.newsListButton')).toHaveCount(0);
+  } else if (id === 'benefits') await expect(main.locator('.pointRow', {hasText: FIXTURE_TEXT.points})).toBeVisible();
+  else if (id === 'journal') await expect(main.locator('.journalCalendar')).toBeVisible();
+  else throw new Error(`알 수 없는 탭 ${id}`);
+}
+
 /** 탭 하나의 대표 합성 문구 검사 → 문제 목록 */
 async function checkTabContent(page, id) {
-  const main = page.locator('div.demoShell > main');
+  const main = page.locator('div.shell.uiV2 > main');
   if (id === 'home') return await visible(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})) ? [] : [`'${FIXTURE_TEXT.task}' 없음`];
   if (id === 'finance') {
     const chart = main.locator('.dailyChart');
@@ -233,7 +330,7 @@ async function checkTabContent(page, id) {
     await expect(details.locator('.dailyDetailsTotal')).toHaveText('0원');
     await hit.click();
     await expect(chart.locator('.dailyMarker')).toHaveCount(1);
-    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만원`);
+    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만`);
     await expect(hit).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay.locator('.financeCalendarAmount')).toHaveText('1.2만');
@@ -242,6 +339,7 @@ async function checkTabContent(page, id) {
     await expect(rows).toHaveCount(2);
     await expect(rows.first()).toContainText(FIXTURE_TEXT.merchant);
     await expect(rows.last()).toContainText(FIXTURE_TEXT.installment);
+    await expect(rows.first().locator('.dailyInstallment')).toHaveText('(일시불)');
     await expect(rows.last().locator('.dailyInstallment')).toHaveText('(할부 3개월) · 일 합계 제외');
 
     await unconfirmedDay.click();
@@ -287,10 +385,10 @@ async function checkTabContent(page, id) {
   return [`알 수 없는 탭 ${id}`];
 }
 
-/** .demoShell(없으면 body) 아래 요소 트리 {tag, className, children}. 글자·style·좌표·path d 는 넣지 않는다. */
+/** .shell.uiV2(없으면 body) 아래 요소 트리 {tag, className, children}. 글자·style·좌표·path d 는 넣지 않는다. */
 const domSkeleton = page => page.evaluate(() => {
   const walk = el => ({tag: el.tagName.toLowerCase(), className: el.getAttribute('class') ?? '', children: [...el.children].map(walk)});
-  return walk(document.querySelector('.demoShell') ?? document.body);
+  return walk(document.querySelector('.shell.uiV2') ?? document.body);
 });
 
 // ── 데이터 경계 검사(390 폭). 각 검사는 새 페이지에서 /api/dashboard·/api/items 를 가로채 합성 응답만 쓴다. ──
@@ -365,7 +463,7 @@ async function boundary(browser, name, routes, fn) {
 async function captureFinanceState(page, filename) {
   // 고정 하단 탭이 펼친 거래를 가리지 않도록 화면 끝에서 전체 페이지를 촬영한다.
   await page.evaluate(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'}));
-  await page.screenshot({path: join(SCREENS_DIR, filename), fullPage: true});
+  await shot(page, filename);
 }
 
 async function checkTabInteractions(browser) {
@@ -416,7 +514,7 @@ async function checkTabInteractions(browser) {
     await expect(undated).toContainText('날짜 없음 · 합성카드A');
     const add = memoButton(undated, FIXTURE_TEXT.undatedMerchant, '추가');
     await expect(add).toBeVisible();
-    await captureFinanceState(page, 'finance-category-open-390.png');
+    await captureFinanceState(page, 'state-finance-category-open-390.png');
     await add.click();
     await expect(undated.getByRole('textbox')).toBeEditable();
   });
@@ -467,6 +565,42 @@ async function checkTabInteractions(browser) {
 
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
 
+  await run('금융 달력 FIXTURE_DAY 선택 → 일별 상세 (state-finance-day)', async page => {
+    await clickTab(page, '금융');
+    const day = financeDay(page, FIXTURE_DAY);
+    await day.click();
+    await expect(day).toHaveAttribute('aria-pressed', 'true');
+    const details = page.locator('.dailyDetails');
+    // 일별 합계는 일시불만(할부 줄은 '일 합계 제외')
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(`${(12000).toLocaleString('ko-KR')}원`); // pii-allow 합성 금액
+    const rows = details.locator('.dailyTransactionWrap');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toBeVisible();
+    await expect(rows.last()).toBeVisible();
+    await captureFinanceState(page, 'state-finance-day-390.png');
+  });
+
+  await run('뉴스 기사 상세 (state-news-detail)', async page => {
+    await clickTab(page, '뉴스');
+    await category(page).click();
+    await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
+    await article(page).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await shot(page, 'state-news-detail-390.png');
+  });
+
+  await run('기록 달력 날짜 선택 (state-journal-day)', async page => {
+    await clickTab(page, '기록');
+    const [y, m] = FIXTURE_DAY.split('-');
+    const day = page.locator(`.journalCalendar [data-date="${y}-${m}-05"]`);
+    await day.click();
+    await expect(day).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.calendarAgendaHeading h2')).toContainText(`${Number(m)}월 5일`);
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await shot(page, 'state-journal-day-390.png');
+  });
+
   await run('혜택 포인트 제공처 줄 펼침 → 증감·사유', async page => {
     await clickTab(page, '혜택');
     const row = page.locator('.pointRow', {hasText: FIXTURE_TEXT.points});
@@ -481,7 +615,7 @@ async function checkTabInteractions(browser) {
     await expect(row.locator('.pointDecreaseReason')).toContainText('합성사용사유A');
     await expect(row.locator('.pointLogDate')).toHaveText(FIXTURE_DAY.replace(/-/g, '.'));
     await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
-    await page.screenshot({path: join(SCREENS_DIR, 'benefits-points-open-390.png'), fullPage: true});
+    await shot(page, 'benefits-points-open-390.png');
     await clickTab(page, '홈');
     await clickTab(page, '혜택');
     await expect(head).toHaveAttribute('aria-expanded', 'true');
@@ -900,10 +1034,12 @@ try {
         const name = `탭 ${id} ${label}`;
         try {
           await clickTab(page, tabLabel);
+          // 탭 진입 초기 상태를 확인하고 먼저 찍은 다음(상호작용 전 화면), 대표 문구 검사(클릭·펼치기 포함)와 가로 넘침 검사를 한다.
+          await checkTabEntry(page, id, tabLabel);
+          await shot(page, `tab-${id}-${w}.png`);
           const errs = await checkTabContent(page, id);
           const {sw, iw} = await overflow(page);
           if (sw > iw) errs.push(`가로 넘침 scrollWidth ${sw} > innerWidth ${iw}`);
-          await page.screenshot({path: join(SCREENS_DIR, `tab-${id}-${w}.png`), fullPage: true});
           if (errs.length) fail(name, errs); else console.log(`PASS ${name} 대표 문구·가로 넘침`);
         } catch (e) { fail(name, [e.message.split('\n')[0]]); }
       }

@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {ChevronDown,Search} from 'lucide-react';
-import {cycleAmountLabel,cycleGroups,detailRows,installmentInfo,installmentLabel,isAggregateWithoutDetail,koreanDate,memoSearch} from '@/lib/finance-view';
+import {cycleAmountLabel,cycleGroups,detailRows,installmentLabel,isAggregateWithoutDetail,koreanDate,memoSearch} from '@/lib/finance-view';
 import {paymentTime} from '@/lib/transaction-time';
 import type {MemoEditorProps,MemoPlace} from './finance-tab';
 import type {Item} from './use-dashboard-data';
@@ -30,7 +30,7 @@ function TransactionRow({item,place,editor,onSelect}:{
        : <div className="financeTransactionIdentity">{identity}</div>}
      <div className="financeTransactionAmount">
        <strong>{item.amount===null?'금액 미등록':won(item.amount)}</strong>
-       <small className={installmentInfo(item).installment?'financeInstallment':undefined}>{installmentLabel(item)}</small>
+       <small className="financeInstallment">{installmentLabel(item)}</small>
        <button type="button" className="financeAction" aria-label={item.title+' 메모 '+(memo?'수정':'추가')}
          onClick={()=>editing?editor.cancelMemo():editor.startMemo(item,place)}>{editing?'닫기':memo?'수정':'메모 추가'}</button>
      </div>

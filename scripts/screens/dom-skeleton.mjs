@@ -25,7 +25,7 @@ export function firstDomDifference(baseline, current, tabs) {
   for (const tab of tabs) {
     if (!baseline?.[tab]) return `${tab} (기준선에 탭 없음)`;
     if (!current?.[tab]) return `${tab} (현재 화면에 탭 없음)`;
-    // 뿌리(.demoShell)는 경로에서 빼고 탭 이름으로 시작한다
+    // 뿌리(.shell.uiV2)는 경로에서 빼고 탭 이름으로 시작한다
     const diff = firstNodeDifference(baseline[tab], current[tab], tab);
     if (diff) return diff;
   }

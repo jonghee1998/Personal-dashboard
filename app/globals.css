@@ -1,11 +1,55 @@
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0c1017;color:#eef3ff;font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif}button,input{font:inherit}button{cursor:pointer}.shell{max-width:620px;margin:auto;min-height:100vh;padding:28px 18px 110px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px}.brand{font-size:10px;letter-spacing:2px;color:#8794ab;font-weight:700}h1{font-size:26px;letter-spacing:-1px;margin:9px 0 0}h2{font-size:16px;margin:0 0 16px}.profile{border:0;background:#222937;color:white;border-radius:50%;width:40px;height:40px}.hero{margin-bottom:12px}.metric{padding:21px;background:#1b2331;border:1px solid #293448;border-radius:20px;display:flex;flex-direction:column;gap:9px;min-width:0}.metric.primary{background:linear-gradient(130deg,#263b64,#1b2944);border-color:#395382;padding:25px}.metric strong{font-size:clamp(21px,5vw,29px);letter-spacing:-1px;white-space:nowrap}.metric small{color:#a3b0c4;font-size:11px}.eyebrow{color:#bac8dd;font-size:12px}.metricgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px}.panel{border:1px solid #283243;background:#181e29;padding:19px;border-radius:19px;margin:15px 0}.sectionTitle{display:flex;justify-content:space-between;align-items:center}.sectionTitle h2{margin:0 0 12px}.sectionTitle span{color:#98e4c1;font-size:12px}.listitem{display:flex;align-items:center;gap:11px;padding:13px 1px;border-bottom:1px solid #29313d}.listitem:last-child{border-bottom:0}.itembody{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}.itembody b{font-size:13px;line-height:1.45;font-weight:600}.itembody small{font-size:11px;color:#8492a8;line-height:1.45}.listitem strong{font-size:12px;white-space:nowrap}.external,.textbutton{color:#b4c8ff;text-decoration:none;font-size:12px;background:none;border:0}.check{width:23px;height:23px;flex:none;border:2px solid #546176;background:transparent;color:#11291c;border-radius:7px}.check.checked{background:#88dcaf;border-color:#88dcaf;font-weight:900}.struck{text-decoration:line-through;color:#8492a8}.empty{color:#8997ad;font-size:12px;line-height:1.7}.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,620px);display:flex;justify-content:space-around;background:#171e2afa;border-top:1px solid #30394a;padding:12px 8px max(16px,env(safe-area-inset-bottom));backdrop-filter:blur(18px)}.bottom button{display:flex;gap:5px;flex-direction:column;align-items:center;color:#7f8ca3;border:0;background:none;padding:4px 12px;font-size:11px}.bottom button.active{color:#a6baff}.navicon{font-size:21px}.error{color:#ffc5c5;background:#4d2629;border-radius:10px;padding:12px;margin-bottom:13px}.loading{padding:60px 0;color:#90a0b7;text-align:center}.seg{display:flex;gap:7px;margin-bottom:9px}.seg button{background:#222d3d;border:0;border-radius:10px;color:#9aa9c1;padding:10px 12px;font-size:11px;flex:1}.seg button.selected{background:#b3c5ff;color:#1a2538;font-weight:700}.barrow{margin:18px 0}.barheading{display:flex;justify-content:space-between;font-size:12px;color:#bec9d9;margin-bottom:8px}.track{height:8px;background:#30394c;border-radius:9px;overflow:hidden}.track>div{height:100%;background:#9db6ff;border-radius:9px}a{color:#afc6ff}.loginWrap{max-width:400px;margin:14vh auto;padding:22px}.loginWrap form{display:flex;flex-direction:column;gap:14px}.loginWrap input{background:#202a39;border:1px solid #43516a;color:white;padding:15px;border-radius:12px}.loginWrap button{background:#b5c7ff;color:#1a2943;border:0;border-radius:12px;padding:14px;font-weight:800}@media(min-width:650px){.shell{padding-top:42px}}
-.demoBanner{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:0 0 22px;padding:14px 16px;border-radius:14px;background:#263020;border:1px solid #779967;color:#e0ffcf}
-.demoBanner strong{font-size:13px}
-.demoBanner span{width:100%;font-size:11px;color:#c6deb8}
-.demoBanner button{border:1px solid #779967;border-radius:8px;background:#34452a;color:#e0ffcf;padding:7px 10px;font-size:12px}
-
-
-/* Isolated demo-home navigation styles */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#0c1017;color:#eef3ff;font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.shell{max-width:620px;margin:auto;min-height:100vh;padding:28px 18px 110px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px}
+.brand{font-size:10px;letter-spacing:2px;color:#8794ab;font-weight:700}
+h1{font-size:26px;letter-spacing:-1px;margin:9px 0 0}
+h2{font-size:16px;margin:0 0 16px}
+.profile{border:0;background:#222937;color:white;border-radius:50%;width:40px;height:40px}
+.hero{margin-bottom:12px}
+.metric{padding:21px;background:#1b2331;border:1px solid #293448;border-radius:20px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.metric.primary{background:linear-gradient(130deg,#263b64,#1b2944);border-color:#395382;padding:25px}
+.metric strong{font-size:clamp(21px,5vw,29px);letter-spacing:-1px;white-space:nowrap}
+.metric small{color:#a3b0c4;font-size:11px}
+.eyebrow{color:#bac8dd;font-size:12px}
+.metricgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px}
+.panel{border:1px solid #283243;background:#181e29;padding:19px;border-radius:19px;margin:15px 0}
+.sectionTitle{display:flex;justify-content:space-between;align-items:center}
+.sectionTitle h2{margin:0 0 12px}
+.sectionTitle span{color:#98e4c1;font-size:12px}
+.listitem{display:flex;align-items:center;gap:11px;padding:13px 1px;border-bottom:1px solid #29313d}
+.listitem:last-child{border-bottom:0}
+.itembody{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
+.itembody b{font-size:13px;line-height:1.45;font-weight:600}
+.itembody small{font-size:11px;color:#8492a8;line-height:1.45}
+.listitem strong{font-size:12px;white-space:nowrap}
+.external,.textbutton{color:#b4c8ff;text-decoration:none;font-size:12px;background:none;border:0}
+.check{width:23px;height:23px;flex:none;border:2px solid #546176;background:transparent;color:#11291c;border-radius:7px}
+.check.checked{background:#88dcaf;border-color:#88dcaf;font-weight:900}
+.struck{text-decoration:line-through;color:#8492a8}
+.empty{color:#8997ad;font-size:12px;line-height:1.7}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,620px);display:flex;justify-content:space-around;background:#171e2afa;border-top:1px solid #30394a;padding:12px 8px max(16px,env(safe-area-inset-bottom));backdrop-filter:blur(18px)}
+.bottom button{display:flex;gap:5px;flex-direction:column;align-items:center;color:#7f8ca3;border:0;background:none;padding:4px 12px;font-size:11px}
+.bottom button.active{color:#a6baff}
+.navicon{font-size:21px}
+.error{color:#ffc5c5;background:#4d2629;border-radius:10px;padding:12px;margin-bottom:13px}
+.loading{padding:60px 0;color:#90a0b7;text-align:center}
+.seg{display:flex;gap:7px;margin-bottom:9px}
+.seg button{background:#222d3d;border:0;border-radius:10px;color:#9aa9c1;padding:10px 12px;font-size:11px;flex:1}
+.seg button.selected{background:#b3c5ff;color:#1a2538;font-weight:700}
+.barrow{margin:18px 0}
+.barheading{display:flex;justify-content:space-between;font-size:12px;color:#bec9d9;margin-bottom:8px}
+.track{height:8px;background:#30394c;border-radius:9px;overflow:hidden}
+.track>div{height:100%;background:#9db6ff;border-radius:9px}
+a{color:#afc6ff}
+.loginWrap{max-width:400px;margin:14vh auto;padding:22px}
+.loginWrap form{display:flex;flex-direction:column;gap:14px}
+.loginWrap input{background:#202a39;border:1px solid #43516a;color:white;padding:15px;border-radius:12px}
+.loginWrap button{background:#b5c7ff;color:#1a2943;border:0;border-radius:12px;padding:14px;font-weight:800}
+@media(min-width:650px){.shell{padding-top:42px}
+}
 .navCard,.newsNavCard{display:block;width:100%;padding:0;margin:0 0 14px;text-align:left;border:0;background:none;color:inherit;font:inherit;cursor:pointer;appearance:none}
 .navCard .metric{width:100%;transition:border-color .18s,transform .18s}
 .navCard:active .metric,.newsNavCard:active{transform:scale(.99)}
@@ -19,22 +63,25 @@
 .newsPreviewItem:last-child{border-bottom:0}
 .newsPreviewItem b{font-size:13px;line-height:1.45;font-weight:600}
 .newsPreviewItem small{font-size:11px;color:#8492a8}
-
-
-/* Finance demo: descending category spending and transaction memos */
-.categorySection{margin:17px 0 22px}.categoryHeading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 1px;border-bottom:1px solid #3b4960}
-.categoryHeading b{font-size:14px;color:#d9e6ff}.categoryHeading span{font-size:12px;color:#a7b9d8;white-space:nowrap}
-.financeSeg{margin:13px 0 7px}.memoInlineButton{border:1px solid #485c80;background:#24344e;color:#c5d7fc;border-radius:9px;padding:8px;font-size:11px;white-space:nowrap;flex-shrink:0}
+.categorySection{margin:17px 0 22px}
+.categoryHeading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 1px;border-bottom:1px solid #3b4960}
+.categoryHeading b{font-size:14px;color:#d9e6ff}
+.categoryHeading span{font-size:12px;color:#a7b9d8;white-space:nowrap}
+.financeSeg{margin:13px 0 7px}
+.memoInlineButton{border:1px solid #485c80;background:#24344e;color:#c5d7fc;border-radius:9px;padding:8px;font-size:11px;white-space:nowrap;flex-shrink:0}
 .savedMemo{color:#96dfc1!important;white-space:normal;overflow-wrap:anywhere}
-.memoEntry{padding:15px 0;border-bottom:1px solid #29313d}.memoEntry:last-child{border-bottom:0}
-.memoEntryHeader{display:flex;align-items:center;gap:12px}.memoEntryHeader strong{white-space:nowrap;font-size:12px}
+.memoEntry{padding:15px 0;border-bottom:1px solid #29313d}
+.memoEntry:last-child{border-bottom:0}
+.memoEntryHeader{display:flex;align-items:center;gap:12px}
+.memoEntryHeader strong{white-space:nowrap;font-size:12px}
 .memoRead{display:flex;width:100%;justify-content:space-between;text-align:left;align-items:center;gap:8px;margin-top:10px;border:1px solid #3a475a;border-radius:11px;background:#242d3c;color:#d9e6f9;padding:12px;min-height:43px;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
-.memoPlaceholder{color:#8596b0}.memoEditHint{color:#a5bdfa;white-space:nowrap}
+.memoPlaceholder{color:#8596b0}
+.memoEditHint{color:#a5bdfa;white-space:nowrap}
 .memoEditor textarea{width:100%;margin-top:10px;padding:12px;border:1px solid #647ca1;border-radius:11px;background:#222d40;color:#f4f7ff;font:inherit;font-size:13px;resize:vertical;outline-offset:2px}
-.memoActions{display:flex;justify-content:flex-end;gap:9px;align-items:center;margin-top:7px}.memoActions span{margin-right:auto;font-size:11px;color:#92a2bc}.memoActions button{padding:9px 13px;border-radius:9px;border:1px solid #45546a;background:#283347;color:#c8d8f2;font-size:12px}.memoActions .memoSave{background:#b3c5ff;color:#14233c;border-color:#b3c5ff;font-weight:700}
-
-
-/* Demo news reader */
+.memoActions{display:flex;justify-content:flex-end;gap:9px;align-items:center;margin-top:7px}
+.memoActions span{margin-right:auto;font-size:11px;color:#92a2bc}
+.memoActions button{padding:9px 13px;border-radius:9px;border:1px solid #45546a;background:#283347;color:#c8d8f2;font-size:12px}
+.memoActions .memoSave{background:#b3c5ff;color:#14233c;border-color:#b3c5ff;font-weight:700}
 .newsListButton{display:flex;align-items:center;gap:12px;width:100%;min-height:80px;padding:16px 0;color:inherit;text-align:left;font:inherit;border:0;border-bottom:1px solid #29313d;background:none;cursor:pointer}
 .newsListButton:last-of-type{border-bottom:0}
 .newsListButton:focus-visible,.newsBack:focus-visible{outline:2px solid #b3c5ff;outline-offset:3px;border-radius:8px}
@@ -53,26 +100,25 @@
 .newsDetailBody p{margin:0 0 22px}
 .newsOriginal{display:inline-block;margin:8px 0 18px;padding:12px 17px;border:1px solid #526a95;border-radius:10px;text-decoration:none;font-size:13px}
 .newsBackBottom{display:block;margin-top:12px}
-
-/* Finance summary: full-width total, two equal settlement cards beneath */
 .financeSummary .financeTotal{margin-bottom:12px}
 .financeSummary .financeTotal .metric{width:100%}
 .financeSummary .metricgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-
-
-/* Demo benefits: points by provider and application tracking */
 .pointOverview{display:flex;flex-direction:column;gap:7px;padding:20px;border-radius:15px;background:linear-gradient(120deg,#263852,#1e2b41);margin:8px 0 17px}
 .pointOverview>strong{font-size:clamp(28px,7vw,36px);font-weight:800;letter-spacing:-1px}
 .pointOverview>small{font-size:12px}
-.deltaUp{color:#8de3b9!important}.deltaDown{color:#ffb5ad!important}.deltaFlat{color:#9babbe!important}
+.deltaUp{color:#8de3b9!important}
+.deltaDown{color:#ffb5ad!important}
+.deltaFlat{color:#9babbe!important}
 .pointProviderHeading{display:flex;justify-content:space-between;color:#8193ac;font-size:11px;border-bottom:1px solid #29313d;padding:10px 0}
 .pointProvider{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid #29313d}
 .pointProvider:last-of-type{border-bottom:0}
 .pointAmounts{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.pointAmounts strong{font-size:15px}.pointAmounts small{font-size:12px}
+.pointAmounts strong{font-size:15px}
+.pointAmounts small{font-size:12px}
 .applicationCounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 20px}
 .applicationCounts>div{display:flex;flex-direction:column;gap:5px;align-items:center;padding:13px 4px;background:#232d3d;border-radius:12px}
-.applicationCounts strong{font-size:21px}.applicationCounts span{font-size:11px;color:#a3b1c9}
+.applicationCounts strong{font-size:21px}
+.applicationCounts span{font-size:11px;color:#a3b1c9}
 .applicationsScroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 .applicationsScroll:focus-visible{outline:2px solid #b3c5ff;outline-offset:3px}
 .applicationsTable{border-collapse:collapse;width:100%;min-width:610px;text-align:left}
@@ -81,10 +127,9 @@
 .applicationsTable td:nth-child(2){max-width:190px;white-space:normal;min-width:140px;line-height:1.5}
 .applicationsTable th:first-child,.applicationsTable td:first-child{min-width:68px;white-space:nowrap;text-align:left}
 .applicationStatus{display:inline-block;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700}
-.statusPending{background:#3d3724;color:#f6d48d}.statusAccepted{background:#1c4637;color:#94ebbd}.statusRejected{background:#442d36;color:#f6a5b3}
-
-
-/* MY LIFE LOG monthly calendar - demo only */
+.statusPending{background:#3d3724;color:#f6d48d}
+.statusAccepted{background:#1c4637;color:#94ebbd}
+.statusRejected{background:#442d36;color:#f6a5b3}
 .lifeCalendar{display:flex;flex-direction:column;gap:17px}
 .calendarPanel{background:#1b2432;border:1px solid #303c4f;border-radius:20px;padding:19px 16px 15px}
 .calendarHeader,.calendarMonthNav,.calendarAgendaHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -106,7 +151,9 @@
 .calendarEmpty{min-height:47px}
 .calendarDots{display:flex;justify-content:center;gap:3px;height:5px;align-items:center}
 .calendarDot{display:inline-block;width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.eventDot{background:#83b7ff}.taskDot{background:#93dfb9}.journalDot{background:#e3a8e9}
+.eventDot{background:#83b7ff}
+.taskDot{background:#93dfb9}
+.journalDot{background:#e3a8e9}
 .calendarDay.chosen .calendarDot{filter:brightness(.7)}
 .calendarLegend{display:flex;justify-content:center;gap:18px;margin:18px 0 1px}
 .calendarLegend span{display:flex;align-items:center;gap:6px;font-size:11px;color:#9aaac0}
@@ -131,9 +178,6 @@
 .calendarNoEntries>strong{font-size:14px}
 .calendarNoEntries p{font-size:12px;line-height:1.6;color:#899bb5;margin:0}
 .calendarDemoNote{font-size:11px;line-height:1.7;color:#899bb4;margin:0 2px}
-
-
-/* Unified calendar search + news archive (demo) */
 .calendarSearchPanel{background:#1b2432;border:1px solid #303c4f;border-radius:19px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .calendarSearchPanel>label{font-size:13px;font-weight:750;color:#d8e4f7}
 .calendarSearchField{display:flex;align-items:center;gap:8px;background:#101827;border:1px solid #3a4b64;border-radius:12px;padding:0 11px}
@@ -160,9 +204,6 @@
 .calendarSearchResultText>span{font-size:11px;line-height:1.5;color:#8497ae;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .calendarResultArrow{font-size:25px;color:#99aed1}
 .calendarNewsOpen{border:1px solid #866443;border-radius:8px;padding:7px 9px;background:#453525;color:#f4ca91;font-size:11px;white-space:nowrap}
-
-
-/* AI Tech Digest and monthly AI subscriptions - demo only */
 .digestPanel{border-color:#40547a;background:linear-gradient(145deg,#202d45,#181f2e)}
 .digestPanel .sectionTitle h2{color:#d3e2ff}
 .aiSubscriptionPanel{margin-top:19px}
@@ -174,9 +215,6 @@
 .aiSubscriptionPrice{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
 .aiSubscriptionPrice strong{font-size:14px}
 .aiSubscriptionPrice span{font-size:11px;color:#9bcdb7}
-
-
-/* Single consolidated todo list in demo records */
 .todoPanel{margin-top:0}
 .todoAdd{display:flex;gap:8px;margin:12px 0 9px}
 .todoAdd input{flex:1;min-width:0;padding:12px;border-radius:11px;background:#111b2b;border:1px solid #3a4b64;color:#edf3ff;font-size:13px;outline-offset:2px}
@@ -189,9 +227,6 @@
 .todoContent{display:flex;flex-direction:column;gap:5px;min-width:0}
 .todoContent strong{font-size:13px;overflow-wrap:anywhere}
 .todoContent small{color:#92a5c0;font-size:11px}
-
-
-/* Clear news categories, showing three latest items per category */
 .newsCategoryIntro{padding:4px 3px 5px;color:#98aac2;font-size:12px;line-height:1.7}
 .newsCategoryIntro strong{color:#d1ddf7}
 .newsCategoryPanel{margin-top:13px;margin-bottom:15px}
@@ -203,9 +238,6 @@
 .digestPanel .newsCategorySymbol{background:#493e69;color:#d8b8ff}
 .newsCategoryMore{border:1px solid #435675;border-radius:9px;background:#293952;color:#bed1f1;padding:9px 10px;font-size:11px;white-space:nowrap}
 .newsCategoryMore:focus-visible{outline:2px solid #afc6ff;outline-offset:3px}
-
-
-/* Finance daily spending: interactive line chart (demo only) */
 .dailySpendingPanel{overflow:hidden}
 .dailySpendingHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;flex-wrap:wrap}
 .dailySpendingHeader h2{margin:0 0 6px}
@@ -236,1546 +268,475 @@
 .dailyTransaction small{font-size:11px;color:#8fa3bd;overflow-wrap:anywhere}
 .dailyTransaction>strong{white-space:nowrap}
 .dailyDetailsEmpty{text-align:center;padding:18px 6px;color:#8598b3;font-size:12px;border:1px dashed #36465e;border-radius:12px}
+.shell{  --muted:#9cabbe; --accent:#bfd1ff; padding:26px 20px 120px; background:radial-gradient(ellipse 460px 260px at 100% -40px,rgba(93,127,192,.13),transparent 74%); letter-spacing:-.015em;}
+.shell .top{align-items:center;margin-bottom:27px;gap:12px}
+.shell .topIdentity{min-width:0}
+.shell .brand{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.16em;color:#a1b7dc;font-weight:800}
+.shell .brandMark{font-size:16px;color:#b9ceff;letter-spacing:0}
+.shell .brandEdition{color:#687993;font-weight:600;letter-spacing:.11em}
+.shell .top h1{margin:13px 0 0;line-height:1.2;font-size:clamp(25px,6.9vw,33px);letter-spacing:-.07em;font-weight:770;color:#f1f5ff;text-wrap:balance}
+.shell .homeSubtitle{color:#96a9c6;font-size:12px;line-height:1.6;margin:10px 0 0;letter-spacing:-.015em}
+.shell .profile{flex-shrink:0;background:#202d40;border:1px solid #415371;color:#d9e4ff;width:40px;height:40px;font-size:17px}
+.shell .metric,.shell .panel,.shell .newsNavCard,.shell .calendarPanel,.shell .calendarAgenda,.shell .calendarSearchPanel{box-shadow:0 9px 30px rgba(0,0,0,.10)}
+.shell .metric{padding:19px 18px;border-radius:17px;border:1px solid #344259;background:linear-gradient(155deg,#202c3e,#1a2535);gap:8px}
+.shell .metric.primary{padding:25px 23px;border:1px solid #5677b0;border-radius:20px;background:radial-gradient(ellipse at top right,rgba(163,192,251,.19),transparent 65%),linear-gradient(128deg,#293d61,#1d2d48)}
+.shell .metric .eyebrow{font-size:11px;font-weight:650;letter-spacing:.015em;color:#bdcbe2}
+.shell .metric strong{font-size:clamp(21px,5.8vw,30px);font-weight:780;letter-spacing:-.055em;line-height:1.22;overflow-wrap:anywhere;white-space:normal;font-variant-numeric:tabular-nums}
+.shell .metric.primary strong{font-size:clamp(29px,7.8vw,39px)}
+.shell .metric small{font-size:11px;line-height:1.5;color:#9baecb}
+.shell .financeSummary .financeTotal .metric{padding:25px 22px}
+.shell .financeSummary .financeTotal .metric strong{font-size:clamp(28px,7vw,37px)}
+.shell .metricgrid{gap:10px;margin-bottom:17px}
+.shell .panel{background:#182230;border:1px solid #2e3b50;border-radius:18px;padding:19px 18px;margin:16px 0}
+.shell h2{font-size:16px;font-weight:770;letter-spacing:-.04em;line-height:1.4}
+.shell .sectionTitle h2{margin-bottom:13px}
+.shell .sectionTitle span{color:#a9c5ff;font-size:11px;font-weight:650}
+.shell .itembody b,.shell .newsPreviewItem b,.shell .newsListText strong{font-size:13px;line-height:1.55;font-weight:690;letter-spacing:-.025em}
+.shell .itembody small,.shell .newsListText>span,.shell .newsPreviewItem small{font-size:11px;line-height:1.55;color:#92a4bd}
+.shell .listitem{padding:15px 0;gap:11px;border-bottom-color:#2b3a4d}
+.shell .listitem strong{font-size:12px;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.shell .newsNavCard{background:linear-gradient(150deg,#1e2b40,#1a2433);border-color:#344761;border-radius:18px;padding:19px 18px;margin-bottom:14px}
+.shell .newsPreviewItem{padding:13px 0;border-bottom-color:#304158}
+.shell .newsNavCard .linkHint{color:#afc9ff;font-size:11px;font-weight:650}
+.shell .empty{font-size:12px;line-height:1.7;color:#92a5bd}
+.shell .seg{gap:6px}
+.shell .seg button{min-height:39px;background:#253249;color:#acbad0;font-size:12px;border-radius:10px}
+.shell .seg button.selected{background:#bfcefa;color:#1c2b44}
+.shell .bottom{background:rgba(18,27,41,.94);border-top:1px solid #34435b;padding:11px 8px max(17px,env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.15)}
+.shell .bottom button{position:relative;min-width:0;flex:1;gap:5px;padding:5px 2px;font-size:11px;letter-spacing:-.02em;color:#91a0b8}
+.shell .bottom button.active{color:#c5d5ff;font-weight:750}
+.shell .bottom button.active:before{content:"";position:absolute;top:-12px;width:26px;height:2px;background:#acc5ff;border-radius:2px}
+.shell .navicon{font-size:21px;line-height:1}
+.shell .barheading{font-size:12px;letter-spacing:-.015em}
+.shell .track{height:7px;background:#2b3950}
+.shell .track>div{background:linear-gradient(90deg,#83a5eb,#b6cbff)}
+.shell .calendarMonthNav strong,.shell .dailyMonthNav strong{letter-spacing:-.035em}
+.shell .calendarAgendaEntry strong,.shell .dailyTransaction strong{font-size:13px}
+.shell .applicationCounts strong,.shell .pointOverview>strong,.shell .aiSubscriptionTotal strong{letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.shell button{transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.shell button:focus-visible{outline:2px solid #c0d3ff;outline-offset:3px}
+@media(max-width:370px){.shell{padding-left:14px;padding-right:14px}
+.shell .metricgrid{gap:8px}
+.shell .metricgrid .metric{padding:15px 12px}
+.shell .metricgrid .metric strong{font-size:clamp(17px,5vw,23px)}
 
+}
+@media(prefers-reduced-motion:reduce){.shell button{transition:none}
+}
+.shell .expenseCategoryMore{display:block;width:100%;border:1px solid #445773;background:#26374d;color:#c7d9fa;font-weight:700;font-size:12px;border-radius:11px;padding:12px;margin:12px 0 7px;text-align:center}
+.shell .expenseCategoryMore:focus-visible{outline:2px solid #b9ceff;outline-offset:3px}
+.shell .expenseItemWrap{border-bottom:1px solid #29374c}
+.shell .expenseItemWrap>.listitem{border-bottom:0}
+.shell .expenseSubItems{margin:0 0 10px 17px;padding-left:12px;border-left:2px solid #455c7a}
+.shell .expenseSubItem{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:#b6c8e3;padding:7px 0;font-size:12px}
+.shell .expenseSubItem small{color:#869cb7;font-size:10px}
+.shell .expenseSubItem strong{font-size:12px;white-space:nowrap}
+.shell .expenseAggregateNote{font-size:11px;line-height:1.65;color:#aebdd5;background:#2a3242;border-radius:9px;margin:0 0 11px;padding:10px 12px}
+.shell .pointDecreaseReason{color:#ffc6b2!important;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
+.shell .newsCategoryHeading{gap:8px}
+.shell .newsCategoryToggle{display:flex;flex:1;min-width:0;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;color:inherit;padding:4px 0;text-align:left}
+.shell .newsCategoryToggle .newsCategoryLabel{min-width:0}
+.shell .newsCategoryToggle .newsCategoryLabel>span:last-child{display:flex;flex-direction:column;gap:5px;min-width:0}
+.shell .newsCategoryName{font-size:16px;font-weight:770;line-height:1.4;letter-spacing:-.04em;overflow-wrap:anywhere}
+.shell .newsCategoryChevron{display:inline-block;font-size:23px;line-height:1;color:#b5caff;transition:transform .2s;flex-shrink:0}
+.shell .newsCategoryChevron.collapsed{transform:rotate(-90deg)}
+.shell .newsCategoryToggle:hover .newsCategoryName{color:#c5d7ff}
+.shell .newsCategoryToggle:focus-visible{outline:2px solid #bfd1ff;outline-offset:4px;border-radius:7px}
+@media(prefers-reduced-motion:reduce){.shell .newsCategoryChevron{transition:none}
+}
+.shell .expenseCategoryToggle{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px;text-align:left;background:transparent;border:0;color:inherit;cursor:pointer;padding:14px 0}
+.shell .expenseCategoryToggle>b{font-size:13px;font-weight:750;line-height:1.5;min-width:0}
+.shell .expenseCategoryMeta{display:flex;align-items:center;gap:8px;flex-shrink:0;color:#b1c3df;font-size:11px;white-space:nowrap}
+.shell .expenseCategoryChevron{display:inline-block;font-size:20px;line-height:1;color:#bad0fa;transition:transform .2s}
+.shell .expenseCategoryChevron.collapsed{transform:rotate(-90deg)}
+.shell .expenseCategoryToggle:hover>b{color:#bfd1ff}
+.shell .expenseCategoryToggle:focus-visible{outline:2px solid #c0d3ff;outline-offset:3px;border-radius:7px}
+@media(prefers-reduced-motion:reduce){.shell .expenseCategoryChevron{transition:none}
+}
+.shell .pointIncreaseReason{color:#95dfb5!important;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
+.shell .calendarDot.pointDot{background:#e1c36c}
+.shell .calendarAgendaEntry.point .calendarEntryIcon,.shell .calendarResultIcon.point{color:#f4dfa2;background:#433a27}
+.shell .calendarPointAmount{display:block;font-size:15px;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:4px 0}
+.shell .calendarPointAmount.positive{color:#96e2b3}
+.shell .calendarPointAmount.negative{color:#ffb5a4}
+.shell{--preview-ink:#edf3fb;  color:var(--preview-ink); background:radial-gradient(ellipse 110% 380px at 50% -110px,rgba(77,118,170,.14),transparent 75%);}
+html:has(.shell),body:has(.shell){background:#101722;}
+.shell .top{margin-bottom:29px;align-items:flex-start}
+.shell .brand{font-size:10px;letter-spacing:.17em;color:#8ca6c5}
+.shell .brandMark{color:#c4d7f5}
+.shell .top h1{font-size:clamp(27px,7vw,34px); margin-top:14px; font-weight:760; letter-spacing:-.065em; line-height:1.15;}
+.shell .profile{border:1px solid #40506a; background:linear-gradient(145deg,#24354b,#1b2839); box-shadow:0 4px 18px rgba(0,0,0,.15);}
+.shell .panel,.shell .calendarPanel,.shell .calendarAgenda,.shell .calendarSearchPanel{background:linear-gradient(155deg,#1d2a39,#1a2533 70%); border:1px solid #34445b; border-radius:22px; padding:21px 20px; box-shadow:0 9px 26px rgba(0,0,0,.12); margin:17px 0;}
+.shell .metric{background:linear-gradient(160deg,#243249,#202c3e); border:1px solid #40536d; border-radius:20px; box-shadow:0 8px 22px rgba(0,0,0,.12);}
+.shell .metric.primary{background:radial-gradient(circle at 94% 0%,rgba(170,200,248,.22),transparent 45%),linear-gradient(120deg,#344a71,#243550 75%); border-color:#617da9; border-radius:23px; padding:28px 24px;}
+.shell .metric.primary strong{letter-spacing:-.065em}
+.shell .metric .eyebrow{font-size:12px;color:#c1cee1}
+.shell .metric small{color:#b0c1d7}
+.shell h2{font-size:16px;letter-spacing:-.045em}
+.shell .sectionTitle span{color:#b5cbef}
+.shell .newsNavCard{background:linear-gradient(150deg,#233449,#1a2738); border:1px solid #3c516e; border-radius:22px; padding:21px 20px;}
+.shell .newsPreviewItem{padding:15px 1px}
+.shell .newsPreviewItem b{color:#e6edf8;font-size:13px}
+.shell .navCard:hover .metric,.shell .newsNavCard:hover{border-color:#8ba7d4}
+.shell .newsCategoryPanel{padding:9px 20px}
+.shell .newsCategoryHeading{padding:13px 0;min-height:69px}
+.shell .newsCategoryName{font-size:15px;letter-spacing:-.035em}
+.shell .newsCategoryToggle{padding:6px 0}
+.shell .newsCategorySymbol{display:grid;place-items:center; width:37px;height:37px; flex:0 0 37px; border:1px solid #4c6481; border-radius:12px; background:#293c55; color:#c9d9f6;}
+.shell .newsCategoryChevron{display:grid;place-items:center; width:30px;height:30px; color:#c2d4f2; font-size:24px;}
+.shell .newsCategoryMore{border-radius:10px;}
+.shell .newsListButton{padding:17px 0;border-top:1px solid #2e4057}
+.shell .newsListText strong{font-size:14px}
+.shell .categorySection{border:1px solid #34475e; border-radius:15px; padding:0 15px; margin:12px 0; background:rgba(23,34,48,.64); overflow:hidden;}
+.shell .expenseCategoryToggle{padding:16px 2px; border-bottom:0; min-height:58px;}
+.shell .expenseCategoryToggle>b{color:#ecf2fa; font-size:13px; font-weight:720;}
+.shell .expenseCategoryMeta{font-size:11px; gap:7px; color:#b2c4de;}
+.shell .expenseCategoryChevron{color:#c5d6f6}
+.shell .expenseCategoryMore{margin:10px 0 14px}
+.shell .barrow{margin:19px 0}
+.shell .track{height:6px}
+.shell .pointOverview,.shell .aiSubscriptionTotal{border-radius:17px;}
+.shell .pointProvider{padding:15px 0}
+.shell .pointIncreaseReason,.shell .pointDecreaseReason{font-weight:550}
+.shell .seg button{min-height:41px;border-radius:12px}
+.shell .seg button.selected{background:#c5d8f9;color:#1b2a3d}
+.shell .bottom{background:rgba(17,26,39,.91); border-top:1px solid #42536d; backdrop-filter:blur(24px); box-shadow:0 -8px 30px rgba(0,0,0,.24); border-radius:18px 18px 0 0;}
+.shell .bottom button.active{color:#e1eaff}
+.shell .bottom button.active:before{background:#c3d6fc}
+.shell .calendarDay.chosen{outline-offset:0}
+@media(max-width:380px){.shell .panel,.shell .calendarPanel,.shell .calendarAgenda,.shell .calendarSearchPanel{padding:18px 15px}
+.shell .categorySection{padding:0 10px}
+.shell .expenseCategoryMeta{font-size:10px}
+.shell .newsCategoryPanel{padding:8px 15px}
 
-/* ── PERSONAL OS / DEMO · final visual polish (never affects live dashboard) ── */
-.demoShell{
- --surface:#192331;
- --line:#303e54;
- --muted:#9cabbe;
- --accent:#bfd1ff;
- padding:26px 20px 120px;
- background:radial-gradient(ellipse 460px 260px at 100% -40px,rgba(93,127,192,.13),transparent 74%);
- letter-spacing:-.015em;
 }
-.demoShell .demoBanner{background:#182a25;border:1px solid #3e6052;border-radius:13px;padding:11px 13px;margin-bottom:29px;gap:6px}
-.demoShell .demoBanner strong{font-size:11px;letter-spacing:.045em}
-.demoShell .demoBanner span{font-size:11px;line-height:1.5}
-.demoShell .demoBanner button{font-size:11px;border-radius:8px}
-.demoShell .top{align-items:center;margin-bottom:27px;gap:12px}
-.demoShell .topIdentity{min-width:0}
-.demoShell .brand{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.16em;color:#a1b7dc;font-weight:800}
-.demoShell .brandMark{font-size:16px;color:#b9ceff;letter-spacing:0}
-.demoShell .brandEdition{color:#687993;font-weight:600;letter-spacing:.11em}
-.demoShell .top h1{margin:13px 0 0;line-height:1.2;font-size:clamp(25px,6.9vw,33px);letter-spacing:-.07em;font-weight:770;color:#f1f5ff;text-wrap:balance}
-.demoShell .homeSubtitle{color:#96a9c6;font-size:12px;line-height:1.6;margin:10px 0 0;letter-spacing:-.015em}
-.demoShell .profile{flex-shrink:0;background:#202d40;border:1px solid #415371;color:#d9e4ff;width:40px;height:40px;font-size:17px}
-.demoShell .metric,.demoShell .panel,.demoShell .newsNavCard,.demoShell .calendarPanel,.demoShell .calendarAgenda,.demoShell .calendarSearchPanel{box-shadow:0 9px 30px rgba(0,0,0,.10)}
-.demoShell .metric{padding:19px 18px;border-radius:17px;border:1px solid #344259;background:linear-gradient(155deg,#202c3e,#1a2535);gap:8px}
-.demoShell .metric.primary{padding:25px 23px;border:1px solid #5677b0;border-radius:20px;background:radial-gradient(ellipse at top right,rgba(163,192,251,.19),transparent 65%),linear-gradient(128deg,#293d61,#1d2d48)}
-.demoShell .metric .eyebrow{font-size:11px;font-weight:650;letter-spacing:.015em;color:#bdcbe2}
-.demoShell .metric strong{font-size:clamp(21px,5.8vw,30px);font-weight:780;letter-spacing:-.055em;line-height:1.22;overflow-wrap:anywhere;white-space:normal;font-variant-numeric:tabular-nums}
-.demoShell .metric.primary strong{font-size:clamp(29px,7.8vw,39px)}
-.demoShell .metric small{font-size:11px;line-height:1.5;color:#9baecb}
-.demoShell .financeSummary .financeTotal .metric{padding:25px 22px}
-.demoShell .financeSummary .financeTotal .metric strong{font-size:clamp(28px,7vw,37px)}
-.demoShell .metricgrid{gap:10px;margin-bottom:17px}
-.demoShell .panel{background:#182230;border:1px solid #2e3b50;border-radius:18px;padding:19px 18px;margin:16px 0}
-.demoShell h2{font-size:16px;font-weight:770;letter-spacing:-.04em;line-height:1.4}
-.demoShell .sectionTitle h2{margin-bottom:13px}
-.demoShell .sectionTitle span{color:#a9c5ff;font-size:11px;font-weight:650}
-.demoShell .itembody b,.demoShell .newsPreviewItem b,.demoShell .newsListText strong{font-size:13px;line-height:1.55;font-weight:690;letter-spacing:-.025em}
-.demoShell .itembody small,.demoShell .newsListText>span,.demoShell .newsPreviewItem small{font-size:11px;line-height:1.55;color:#92a4bd}
-.demoShell .listitem{padding:15px 0;gap:11px;border-bottom-color:#2b3a4d}
-.demoShell .listitem strong{font-size:12px;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
-.demoShell .newsNavCard{background:linear-gradient(150deg,#1e2b40,#1a2433);border-color:#344761;border-radius:18px;padding:19px 18px;margin-bottom:14px}
-.demoShell .newsPreviewItem{padding:13px 0;border-bottom-color:#304158}
-.demoShell .newsNavCard .linkHint{color:#afc9ff;font-size:11px;font-weight:650}
-.demoShell .empty{font-size:12px;line-height:1.7;color:#92a5bd}
-.demoShell .seg{gap:6px}
-.demoShell .seg button{min-height:39px;background:#253249;color:#acbad0;font-size:12px;border-radius:10px}
-.demoShell .seg button.selected{background:#bfcefa;color:#1c2b44}
-.demoShell .bottom{background:rgba(18,27,41,.94);border-top:1px solid #34435b;padding:11px 8px max(17px,env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.15)}
-.demoShell .bottom button{position:relative;min-width:0;flex:1;gap:5px;padding:5px 2px;font-size:11px;letter-spacing:-.02em;color:#91a0b8}
-.demoShell .bottom button.active{color:#c5d5ff;font-weight:750}
-.demoShell .bottom button.active:before{content:"";position:absolute;top:-12px;width:26px;height:2px;background:#acc5ff;border-radius:2px}
-.demoShell .navicon{font-size:21px;line-height:1}
-.demoShell .barheading{font-size:12px;letter-spacing:-.015em}
-.demoShell .track{height:7px;background:#2b3950}
-.demoShell .track>div{background:linear-gradient(90deg,#83a5eb,#b6cbff)}
-.demoShell .calendarMonthNav strong,.demoShell .dailyMonthNav strong{letter-spacing:-.035em}
-.demoShell .calendarAgendaEntry strong,.demoShell .dailyTransaction strong{font-size:13px}
-.demoShell .applicationCounts strong,.demoShell .pointOverview>strong,.demoShell .aiSubscriptionTotal strong{letter-spacing:-.05em;font-variant-numeric:tabular-nums}
-.demoShell button{transition:background-color .15s ease,border-color .15s ease,color .15s ease}
-.demoShell button:focus-visible{outline:2px solid #c0d3ff;outline-offset:3px}
-@media(max-width:370px){
- .demoShell{padding-left:14px;padding-right:14px}
- .demoShell .metricgrid{gap:8px}
- .demoShell .metricgrid .metric{padding:15px 12px}
- .demoShell .metricgrid .metric strong{font-size:clamp(17px,5vw,23px)}
-}
-@media(prefers-reduced-motion:reduce){.demoShell button{transition:none}}
-
-
-/* Demo category drilldown and point decrease explanations */
-.demoShell .expenseCategoryMore{display:block;width:100%;border:1px solid #445773;background:#26374d;color:#c7d9fa;font-weight:700;font-size:12px;border-radius:11px;padding:12px;margin:12px 0 7px;text-align:center}
-.demoShell .expenseCategoryMore:focus-visible{outline:2px solid #b9ceff;outline-offset:3px}
-.demoShell .expenseItemWrap{border-bottom:1px solid #29374c}
-.demoShell .expenseItemWrap>.listitem{border-bottom:0}
-.demoShell .expenseSubItems{margin:0 0 10px 17px;padding-left:12px;border-left:2px solid #455c7a}
-.demoShell .expenseSubItem{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:#b6c8e3;padding:7px 0;font-size:12px}
-.demoShell .expenseSubItem small{color:#869cb7;font-size:10px}
-.demoShell .expenseSubItem strong{font-size:12px;white-space:nowrap}
-.demoShell .expenseAggregateNote{font-size:11px;line-height:1.65;color:#aebdd5;background:#2a3242;border-radius:9px;margin:0 0 11px;padding:10px 12px}
-.demoShell .pointDecreaseReason{color:#ffc6b2!important;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
-
-
-/* Collapsible news category headings for demo and production */
-.demoShell .newsCategoryHeading{gap:8px}
-.demoShell .newsCategoryToggle{display:flex;flex:1;min-width:0;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;color:inherit;padding:4px 0;text-align:left}
-.demoShell .newsCategoryToggle .newsCategoryLabel{min-width:0}
-.demoShell .newsCategoryToggle .newsCategoryLabel>span:last-child{display:flex;flex-direction:column;gap:5px;min-width:0}
-.demoShell .newsCategoryName{font-size:16px;font-weight:770;line-height:1.4;letter-spacing:-.04em;overflow-wrap:anywhere}
-.demoShell .newsCategoryChevron{display:inline-block;font-size:23px;line-height:1;color:#b5caff;transition:transform .2s;flex-shrink:0}
-.demoShell .newsCategoryChevron.collapsed{transform:rotate(-90deg)}
-.demoShell .newsCategoryToggle:hover .newsCategoryName{color:#c5d7ff}
-.demoShell .newsCategoryToggle:focus-visible{outline:2px solid #bfd1ff;outline-offset:4px;border-radius:7px}
-@media(prefers-reduced-motion:reduce){.demoShell .newsCategoryChevron{transition:none}}
-
-
-/* Finance category collapsible summaries, closed by default */
-.demoShell .expenseCategoryToggle{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px;text-align:left;background:transparent;border:0;color:inherit;cursor:pointer;padding:14px 0}
-.demoShell .expenseCategoryToggle>b{font-size:13px;font-weight:750;line-height:1.5;min-width:0}
-.demoShell .expenseCategoryMeta{display:flex;align-items:center;gap:8px;flex-shrink:0;color:#b1c3df;font-size:11px;white-space:nowrap}
-.demoShell .expenseCategoryChevron{display:inline-block;font-size:20px;line-height:1;color:#bad0fa;transition:transform .2s}
-.demoShell .expenseCategoryChevron.collapsed{transform:rotate(-90deg)}
-.demoShell .expenseCategoryToggle:hover>b{color:#bfd1ff}
-.demoShell .expenseCategoryToggle:focus-visible{outline:2px solid #c0d3ff;outline-offset:3px;border-radius:7px}
-@media(prefers-reduced-motion:reduce){.demoShell .expenseCategoryChevron{transition:none}}
-
-
-/* Point movement history and both-direction explanations */
-.demoShell .pointIncreaseReason{color:#95dfb5!important;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
-.demoShell .calendarDot.pointDot{background:#e1c36c}
-.demoShell .calendarAgendaEntry.point .calendarEntryIcon,.demoShell .calendarResultIcon.point{color:#f4dfa2;background:#433a27}
-.demoShell .calendarPointAmount{display:block;font-size:15px;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:4px 0}
-.demoShell .calendarPointAmount.positive{color:#96e2b3}
-.demoShell .calendarPointAmount.negative{color:#ffb5a4}
-
-
-/* DESIGN PREVIEW V2 — demo-only, production remains unchanged */
-.demoShell.designPreview{
-  --preview-ink:#edf3fb;
-  --preview-muted:#99aec8;
-  color:var(--preview-ink);
-  background:radial-gradient(ellipse 110% 380px at 50% -110px,rgba(77,118,170,.14),transparent 75%);
-}
-html:has(.demoShell.designPreview),body:has(.demoShell.designPreview){
-  background:#101722;
-}
-.demoShell.designPreview .demoBanner{
-  border:1px solid #355247;
-  background:linear-gradient(115deg,#1b342e,#172923);
-  color:#d3efdf;
-  border-radius:14px;
-  padding:12px 14px;
-  margin-bottom:31px;
-  box-shadow:none;
-}
-.demoShell.designPreview .demoBanner button{
-  background:rgba(175,214,183,.08);
-  color:#ccebd9;
-  border-color:#486b58;
-  padding:8px 11px;
-}
-.demoShell.designPreview .top{margin-bottom:29px;align-items:flex-start}
-.demoShell.designPreview .brand{font-size:10px;letter-spacing:.17em;color:#8ca6c5}
-.demoShell.designPreview .brandMark{color:#c4d7f5}
-.demoShell.designPreview .top h1{
-  font-size:clamp(27px,7vw,34px);
-  margin-top:14px;
-  font-weight:760;
-  letter-spacing:-.065em;
-  line-height:1.15;
-}
-.demoShell.designPreview .profile{
-  border:1px solid #40506a;
-  background:linear-gradient(145deg,#24354b,#1b2839);
-  box-shadow:0 4px 18px rgba(0,0,0,.15);
-}
-.demoShell.designPreview .panel,
-.demoShell.designPreview .calendarPanel,
-.demoShell.designPreview .calendarAgenda,
-.demoShell.designPreview .calendarSearchPanel{
-  background:linear-gradient(155deg,#1d2a39,#1a2533 70%);
-  border:1px solid #34445b;
-  border-radius:22px;
-  padding:21px 20px;
-  box-shadow:0 9px 26px rgba(0,0,0,.12);
-  margin:17px 0;
-}
-.demoShell.designPreview .metric{
-  background:linear-gradient(160deg,#243249,#202c3e);
-  border:1px solid #40536d;
-  border-radius:20px;
-  box-shadow:0 8px 22px rgba(0,0,0,.12);
-}
-.demoShell.designPreview .metric.primary{
-  background:radial-gradient(circle at 94% 0%,rgba(170,200,248,.22),transparent 45%),linear-gradient(120deg,#344a71,#243550 75%);
-  border-color:#617da9;
-  border-radius:23px;
-  padding:28px 24px;
-}
-.demoShell.designPreview .metric.primary strong{letter-spacing:-.065em}
-.demoShell.designPreview .metric .eyebrow{font-size:12px;color:#c1cee1}
-.demoShell.designPreview .metric small{color:#b0c1d7}
-.demoShell.designPreview h2{font-size:16px;letter-spacing:-.045em}
-.demoShell.designPreview .sectionTitle span{color:#b5cbef}
-.demoShell.designPreview .newsNavCard{
-  background:linear-gradient(150deg,#233449,#1a2738);
-  border:1px solid #3c516e;
-  border-radius:22px;
-  padding:21px 20px;
-}
-.demoShell.designPreview .newsPreviewItem{padding:15px 1px}
-.demoShell.designPreview .newsPreviewItem b{color:#e6edf8;font-size:13px}
-.demoShell.designPreview .navCard:hover .metric,
-.demoShell.designPreview .newsNavCard:hover{border-color:#8ba7d4}
-.demoShell.designPreview .newsCategoryPanel{padding:9px 20px}
-.demoShell.designPreview .newsCategoryHeading{padding:13px 0;min-height:69px}
-.demoShell.designPreview .newsCategoryName{font-size:15px;letter-spacing:-.035em}
-.demoShell.designPreview .newsCategoryToggle{padding:6px 0}
-.demoShell.designPreview .newsCategorySymbol{
-  display:grid;place-items:center;
-  width:37px;height:37px;
-  flex:0 0 37px;
-  border:1px solid #4c6481;
-  border-radius:12px;
-  background:#293c55;
-  color:#c9d9f6;
-}
-.demoShell.designPreview .newsCategoryChevron{
-  display:grid;place-items:center;
-  width:30px;height:30px;
-  color:#c2d4f2;
-  font-size:24px;
-}
-.demoShell.designPreview .newsCategoryMore{
-  border-radius:10px;
-}
-.demoShell.designPreview .newsListButton{padding:17px 0;border-top:1px solid #2e4057}
-.demoShell.designPreview .newsListText strong{font-size:14px}
-.demoShell.designPreview .categorySection{
-  border:1px solid #34475e;
-  border-radius:15px;
-  padding:0 15px;
-  margin:12px 0;
-  background:rgba(23,34,48,.64);
-  overflow:hidden;
-}
-.demoShell.designPreview .expenseCategoryToggle{
-  padding:16px 2px;
-  border-bottom:0;
-  min-height:58px;
-}
-.demoShell.designPreview .expenseCategoryToggle>b{
-  color:#ecf2fa;
-  font-size:13px;
-  font-weight:720;
-}
-.demoShell.designPreview .expenseCategoryMeta{
-  font-size:11px;
-  gap:7px;
-  color:#b2c4de;
-}
-.demoShell.designPreview .expenseCategoryChevron{color:#c5d6f6}
-.demoShell.designPreview .expenseCategoryMore{margin:10px 0 14px}
-.demoShell.designPreview .barrow{margin:19px 0}
-.demoShell.designPreview .track{height:6px}
-.demoShell.designPreview .pointOverview,
-.demoShell.designPreview .aiSubscriptionTotal{
-  border-radius:17px;
-}
-.demoShell.designPreview .pointProvider{padding:15px 0}
-.demoShell.designPreview .pointIncreaseReason,.demoShell.designPreview .pointDecreaseReason{font-weight:550}
-.demoShell.designPreview .seg button{min-height:41px;border-radius:12px}
-.demoShell.designPreview .seg button.selected{background:#c5d8f9;color:#1b2a3d}
-.demoShell.designPreview .bottom{
-  background:rgba(17,26,39,.91);
-  border-top:1px solid #42536d;
-  backdrop-filter:blur(24px);
-  box-shadow:0 -8px 30px rgba(0,0,0,.24);
-  border-radius:18px 18px 0 0;
-}
-.demoShell.designPreview .bottom button.active{color:#e1eaff}
-.demoShell.designPreview .bottom button.active:before{background:#c3d6fc}
-.demoShell.designPreview .calendarDay.chosen{outline-offset:0}
-@media(max-width:380px){
-  .demoShell.designPreview .panel,
-  .demoShell.designPreview .calendarPanel,
-  .demoShell.designPreview .calendarAgenda,
-  .demoShell.designPreview .calendarSearchPanel{padding:18px 15px}
-  .demoShell.designPreview .categorySection{padding:0 10px}
-  .demoShell.designPreview .expenseCategoryMeta{font-size:10px}
-  .demoShell.designPreview .newsCategoryPanel{padding:8px 15px}
-}
-
-/* Shared manual-refresh button in demo and production */
-.demoShell .topActions{display:flex;align-items:center;gap:9px;flex-shrink:0}
-.demoShell .refreshButton{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;background:#202d40;color:#d4e3fb;border:1px solid #415371;border-radius:50%;font-size:25px;line-height:1}
-.demoShell .refreshButton span{display:block;line-height:1}
-.demoShell .refreshButton:hover{background:#2b405c;border-color:#6d88b2}
-.demoShell .refreshButton:disabled{opacity:.55;cursor:not-allowed}
-.demoShell .refreshButton.refreshing span{animation:dashboard-refresh-spin .9s linear infinite}
-.demoShell .refreshNotice{font-size:11px;line-height:1.5;color:#9cdeb9;margin:-14px 0 14px;text-align:right}
-.designPreview.demoShell .refreshButton{background:linear-gradient(145deg,#24354b,#1b2839);border-color:#40506a;box-shadow:0 4px 18px rgba(0,0,0,.15)}
+.shell .topActions{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.shell .refreshButton{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;background:#202d40;color:#d4e3fb;border:1px solid #415371;border-radius:50%;font-size:25px;line-height:1}
+.shell .refreshButton span{display:block;line-height:1}
+.shell .refreshButton:hover{background:#2b405c;border-color:#6d88b2}
+.shell .refreshButton:disabled{opacity:.55;cursor:not-allowed}
+.shell .refreshButton.refreshing span{animation:dashboard-refresh-spin .9s linear infinite}
+.shell .refreshNotice{font-size:11px;line-height:1.5;color:#9cdeb9;margin:-14px 0 14px;text-align:right}
+.shell .refreshButton{background:linear-gradient(145deg,#24354b,#1b2839);border-color:#40506a;box-shadow:0 4px 18px rgba(0,0,0,.15)}
 @keyframes dashboard-refresh-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.demoShell .refreshButton.refreshing span{animation:none}}
+@media(prefers-reduced-motion:reduce){.shell .refreshButton.refreshing span{animation:none}
+}
+html:has(.shell),body:has(.shell){background:#f3f1e9; color:#192521;}
+.shell{--card:#fffef9;--ink:#192521;--muted:#6c7771;--accent:#d6ef82;--deep:#243a32; max-width:690px; padding:24px 22px 133px; background:transparent; color:var(--ink); font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif;}
+.shell .top{position:relative; border-bottom:2px solid #222c27; padding-bottom:25px; margin-bottom:26px; align-items:flex-end;}
+.shell .brand{font-size:10px; color:#4d6156; letter-spacing:.16em; gap:5px;}
+.shell .brandMark{width:26px;height:26px; display:inline-grid; place-items:center; border-radius:50%; background:#243a32; color:#ddf7a1; font-size:17px; margin-right:4px;}
+.shell .brandEdition{color:#819185}
+.shell .top h1{font-size:clamp(38px,10vw,56px); margin:21px 0 0; letter-spacing:-.085em; line-height:1; font-weight:820; color:#172820;}
+.shell .topActions{gap:8px;padding-bottom:2px}
+.shell .refreshButton,.shell .profile{width:39px;height:39px; border-radius:12px; background:#fffef8; color:#1f342a; border:1px solid #c9d0c7; box-shadow:2px 2px 0 #b9c4b6;}
+.shell .refreshButton:hover,.shell .profile:hover{background:var(--accent);border-color:#7c9654}
+.shell .refreshNotice{color:#315944}
+.shell .panel,.shell .calendarPanel,.shell .calendarAgenda,.shell .calendarSearchPanel{background:var(--card); border:1px solid #d4d9cf; border-radius:15px; box-shadow:3px 4px 0 #e1e4d9; padding:23px; margin:19px 0;}
+.shell .metric{background:#fdfdf8; border:1px solid #d8ddd2; border-radius:14px; box-shadow:3px 4px 0 #e1e4d9; color:var(--ink);}
+.shell .metric.primary{position:relative; background:#243d33; border:1px solid #21372e; border-radius:16px; box-shadow:6px 7px 0 #b7c4af; color:#f6f9ed; padding:30px 26px 35px; overflow:hidden;}
+.shell .metric.primary:after{content:"↗"; position:absolute; right:23px;top:19px; display:grid;place-items:center; width:35px;height:35px; border-radius:50%; background:#d4ee7e; color:#203527; font-size:20px; font-weight:700;}
+.shell .metric.primary .eyebrow{color:#cee8cd;letter-spacing:.01em;font-size:12px}
+.shell .metric.primary strong{color:#f6f9ed; font-size:clamp(36px,9vw,49px); letter-spacing:-.07em; margin-top:10px;}
+.shell .metric.primary small{color:#afc5b3;font-size:11px}
+.shell .metric .eyebrow{color:#607167}
+.shell .metric strong{color:#1b2d23;letter-spacing:-.065em}
+.shell .metric small{color:#77867b}
+.shell h2{color:#1f3027;font-weight:800;font-size:18px;letter-spacing:-.055em}
+.shell .sectionTitle span{color:#47694a;font-size:11px}
+.shell .navCard{margin:0 0 25px}
+.shell .navCard:hover .metric{border-color:#81a568}
+.shell .newsNavCard{background:#ebefdf; border:1px solid #cdd6c6; border-radius:15px; box-shadow:3px 4px 0 #d8ded1; padding:24px; color:#1d2c23;}
+.shell .newsNavCard .linkHint{color:#315e44;font-weight:750}
+.shell .newsPreviewItem{border-bottom:1px solid #ced7c9}
+.shell .newsPreviewItem b,.shell .itembody b,.shell .newsListText strong{color:#22332a}
+.shell .newsPreviewItem small,.shell .itembody small,.shell .newsListText>span{color:#748279}
+.shell .listitem{border-bottom-color:#e2e5dc}
+.shell .listitem strong{color:#24342b}
+.shell .empty{color:#79877b}
+.shell .check{border-color:#94aa9a}
+.shell .check.checked{background:#d5ed92;color:#1f352a;border-color:#7aab59}
+.shell .financeSummary .financeTotal .metric{background:#d9e9cf; border-color:#b7d2aa; box-shadow:4px 5px 0 #c4d5ba;}
+.shell .financeSummary .financeTotal .metric strong{color:#223c2b;font-size:clamp(34px,9vw,46px)}
+.shell .financeSummary .metricgrid .metric{background:#fffef9}
+.shell .barheading{color:#51645a}
+.shell .track{background:#e6e9df;height:9px;border-radius:5px}
+.shell .track>div{background:#83ae80;border-radius:5px}
+.shell .seg{padding:4px;background:#e9ede5;border-radius:11px}
+.shell .seg button{background:transparent; color:#66776a; border-radius:8px; font-weight:650; min-height:38px;}
+.shell .seg button.selected{background:#263f32;color:#f7faef;box-shadow:0 2px 5px #142b2117}
+.shell .categorySection{background:#f4f6ee; border:1px solid #d8e0d0; border-radius:12px; box-shadow:none; padding:0 15px; margin:11px 0;}
+.shell .expenseCategoryToggle{min-height:67px;padding:17px 1px}
+.shell .expenseCategoryToggle>b{color:#21392b;font-size:14px;font-weight:780}
+.shell .expenseCategoryMeta{color:#627767}
+.shell .expenseCategoryChevron{color:#425f4b}
+.shell .expenseItemWrap{border-bottom:1px solid #dce4d6}
+.shell .expenseSubItems{border-color:#92bb87}
+.shell .expenseSubItem{color:#526b57}
+.shell .expenseAggregateNote{background:#e8ebdf;color:#596d59}
+.shell .expenseCategoryMore,.shell .memoInlineButton,.shell .memoRead{border:1px solid #c3d0bf; background:#e8f0df; color:#274735; border-radius:9px;}
+.shell .memoEntry,.shell .aiSubscriptionRow{border-bottom-color:#e0e5db}
+.shell .memoEntryHeader strong{color:#24342b}
+.shell .memoEditor textarea{background:#fffef9;border-color:#acbea9;color:#23392c}
+.shell .memoPlaceholder,.shell .memoEntry small{color:#788b7b}
+.shell .memoSave{background:#294937;color:#fffef2}
+.shell .newsCategoryPanel{background:#fffef9; border-color:#d5ddcf; border-radius:12px; padding:9px 20px;}
+.shell .newsCategoryHeading{padding:12px 0}
+.shell .newsCategoryName{color:#233b2c;font-size:15px}
+.shell .newsCategoryLabel small{color:#819081}
+.shell .newsCategorySymbol{border:0; background:#dfebd4; color:#3c6544; border-radius:11px; width:39px;height:39px;}
+.shell .digestPanel .newsCategorySymbol{background:#d5ef87;color:#29492e}
+.shell .newsCategoryChevron{color:#57765b}
+.shell .newsListButton{border-color:#e1e6dd;color:#24342b}
+.shell .newsListText small{color:#7a887d}
+.shell .newsListArrow{color:#53735b}
+.shell .newsCategoryMore{background:#e8efdf;color:#34523a;border:1px solid #c5d3bd;}
+.shell .newsCategoryIntro{color:#687c6c}
+.shell .newsDetail{background:#fffef9;border:1px solid #d5dfd1;color:#21372a}
+.shell .newsDetailHeadline{color:#1f3028}
+.shell .newsDetailBody{color:#36483b}
+.shell .newsDetailSummary{color:#506957}
+.shell .newsDetailDate,.shell .newsDetailCategory{color:#708574}
+.shell .newsBack,.shell .newsOriginal{color:#315b40}
+.shell .pointOverview{background:#dcedd1; border:1px solid #bad3ad; color:#233c2a; border-radius:14px;}
+.shell .pointOverview .eyebrow{color:#42684c}
+.shell .pointOverview>strong{color:#223b2a}
+.shell .pointProviderHeading{border-color:#d9dfd5;color:#748577}
+.shell .pointProvider{border-bottom-color:#e2e6de}
+.shell .pointAmounts strong{color:#283b2c}
+.shell .pointIncreaseReason{color:#237949!important}
+.shell .pointDecreaseReason{color:#ad5a42!important}
+.shell .deltaUp{color:#24754d!important}
+.shell .deltaDown{color:#a74d41!important}
+.shell .applicationCounts>div{background:#edf1e8;border:1px solid #d9e3d3}
+.shell .applicationCounts strong{color:#2c4933}
+.shell .applicationCounts span{color:#718273}
+.shell .applicationsTable th{color:#5f7460;border-bottom-color:#cad6c8}
+.shell .applicationsTable td{color:#334b39;border-bottom-color:#e1e7dd}
+.shell .aiSubscriptionTotal{background:#e6ebe2; border:1px solid #cad9c4; color:#253f2c;}
+.shell .aiSubscriptionTotal strong{color:#28412d}
+.shell .aiSubscriptionTotal small{color:#667a66}
+.shell .aiSubscriptionPrice strong{color:#283b2c}
+.shell .calendarHeader h2,.shell .calendarAgendaHeading h2,.shell .calendarMonthNav strong{color:#263b2c}
+.shell .calendarEyebrow{color:#587260}
+.shell .calendarToday,.shell .calendarArrows button{background:#edf3e8; border:1px solid #d0ddc9; color:#32513a;}
+.shell .calendarWeekday{color:#70816e}
+.shell .calendarWeekday.sunday,.shell .calendarDay.sunday{color:#b65b4d}
+.shell .calendarDay{color:#304333}
+.shell .calendarDay.today{border-color:#93b18a}
+.shell .calendarDay.chosen{background:#294739;color:#fffef5;border-color:#294739}
+.shell .calendarLegend span{color:#687c6c}
+.shell .calendarSearchPanel>label{color:#29432f}
+.shell .calendarSearchField{background:#f4f6f0;border-color:#cedbcb}
+.shell .calendarSearchField input{color:#283d2d}
+.shell .calendarSearchField input::placeholder{color:#92a195}
+.shell .calendarSearchField>span,.shell .calendarSearchField button{color:#617764}
+.shell .calendarFilters button{background:#edf2e9;color:#506f52;border-color:#d3dfcf}
+.shell .calendarFilters button.active{background:#294a38;color:#fffef4;border-color:#294a38}
+.shell .calendarAgendaHeading span,.shell .calendarEntryInfo small,.shell .calendarEntryInfo>span{color:#758777}
+.shell .calendarAgendaHeading>strong{background:#e2ebda;color:#395b40}
+.shell .calendarAgendaEntry{border-bottom-color:#e2e6de}
+.shell .calendarEntryInfo strong{color:#2a4031}
+.shell .calendarDay.chosen .calendarDot{filter:none}
+.shell .calendarNoEntries{color:#5d735f}
+.shell .calendarNoEntries p,.shell .calendarDemoNote{color:#849685}
+.shell .calendarSearchResult{color:#2e4833;border-color:#dce4d7}
+.shell .calendarSearchResultText small,.shell .calendarSearchResultText>span{color:#728772}
+.shell .calendarTaskToggle{background:#e9f2e8;border-color:#c2d9c1;color:#2f7044}
+.shell .calendarTaskToggle.checked{background:#d9efc3;color:#2c693f}
+.shell .calendarNewsOpen{background:#f1e8d9;color:#865c31}
+.shell .calendarPointAmount.positive{color:#26804b}
+.shell .calendarPointAmount.negative{color:#bf604a}
+.shell .bottom{left:50%; width:min(calc(100% - 26px),640px); bottom:12px; transform:translateX(-50%); padding:9px 6px max(9px,env(safe-area-inset-bottom)); background:#233c30; border:1px solid #274b36; border-radius:22px; box-shadow:0 12px 35px #17291e3d;}
+.shell .bottom button{color:#a8c1ac; border-radius:14px; padding:8px 2px; font-size:11px; gap:6px;}
+.shell .bottom button.active{color:#d8f598; background:#365b41;}
+.shell .bottom button.active:before{display:none}
+.shell .navicon{font-size:22px}
+.shell button:focus-visible{outline-color:#7aa063}
+@media(max-width:410px){.shell{padding:18px 15px 125px}
+.shell .metric.primary{padding:25px 21px 30px}
+.shell .metric.primary strong{font-size:clamp(31px,8vw,42px)}
+.shell .top h1{font-size:clamp(36px,9vw,45px)}
+.shell .panel,.shell .calendarPanel,.shell .calendarAgenda,.shell .calendarSearchPanel{padding:19px 16px}
+.shell .newsCategoryPanel{padding:8px 15px}
+.shell .categorySection{padding:0 10px}
+.shell .bottom{width:calc(100% - 18px)}
 
+}
+.shell .dailySpendingPanel,.shell .aiSubscriptionPanel,.shell .newsDetail,.shell .lifeCalendar{color:#25392c}
+.shell .dailySpendingHeader p,.shell .dailyChartHint,.shell .dailyTotal span,.shell .dailyDetailsHeader small,.shell .dailyTransaction small{color:#728472}
+.shell .dailyMonthNav strong,.shell .dailyTotal strong,.shell .dailyDetailsHeader strong,.shell .dailyTransaction strong{color:#263e2e}
+.shell .dailyMonthNav button{background:#eef3e9;border:1px solid #cadac6;color:#30513a;border-radius:8px;}
+.shell .dailyLineScroller{background:linear-gradient(180deg,#f8faf5,#f1f5eb); border:1px solid #e3e9dc;border-radius:12px;padding:9px 5px 5px;}
+.shell .dailyLineCanvas svg line{stroke:#d1ded0}
+.shell .dailyLineCanvas svg text{fill:#758874}
+.shell .dailyLineCanvas svg path[stroke]{stroke:#4b8761}
+.shell .dailyLineCanvas svg circle{stroke:#fbfdf8;fill:#5b9870}
+.shell .dailyLineCanvas svg circle[fill="#f9d69a"]{fill:#c48d44}
+.shell .dailyLineCanvas svg stop{stop-color:#8cb89a}
+.shell .dailyHit.active{border-color:#427b58}
+.shell .dailyDetails,.shell .dailyDetailsEmpty{background:#f1f5eb;border:1px solid #dce6d6;border-radius:12px;color:#667f6b;}
+.shell .dailyDetailsHeader,.shell .dailyTransaction{border-bottom-color:#dae3d5}
+.shell .newsDetailSummary{background:#edf4e8;border-left:3px solid #719e65; color:#3e5643;border-radius:8px;}
+.shell .newsDetailBody p{color:#3a4b3e}
+.shell .newsBack{background:#edf3e8;border-color:#cfddc9;color:#345942;}
+.shell .newsOriginal{background:#e8f1e4;border-color:#b9cfb0;color:#345c40;}
+.shell .newsCategoryIntro strong{color:#2b4e37}
+.shell .aiSubscriptionTotal{background:linear-gradient(135deg,#e6efdc,#f1f5e9);border-color:#c9dabb; box-shadow:none;}
+.shell .aiSubscriptionTotal .eyebrow{color:#54715c}
+.shell .aiSubscriptionPrice span{color:#487c52}
+.shell .memoActions button{background:#eaf2e4;border:1px solid #c8d8bf;color:#33543e;}
+.shell .memoActions .memoSave{background:#294937;border-color:#294937;color:#fffef2}
+.shell .memoEditHint{color:#38744a}
+.shell .savedMemo{color:#347a4a!important}
+.shell .calendarEntryIcon,.shell .calendarResultIcon{background:#e1ebd9;color:#3e694a;border-radius:10px;}
+.shell .calendarAgendaEntry.news .calendarEntryIcon,.shell .calendarResultIcon.news{background:#f3e7d3;color:#9b6936;}
+.shell .calendarAgendaEntry.task .calendarEntryIcon,.shell .calendarResultIcon.task{background:#dcebd9;color:#3f7950;}
+.shell .calendarAgendaEntry.point .calendarEntryIcon,.shell .calendarResultIcon.point{background:#f3eccc;color:#877038;}
+.shell .calendarResultArrow{color:#69856e}
+.shell .calendarNoEntries>span{color:#719774}
+.shell .calendarSearchField:focus-within{border-color:#77a16d;box-shadow:0 0 0 1px #77a16d;}
+.shell .calendarToday:hover,.shell .calendarArrows button:hover,.shell .dailyMonthNav button:hover{background:#dcebcf}
+.shell .applicationStatus.statusPending{background:#f2ecd9;color:#826c38}
+.shell .applicationStatus.statusAccepted{background:#deefdf;color:#347144}
+.shell .applicationStatus.statusRejected{background:#f6e8e0;color:#a15a47}
+.shell .error{background:#f9e8e0;border:1px solid #e5c5ba;color:#9a4e3e;}
+.shell .loading{color:#647b68}
+.shell a,.shell .external{color:#326747}
+@media(max-width:410px){.shell .dailyTotal{flex-wrap:wrap}
+.shell .dailyMonthNav{margin-top:3px}
 
-/* CONCEPT 02 — EDITORIAL / DAYLIGHT. Demo-only. Remove conceptLight class to rollback. */
-html:has(.demoShell.conceptLight),body:has(.demoShell.conceptLight){
- background:#f3f1e9;
- color:#192521;
 }
-.demoShell.designPreview.conceptLight{
- --paper:#f3f1e9;--card:#fffef9;--ink:#192521;--muted:#6c7771;--line:#d9dcd2;--accent:#d6ef82;--deep:#243a32;
- max-width:690px;
- padding:24px 22px 133px;
- background:transparent;
- color:var(--ink);
- font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif;
-}
-.demoShell.conceptLight .demoBanner{
- background:#e6ebdf;
- border:1px solid #d3dbca;
- color:#33483b;
- border-radius:9px;
- margin-bottom:28px;
- padding:10px 13px;
- box-shadow:none;
-}
-.demoShell.conceptLight .demoBanner strong{font-size:10px;letter-spacing:.14em;color:#39533c}
-.demoShell.conceptLight .demoBanner span{color:#647467}
-.demoShell.conceptLight .demoBanner button{
- border:1px solid #b7c6b4;
- background:#fffef7;
- color:#25412e;
- border-radius:8px;
-}
-.demoShell.conceptLight .top{
- position:relative;
- border-bottom:2px solid #222c27;
- padding-bottom:25px;
- margin-bottom:26px;
- align-items:flex-end;
-}
-.demoShell.conceptLight .brand{
- font-size:10px;
- color:#4d6156;
- letter-spacing:.16em;
- gap:5px;
-}
-.demoShell.conceptLight .brandMark{
- width:26px;height:26px;
- display:inline-grid;
- place-items:center;
- border-radius:50%;
- background:#243a32;
- color:#ddf7a1;
- font-size:17px;
- margin-right:4px;
-}
-.demoShell.conceptLight .brandEdition{color:#819185}
-.demoShell.conceptLight .top h1{
- font-size:clamp(38px,10vw,56px);
- margin:21px 0 0;
- letter-spacing:-.085em;
- line-height:1;
- font-weight:820;
- color:#172820;
-}
-.demoShell.conceptLight .topActions{gap:8px;padding-bottom:2px}
-.demoShell.conceptLight .refreshButton,
-.demoShell.conceptLight .profile{
- width:39px;height:39px;
- border-radius:12px;
- background:#fffef8;
- color:#1f342a;
- border:1px solid #c9d0c7;
- box-shadow:2px 2px 0 #b9c4b6;
-}
-.demoShell.conceptLight .refreshButton:hover,
-.demoShell.conceptLight .profile:hover{background:var(--accent);border-color:#7c9654}
-.demoShell.conceptLight .refreshNotice{color:#315944}
-.demoShell.conceptLight .panel,
-.demoShell.conceptLight .calendarPanel,
-.demoShell.conceptLight .calendarAgenda,
-.demoShell.conceptLight .calendarSearchPanel{
- background:var(--card);
- border:1px solid #d4d9cf;
- border-radius:15px;
- box-shadow:3px 4px 0 #e1e4d9;
- padding:23px;
- margin:19px 0;
-}
-.demoShell.conceptLight .metric{
- background:#fdfdf8;
- border:1px solid #d8ddd2;
- border-radius:14px;
- box-shadow:3px 4px 0 #e1e4d9;
- color:var(--ink);
-}
-.demoShell.conceptLight .metric.primary{
- position:relative;
- background:#243d33;
- border:1px solid #21372e;
- border-radius:16px;
- box-shadow:6px 7px 0 #b7c4af;
- color:#f6f9ed;
- padding:30px 26px 35px;
- overflow:hidden;
-}
-.demoShell.conceptLight .metric.primary:after{
- content:"↗";
- position:absolute;
- right:23px;top:19px;
- display:grid;place-items:center;
- width:35px;height:35px;
- border-radius:50%;
- background:#d4ee7e;
- color:#203527;
- font-size:20px;
- font-weight:700;
-}
-.demoShell.conceptLight .metric.primary .eyebrow{color:#cee8cd;letter-spacing:.01em;font-size:12px}
-.demoShell.conceptLight .metric.primary strong{
- color:#f6f9ed;
- font-size:clamp(36px,9vw,49px);
- letter-spacing:-.07em;
- margin-top:10px;
-}
-.demoShell.conceptLight .metric.primary small{color:#afc5b3;font-size:11px}
-.demoShell.conceptLight .metric .eyebrow{color:#607167}
-.demoShell.conceptLight .metric strong{color:#1b2d23;letter-spacing:-.065em}
-.demoShell.conceptLight .metric small{color:#77867b}
-.demoShell.conceptLight h2{color:#1f3027;font-weight:800;font-size:18px;letter-spacing:-.055em}
-.demoShell.conceptLight .sectionTitle span{color:#47694a;font-size:11px}
-.demoShell.conceptLight .navCard{margin:0 0 25px}
-.demoShell.conceptLight .navCard:hover .metric{border-color:#81a568}
-.demoShell.conceptLight .newsNavCard{
- background:#ebefdf;
- border:1px solid #cdd6c6;
- border-radius:15px;
- box-shadow:3px 4px 0 #d8ded1;
- padding:24px;
- color:#1d2c23;
-}
-.demoShell.conceptLight .newsNavCard .linkHint{color:#315e44;font-weight:750}
-.demoShell.conceptLight .newsPreviewItem{border-bottom:1px solid #ced7c9}
-.demoShell.conceptLight .newsPreviewItem b,
-.demoShell.conceptLight .itembody b,
-.demoShell.conceptLight .newsListText strong{color:#22332a}
-.demoShell.conceptLight .newsPreviewItem small,
-.demoShell.conceptLight .itembody small,
-.demoShell.conceptLight .newsListText>span{color:#748279}
-.demoShell.conceptLight .listitem{border-bottom-color:#e2e5dc}
-.demoShell.conceptLight .listitem strong{color:#24342b}
-.demoShell.conceptLight .empty{color:#79877b}
-.demoShell.conceptLight .check{border-color:#94aa9a}
-.demoShell.conceptLight .check.checked{background:#d5ed92;color:#1f352a;border-color:#7aab59}
-.demoShell.conceptLight .financeSummary .financeTotal .metric{
- background:#d9e9cf;
- border-color:#b7d2aa;
- box-shadow:4px 5px 0 #c4d5ba;
-}
-.demoShell.conceptLight .financeSummary .financeTotal .metric strong{color:#223c2b;font-size:clamp(34px,9vw,46px)}
-.demoShell.conceptLight .financeSummary .metricgrid .metric{background:#fffef9}
-.demoShell.conceptLight .barheading{color:#51645a}
-.demoShell.conceptLight .track{background:#e6e9df;height:9px;border-radius:5px}
-.demoShell.conceptLight .track>div{background:#83ae80;border-radius:5px}
-.demoShell.conceptLight .seg{padding:4px;background:#e9ede5;border-radius:11px}
-.demoShell.conceptLight .seg button{
- background:transparent;
- color:#66776a;
- border-radius:8px;
- font-weight:650;
- min-height:38px;
-}
-.demoShell.conceptLight .seg button.selected{background:#263f32;color:#f7faef;box-shadow:0 2px 5px #142b2117}
-.demoShell.conceptLight .categorySection{
- background:#f4f6ee;
- border:1px solid #d8e0d0;
- border-radius:12px;
- box-shadow:none;
- padding:0 15px;
- margin:11px 0;
-}
-.demoShell.conceptLight .expenseCategoryToggle{min-height:67px;padding:17px 1px}
-.demoShell.conceptLight .expenseCategoryToggle>b{color:#21392b;font-size:14px;font-weight:780}
-.demoShell.conceptLight .expenseCategoryMeta{color:#627767}
-.demoShell.conceptLight .expenseCategoryChevron{color:#425f4b}
-.demoShell.conceptLight .expenseItemWrap{border-bottom:1px solid #dce4d6}
-.demoShell.conceptLight .expenseSubItems{border-color:#92bb87}
-.demoShell.conceptLight .expenseSubItem{color:#526b57}
-.demoShell.conceptLight .expenseAggregateNote{background:#e8ebdf;color:#596d59}
-.demoShell.conceptLight .expenseCategoryMore,
-.demoShell.conceptLight .memoInlineButton,
-.demoShell.conceptLight .memoRead{
- border:1px solid #c3d0bf;
- background:#e8f0df;
- color:#274735;
- border-radius:9px;
-}
-.demoShell.conceptLight .memoEntry,.demoShell.conceptLight .aiSubscriptionRow{border-bottom-color:#e0e5db}
-.demoShell.conceptLight .memoEntryHeader strong{color:#24342b}
-.demoShell.conceptLight .memoEditor textarea{background:#fffef9;border-color:#acbea9;color:#23392c}
-.demoShell.conceptLight .memoPlaceholder,.demoShell.conceptLight .memoEntry small{color:#788b7b}
-.demoShell.conceptLight .memoSave{background:#294937;color:#fffef2}
-.demoShell.conceptLight .newsCategoryPanel{
- background:#fffef9;
- border-color:#d5ddcf;
- border-radius:12px;
- padding:9px 20px;
-}
-.demoShell.conceptLight .newsCategoryHeading{padding:12px 0}
-.demoShell.conceptLight .newsCategoryName{color:#233b2c;font-size:15px}
-.demoShell.conceptLight .newsCategoryLabel small{color:#819081}
-.demoShell.conceptLight .newsCategorySymbol{
- border:0;
- background:#dfebd4;
- color:#3c6544;
- border-radius:11px;
- width:39px;height:39px;
-}
-.demoShell.conceptLight .digestPanel .newsCategorySymbol{background:#d5ef87;color:#29492e}
-.demoShell.conceptLight .newsCategoryChevron{color:#57765b}
-.demoShell.conceptLight .newsListButton{border-color:#e1e6dd;color:#24342b}
-.demoShell.conceptLight .newsListText small{color:#7a887d}
-.demoShell.conceptLight .newsListArrow{color:#53735b}
-.demoShell.conceptLight .newsCategoryMore{
- background:#e8efdf;color:#34523a;border:1px solid #c5d3bd;
-}
-.demoShell.conceptLight .newsCategoryIntro{color:#687c6c}
-.demoShell.conceptLight .newsDetail{background:#fffef9;border:1px solid #d5dfd1;color:#21372a}
-.demoShell.conceptLight .newsDetailHeadline{color:#1f3028}
-.demoShell.conceptLight .newsDetailBody{color:#36483b}
-.demoShell.conceptLight .newsDetailSummary{color:#506957}
-.demoShell.conceptLight .newsDetailDate,.demoShell.conceptLight .newsDetailCategory{color:#708574}
-.demoShell.conceptLight .newsBack,.demoShell.conceptLight .newsOriginal{color:#315b40}
-.demoShell.conceptLight .pointOverview{
- background:#dcedd1;
- border:1px solid #bad3ad;
- color:#233c2a;
- border-radius:14px;
-}
-.demoShell.conceptLight .pointOverview .eyebrow{color:#42684c}
-.demoShell.conceptLight .pointOverview>strong{color:#223b2a}
-.demoShell.conceptLight .pointProviderHeading{border-color:#d9dfd5;color:#748577}
-.demoShell.conceptLight .pointProvider{border-bottom-color:#e2e6de}
-.demoShell.conceptLight .pointAmounts strong{color:#283b2c}
-.demoShell.conceptLight .pointIncreaseReason{color:#237949!important}
-.demoShell.conceptLight .pointDecreaseReason{color:#ad5a42!important}
-.demoShell.conceptLight .deltaUp{color:#24754d!important}
-.demoShell.conceptLight .deltaDown{color:#a74d41!important}
-.demoShell.conceptLight .applicationCounts>div{background:#edf1e8;border:1px solid #d9e3d3}
-.demoShell.conceptLight .applicationCounts strong{color:#2c4933}
-.demoShell.conceptLight .applicationCounts span{color:#718273}
-.demoShell.conceptLight .applicationsTable th{color:#5f7460;border-bottom-color:#cad6c8}
-.demoShell.conceptLight .applicationsTable td{color:#334b39;border-bottom-color:#e1e7dd}
-.demoShell.conceptLight .aiSubscriptionTotal{
- background:#e6ebe2;
- border:1px solid #cad9c4;
- color:#253f2c;
-}
-.demoShell.conceptLight .aiSubscriptionTotal strong{color:#28412d}
-.demoShell.conceptLight .aiSubscriptionTotal small{color:#667a66}
-.demoShell.conceptLight .aiSubscriptionPrice strong{color:#283b2c}
-.demoShell.conceptLight .calendarHeader h2,
-.demoShell.conceptLight .calendarAgendaHeading h2,
-.demoShell.conceptLight .calendarMonthNav strong{color:#263b2c}
-.demoShell.conceptLight .calendarEyebrow{color:#587260}
-.demoShell.conceptLight .calendarToday,
-.demoShell.conceptLight .calendarArrows button{
- background:#edf3e8;
- border:1px solid #d0ddc9;
- color:#32513a;
-}
-.demoShell.conceptLight .calendarWeekday{color:#70816e}
-.demoShell.conceptLight .calendarWeekday.sunday,.demoShell.conceptLight .calendarDay.sunday{color:#b65b4d}
-.demoShell.conceptLight .calendarDay{color:#304333}
-.demoShell.conceptLight .calendarDay.today{border-color:#93b18a}
-.demoShell.conceptLight .calendarDay.chosen{background:#294739;color:#fffef5;border-color:#294739}
-.demoShell.conceptLight .calendarLegend span{color:#687c6c}
-.demoShell.conceptLight .calendarSearchPanel>label{color:#29432f}
-.demoShell.conceptLight .calendarSearchField{background:#f4f6f0;border-color:#cedbcb}
-.demoShell.conceptLight .calendarSearchField input{color:#283d2d}
-.demoShell.conceptLight .calendarSearchField input::placeholder{color:#92a195}
-.demoShell.conceptLight .calendarSearchField>span,.demoShell.conceptLight .calendarSearchField button{color:#617764}
-.demoShell.conceptLight .calendarFilters button{background:#edf2e9;color:#506f52;border-color:#d3dfcf}
-.demoShell.conceptLight .calendarFilters button.active{background:#294a38;color:#fffef4;border-color:#294a38}
-.demoShell.conceptLight .calendarAgendaHeading span,
-.demoShell.conceptLight .calendarEntryInfo small,
-.demoShell.conceptLight .calendarEntryInfo>span{color:#758777}
-.demoShell.conceptLight .calendarAgendaHeading>strong{background:#e2ebda;color:#395b40}
-.demoShell.conceptLight .calendarAgendaEntry{border-bottom-color:#e2e6de}
-.demoShell.conceptLight .calendarEntryInfo strong{color:#2a4031}
-.demoShell.conceptLight .calendarDay.chosen .calendarDot{filter:none}
-.demoShell.conceptLight .calendarNoEntries{color:#5d735f}
-.demoShell.conceptLight .calendarNoEntries p,.demoShell.conceptLight .calendarDemoNote{color:#849685}
-.demoShell.conceptLight .calendarSearchResult{color:#2e4833;border-color:#dce4d7}
-.demoShell.conceptLight .calendarSearchResultText small,.demoShell.conceptLight .calendarSearchResultText>span{color:#728772}
-.demoShell.conceptLight .calendarTaskToggle{background:#e9f2e8;border-color:#c2d9c1;color:#2f7044}
-.demoShell.conceptLight .calendarTaskToggle.checked{background:#d9efc3;color:#2c693f}
-.demoShell.conceptLight .calendarNewsOpen{background:#f1e8d9;color:#865c31}
-.demoShell.conceptLight .calendarPointAmount.positive{color:#26804b}
-.demoShell.conceptLight .calendarPointAmount.negative{color:#bf604a}
-.demoShell.conceptLight .bottom{
- left:50%;
- width:min(calc(100% - 26px),640px);
- bottom:12px;
- transform:translateX(-50%);
- padding:9px 6px max(9px,env(safe-area-inset-bottom));
- background:#233c30;
- border:1px solid #274b36;
- border-radius:22px;
- box-shadow:0 12px 35px #17291e3d;
-}
-.demoShell.conceptLight .bottom button{
- color:#a8c1ac;
- border-radius:14px;
- padding:8px 2px;
- font-size:11px;
- gap:6px;
-}
-.demoShell.conceptLight .bottom button.active{
- color:#d8f598;
- background:#365b41;
-}
-.demoShell.conceptLight .bottom button.active:before{display:none}
-.demoShell.conceptLight .navicon{font-size:22px}
-.demoShell.conceptLight button:focus-visible{outline-color:#7aa063}
-@media(max-width:410px){
- .demoShell.designPreview.conceptLight{padding:18px 15px 125px}
- .demoShell.conceptLight .metric.primary{padding:25px 21px 30px}
- .demoShell.conceptLight .metric.primary strong{font-size:clamp(31px,8vw,42px)}
- .demoShell.conceptLight .top h1{font-size:clamp(36px,9vw,45px)}
- .demoShell.conceptLight .panel,.demoShell.conceptLight .calendarPanel,
- .demoShell.conceptLight .calendarAgenda,.demoShell.conceptLight .calendarSearchPanel{padding:19px 16px}
- .demoShell.conceptLight .newsCategoryPanel{padding:8px 15px}
- .demoShell.conceptLight .categorySection{padding:0 10px}
- .demoShell.conceptLight .bottom{width:calc(100% - 18px)}
-}
-
-
-/* Editorial concept polish — remove leftover navy/blue nested surfaces, DEMO ONLY */
-.demoShell.conceptLight{
- --soft-green:#edf3e8;--light-green:#dceacb;--soft-border:#d4decf;
-}
-.demoShell.conceptLight .dailySpendingPanel,
-.demoShell.conceptLight .aiSubscriptionPanel,
-.demoShell.conceptLight .newsDetail,
-.demoShell.conceptLight .lifeCalendar{color:#25392c}
-.demoShell.conceptLight .dailySpendingHeader p,
-.demoShell.conceptLight .dailyChartHint,
-.demoShell.conceptLight .dailyTotal span,
-.demoShell.conceptLight .dailyDetailsHeader small,
-.demoShell.conceptLight .dailyTransaction small{color:#728472}
-.demoShell.conceptLight .dailyMonthNav strong,
-.demoShell.conceptLight .dailyTotal strong,
-.demoShell.conceptLight .dailyDetailsHeader strong,
-.demoShell.conceptLight .dailyTransaction strong{color:#263e2e}
-.demoShell.conceptLight .dailyMonthNav button{
- background:#eef3e9;border:1px solid #cadac6;color:#30513a;border-radius:8px;
-}
-.demoShell.conceptLight .dailyLineScroller{
- background:linear-gradient(180deg,#f8faf5,#f1f5eb);
- border:1px solid #e3e9dc;border-radius:12px;padding:9px 5px 5px;
-}
-.demoShell.conceptLight .dailyLineCanvas svg line{stroke:#d1ded0}
-.demoShell.conceptLight .dailyLineCanvas svg text{fill:#758874}
-.demoShell.conceptLight .dailyLineCanvas svg path[stroke]{stroke:#4b8761}
-.demoShell.conceptLight .dailyLineCanvas svg circle{stroke:#fbfdf8;fill:#5b9870}
-.demoShell.conceptLight .dailyLineCanvas svg circle[fill="#f9d69a"]{fill:#c48d44}
-.demoShell.conceptLight .dailyLineCanvas svg stop{stop-color:#8cb89a}
-.demoShell.conceptLight .dailyHit.active{border-color:#427b58}
-.demoShell.conceptLight .dailyDetails,
-.demoShell.conceptLight .dailyDetailsEmpty{
- background:#f1f5eb;border:1px solid #dce6d6;border-radius:12px;color:#667f6b;
-}
-.demoShell.conceptLight .dailyDetailsHeader,
-.demoShell.conceptLight .dailyTransaction{border-bottom-color:#dae3d5}
-.demoShell.conceptLight .newsDetailSummary{
- background:#edf4e8;border-left:3px solid #719e65;
- color:#3e5643;border-radius:8px;
-}
-.demoShell.conceptLight .newsDetailBody p{color:#3a4b3e}
-.demoShell.conceptLight .newsBack{
- background:#edf3e8;border-color:#cfddc9;color:#345942;
-}
-.demoShell.conceptLight .newsOriginal{
- background:#e8f1e4;border-color:#b9cfb0;color:#345c40;
-}
-.demoShell.conceptLight .newsCategoryIntro strong{color:#2b4e37}
-.demoShell.conceptLight .aiSubscriptionTotal{
- background:linear-gradient(135deg,#e6efdc,#f1f5e9);border-color:#c9dabb;
- box-shadow:none;
-}
-.demoShell.conceptLight .aiSubscriptionTotal .eyebrow{color:#54715c}
-.demoShell.conceptLight .aiSubscriptionPrice span{color:#487c52}
-.demoShell.conceptLight .memoActions button{
- background:#eaf2e4;border:1px solid #c8d8bf;color:#33543e;
-}
-.demoShell.conceptLight .memoActions .memoSave{background:#294937;border-color:#294937;color:#fffef2}
-.demoShell.conceptLight .memoEditHint{color:#38744a}
-.demoShell.conceptLight .savedMemo{color:#347a4a!important}
-.demoShell.conceptLight .calendarEntryIcon,
-.demoShell.conceptLight .calendarResultIcon{
- background:#e1ebd9;color:#3e694a;border-radius:10px;
-}
-.demoShell.conceptLight .calendarAgendaEntry.news .calendarEntryIcon,
-.demoShell.conceptLight .calendarResultIcon.news{
- background:#f3e7d3;color:#9b6936;
-}
-.demoShell.conceptLight .calendarAgendaEntry.task .calendarEntryIcon,
-.demoShell.conceptLight .calendarResultIcon.task{
- background:#dcebd9;color:#3f7950;
-}
-.demoShell.conceptLight .calendarAgendaEntry.point .calendarEntryIcon,
-.demoShell.conceptLight .calendarResultIcon.point{
- background:#f3eccc;color:#877038;
-}
-.demoShell.conceptLight .calendarResultArrow{color:#69856e}
-.demoShell.conceptLight .calendarNoEntries>span{color:#719774}
-.demoShell.conceptLight .calendarSearchField:focus-within{
- border-color:#77a16d;box-shadow:0 0 0 1px #77a16d;
-}
-.demoShell.conceptLight .calendarToday:hover,
-.demoShell.conceptLight .calendarArrows button:hover,
-.demoShell.conceptLight .dailyMonthNav button:hover{background:#dcebcf}
-.demoShell.conceptLight .applicationStatus.statusPending{background:#f2ecd9;color:#826c38}
-.demoShell.conceptLight .applicationStatus.statusAccepted{background:#deefdf;color:#347144}
-.demoShell.conceptLight .applicationStatus.statusRejected{background:#f6e8e0;color:#a15a47}
-.demoShell.conceptLight .error{
- background:#f9e8e0;border:1px solid #e5c5ba;color:#9a4e3e;
-}
-.demoShell.conceptLight .loading{color:#647b68}
-.demoShell.conceptLight a,.demoShell.conceptLight .external{color:#326747}
-@media(max-width:410px){
- .demoShell.conceptLight .dailyTotal{flex-wrap:wrap}
- .demoShell.conceptLight .dailyMonthNav{margin-top:3px}
-}
-
-
-/* PERSONAL OS — 현재 미사용 실험 스타일 */
-html:has(.demoShell.conceptOrbit),body:has(.demoShell.conceptOrbit){background:#f6f5f0;color:#28372c}
-.demoShell.conceptOrbit{
- --orbit-sage:#dce5d7;--orbit-sage-deep:#697d69;--orbit-orange:#e8c2a3;--orbit-ink:#28372c;
- --orbit-paper:#fffdfa;--orbit-line:#dedfd6;
- background:none;max-width:680px;color:var(--orbit-ink);
- padding-top:21px;
-}
-.demoShell.conceptOrbit .demoBanner{background:#eff1e9;border-color:#d9e0d6;color:#536557}
-.demoShell.conceptOrbit .top{border-bottom:1px solid #cbd3c9;padding-bottom:17px;margin-bottom:19px}
-.demoShell.conceptOrbit .top h1{font-size:clamp(28px,7vw,34px);letter-spacing:-.055em;margin-top:13px}
-.demoShell.conceptOrbit .brandMark{background:#607762;color:#f5f6e7}
-.demoShell.conceptOrbit .brand{color:#5e7163}
-.demoShell.conceptOrbit .profile,.demoShell.conceptOrbit .refreshButton{box-shadow:none;border:1px solid #d5dcd3;background:#fffefa}
-.demoShell.conceptOrbit .orbitHome{display:flex;flex-direction:column;gap:16px}
-.demoShell.conceptOrbit .orbitGreeting{padding:5px 2px 0}
-.demoShell.conceptOrbit .orbitEdition{font-size:9px;color:#8b9c8b;letter-spacing:.15em;font-weight:750;display:flex;align-items:center;gap:7px}
-.demoShell.conceptOrbit .orbitEditionRule{height:1px;background:#ced8cb;width:24px}
-.demoShell.conceptOrbit .orbitLiveDot{width:6px;height:6px;border-radius:50%;background:#899f88}
-.demoShell.conceptOrbit .orbitWelcome{font-size:24px;font-weight:790;letter-spacing:-.065em;color:#293a2d;margin-top:11px}
-.demoShell.conceptOrbit .orbitToday{display:block;font-size:11px;letter-spacing:-.01em;color:#8a988b;font-weight:500;margin-top:6px}
-.demoShell.conceptOrbit .orbitCategories{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:3px 0 4px}
-.demoShell.conceptOrbit .orbitCategories button{border:0;background:transparent;color:#485b4b;display:flex;flex-direction:column;align-items:center;gap:8px;padding:3px 0 7px;font-weight:640;font-size:11px}
-.demoShell.conceptOrbit .orbitCategoryIcon{width:clamp(45px,11vw,58px);height:clamp(45px,11vw,58px);border-radius:18px;display:grid;place-items:center;background:#e8ede4;border:1px solid #dbe2d7;font-size:22px;font-weight:550;color:#566d58}
-.demoShell.conceptOrbit .orbitCategories button:nth-child(2) .orbitCategoryIcon,
-.demoShell.conceptOrbit .orbitCategories button:nth-child(4) .orbitCategoryIcon{background:#f2e7dd;border-color:#ead8c9;color:#996d51}
-.demoShell.conceptOrbit .orbitCategories button:hover .orbitCategoryIcon{border-color:#9eb39c;transform:translateY(-1px)}
-.demoShell.conceptOrbit .orbitHero{position:relative;text-align:left;display:flex;flex-direction:column;gap:16px;width:100%;padding:23px 24px;background:#dbe5d6;border:1px solid #cbd9c8;border-radius:22px;color:#24362a;overflow:hidden;box-shadow:none}
-.demoShell.conceptOrbit .orbitHeroEyebrow{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:720;color:#536b54}
-.demoShell.conceptOrbit .orbitHeroEyebrow>span{background:#f7faf1;border:1px solid #d2dfcb;width:31px;height:31px;border-radius:11px;display:grid;place-items:center;font-size:18px;color:#47604c}
-.demoShell.conceptOrbit .orbitHero>strong{font-size:clamp(30px,8.3vw,43px);font-weight:820;letter-spacing:-.075em;color:#263b2b;line-height:1.2;font-variant-numeric:tabular-nums}
-.demoShell.conceptOrbit .orbitHeroFooter{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#667a68;font-size:11px}
-.demoShell.conceptOrbit .orbitHeroStamp{font-size:9px;letter-spacing:.1em;color:#889d8b;font-weight:700}
-.demoShell.conceptOrbit .orbitQuickStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.demoShell.conceptOrbit .orbitQuickCard{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;background:#fffdfa;border:1px solid #dce2d7;border-radius:19px;padding:17px 15px;min-width:0;color:#2d3d30;box-shadow:none}
-.demoShell.conceptOrbit .orbitQuickIcon{display:grid;place-items:center;width:31px;height:31px;border-radius:11px;background:#e6eee3;color:#56765a;font-size:18px}
-.demoShell.conceptOrbit .orbitQuickWarm{background:#f4e8dc;border-color:#ebdacb}
-.demoShell.conceptOrbit .orbitQuickWarm .orbitQuickIcon{background:#f9f1e8;color:#a16f4a}
-.demoShell.conceptOrbit .orbitQuickCard small{font-size:11px;color:#7c887c;margin-top:3px}
-.demoShell.conceptOrbit .orbitQuickCard strong{font-size:clamp(17px,5vw,25px);letter-spacing:-.055em;overflow-wrap:anywhere}
-.demoShell.conceptOrbit .orbitQuickCard>span:last-child{font-size:10px;color:#839083}
-.demoShell.conceptOrbit .orbitSection{margin-top:8px}
-.demoShell.conceptOrbit .orbitSectionHeader{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-bottom:12px}
-.demoShell.conceptOrbit .orbitSectionHeader>div>span{display:block;color:#8b9a8a;font-size:9px;font-weight:800;letter-spacing:.14em;margin-bottom:4px}
-.demoShell.conceptOrbit .orbitSectionHeader h2{font-size:18px;margin:0;color:#2b3d2f}
-.demoShell.conceptOrbit .orbitCount{font-size:12px;color:#748774;background:#e9efe7;padding:6px 10px;border-radius:30px}
-.demoShell.conceptOrbit .orbitPlainLink{border:0;background:transparent;color:#647e67;font-size:11px;font-weight:750;padding:8px 0}
-.demoShell.conceptOrbit .orbitTaskBoard,.demoShell.conceptOrbit .orbitNewsBoard{background:#fffdfa;border:1px solid #e0e4da;border-radius:19px;padding:8px 17px}
-.demoShell.conceptOrbit .orbitNewsRow{display:flex;align-items:center;text-align:left;gap:13px;width:100%;padding:14px 1px;background:transparent;border:0;border-bottom:1px solid #e6e9e1;color:#29392d}
-.demoShell.conceptOrbit .orbitNewsRow:last-child{border-bottom:0}
-.demoShell.conceptOrbit .orbitNewsIndex{font-size:11px;font-weight:800;color:#ae947f;font-variant-numeric:tabular-nums}
-.demoShell.conceptOrbit .orbitNewsCopy{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
-.demoShell.conceptOrbit .orbitNewsCopy small{color:#9b806c;font-size:10px}
-.demoShell.conceptOrbit .orbitNewsCopy strong{font-size:12px;line-height:1.5;font-weight:670;overflow-wrap:anywhere}
-.demoShell.conceptOrbit .orbitNewsArrow{color:#8b9c8b;font-size:17px}
-.demoShell.conceptOrbit .orbitTaskBoard .listitem{border-bottom-color:#e9ece4}
-.demoShell.conceptOrbit .bottom{background:#fffdfa;border:1px solid #e0e3da;border-radius:20px;box-shadow:0 10px 30px #2a3f2a15}
-.demoShell.conceptOrbit .bottom button{color:#89978b}
-.demoShell.conceptOrbit .bottom button.active{background:#e4ecdf;color:#405e48}
-.demoShell.conceptOrbit .bottom button.active:before{display:none}
-.demoShell.conceptOrbit .panel,.demoShell.conceptOrbit .calendarPanel,.demoShell.conceptOrbit .calendarAgenda,.demoShell.conceptOrbit .calendarSearchPanel{background:#fffdfa;border-color:#dfe4db;box-shadow:none}
-.demoShell.conceptOrbit .pointOverview,.demoShell.conceptOrbit .financeSummary .financeTotal .metric{background:#e5ecdf;border-color:#d3dfcb;box-shadow:none}
-.demoShell.conceptOrbit .aiSubscriptionTotal{background:#f2e8dd;border-color:#e5d9ca}
-.demoShell.conceptOrbit .newsCategorySymbol{background:#e7eee1;color:#5f7c62}
-.demoShell.conceptOrbit .digestPanel .newsCategorySymbol{background:#efdfd0;color:#95694e}
-.demoShell.conceptOrbit .categorySection{background:#f7f8f3}
-.demoShell.conceptOrbit .seg button.selected,.demoShell.conceptOrbit .calendarFilters button.active{background:#526c57;color:#fffefa}
-.demoShell.conceptOrbit .calendarDay.chosen{background:#607d64;border-color:#607d64;color:#fffefa}
-.demoShell.conceptOrbit .dailyLineCanvas svg path[stroke]{stroke:#789781}
-.demoShell.conceptOrbit .dailyLineCanvas svg circle{fill:#819e8b}
-@media(max-width:370px){.demoShell.conceptOrbit .orbitCategories{gap:3px}.demoShell.conceptOrbit .orbitCategoryIcon{width:43px;height:43px;border-radius:14px}.demoShell.conceptOrbit .orbitQuickCard{padding:14px 12px}.demoShell.conceptOrbit .orbitHero{padding:20px 18px}}
-
-
-/* MARINE 03 — 현재 미사용 실험 스타일 */
-html:has(.demoShell.conceptMarine),body:has(.demoShell.conceptMarine){background:#f4f5f2;color:#183244}
-.demoShell.designPreview.conceptMarine{
- --marine-ink:#13334b;--marine-navy:#073a61;--marine-deep:#063354;
- --marine-cyan:#6cb8c9;--marine-muted:#758c9d;--marine-paper:#fff;
- --marine-line:#dce5e9;
- max-width:740px;
- background:transparent;color:var(--marine-ink);
- padding:19px 20px 128px;
- font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif;
-}
-.demoShell.conceptMarine .demoBanner{
- margin:0 0 23px;padding:9px 13px;
- border:1px solid #b9d6d8;border-radius:5px;background:#e5f1f1;
- box-shadow:none;color:#335d68;
-}
-.demoShell.conceptMarine .demoBanner strong{color:#2d6973}
-.demoShell.conceptMarine .demoBanner span{color:#63838c}
-.demoShell.conceptMarine .demoBanner button{background:#fff;border:1px solid #a4c8d0;color:#285f74;border-radius:5px}
-.demoShell.conceptMarine .top{
- padding:0 0 18px;margin-bottom:16px;
- border-bottom:1px solid #d4e1e7;align-items:flex-end;
-}
-.demoShell.conceptMarine .brand{letter-spacing:.2em;color:#567386}
-.demoShell.conceptMarine .brandMark{background:#073c64;color:#d6eff0;border-radius:3px;box-shadow:none}
-.demoShell.conceptMarine .brandEdition{color:#849ea9}
-.demoShell.conceptMarine .top h1{
- font-size:clamp(27px,6vw,35px);font-weight:780;letter-spacing:-.06em;
- margin-top:13px;color:#073955;
-}
-.demoShell.conceptMarine .refreshButton,.demoShell.conceptMarine .profile{
- background:#fff;border:1px solid #cedfe6;color:#0b4b71;box-shadow:none;border-radius:5px;
-}
-.demoShell.conceptMarine .refreshButton:hover,.demoShell.conceptMarine .profile:hover{background:#e8f5f6}
-.demoShell.conceptMarine .refreshNotice{color:#276779}
-.demoShell.conceptMarine .marineHome{display:flex;flex-direction:column;gap:37px}
-.demoShell.conceptMarine .marineHero{
- position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;
- min-height:320px;padding:26px 28px 20px;overflow:hidden;
- background:linear-gradient(125deg,#083758,#0c5074);
- color:white;
-}
-.demoShell.conceptMarine .marineHeroImage{position:absolute;inset:0;z-index:-1;overflow:hidden;
- background:
- radial-gradient(ellipse at 77% 37%,rgba(109,210,227,.55) 0%,transparent 22%),
- linear-gradient(170deg,rgba(9,41,74,.15),rgba(4,34,62,.42) 44%,rgba(3,40,68,.87) 100%),
- linear-gradient(114deg,#102f57 0%,#1c75a0 48%,#92c9d6 80%,#277396 100%);
-}
-.demoShell.conceptMarine .marineHeroImage:before{
- content:"";position:absolute;left:-8%;right:-8%;top:49%;height:54%;
- background:repeating-linear-gradient(172deg,rgba(165,214,228,.17) 0 2px,transparent 3px 13px),
- linear-gradient(180deg,rgba(15,94,128,.15),rgba(3,34,60,.76));
- transform:skewY(-3deg);
-}
-.demoShell.conceptMarine .marineHeroImage:after{
- content:"";position:absolute;left:-10%;top:11%;width:64%;height:82%;
- background:linear-gradient(135deg,rgba(4,23,43,.85),rgba(6,44,75,.2));
- clip-path:polygon(0 28%,42% 18%,57% 37%,85% 37%,100% 88%,0 100%);
- opacity:.66;
-}
-.demoShell.conceptMarine .marineHorizon{position:absolute;z-index:1;left:0;right:0;top:49%;height:1px;background:rgba(211,237,237,.4)}
-.demoShell.conceptMarine .marineSun{position:absolute;right:18%;top:18%;width:130px;height:130px;background:radial-gradient(circle,#dce8e8 0%,#8cc8d8 30%,rgba(120,207,224,.1) 68%,transparent 72%);opacity:.4;border-radius:50%}
-.demoShell.conceptMarine .marineColumn{position:absolute;bottom:9%;width:40px;background:linear-gradient(90deg,#093251,#2b7591,#0d3a5c);box-shadow:15px 12px 0 -8px rgba(7,36,57,.7);transform:skewY(-9deg);opacity:.7}
-.demoShell.conceptMarine .marineColumnOne{height:38%;left:62%}
-.demoShell.conceptMarine .marineColumnTwo{height:47%;left:74%;width:26px}
-.demoShell.conceptMarine .marineColumnThree{height:30%;left:84%;width:47px}
-.demoShell.conceptMarine .marineHeroContent{position:relative;z-index:2}
-.demoShell.conceptMarine .marineKicker{font-size:10px;letter-spacing:.23em;font-weight:750;color:#c5e2eb}
-.demoShell.conceptMarine .marineKicker span{color:#84c8df}
-.demoShell.conceptMarine .marineHeroTitle{font-size:clamp(34px,8vw,60px);font-weight:820;letter-spacing:-.08em;line-height:1.08;margin-top:41px;text-shadow:0 4px 24px rgba(0,18,39,.27)}
-.demoShell.conceptMarine .marineHeroSub{margin-top:13px;font-size:13px;letter-spacing:.015em;color:#d6eaf0}
-.demoShell.conceptMarine .marineHeroBottom{position:relative;z-index:2;display:flex;justify-content:space-between;gap:12px;padding-top:30px;align-items:center;font-size:9px;font-weight:730;letter-spacing:.16em;color:#b6d7e4}
-.demoShell.conceptMarine .marineServices,
-.demoShell.conceptMarine .marineOverview,
-.demoShell.conceptMarine .marineUpdates{margin:0}
-.demoShell.conceptMarine .marineSectionLabel{display:flex;align-items:center;gap:13px;margin-bottom:19px}
-.demoShell.conceptMarine .marineSectionLabel>span:first-child{color:#16a0b2;font-size:11px;font-weight:790;letter-spacing:.09em}
-.demoShell.conceptMarine .marineSectionLabel>div{display:flex;align-items:baseline;gap:11px;min-width:0}
-.demoShell.conceptMarine .marineSectionLabel b{font-size:19px;font-weight:800;letter-spacing:-.055em;color:#133b5a}
-.demoShell.conceptMarine .marineSectionLabel small{font-size:10px;color:#8aa1af;letter-spacing:.14em}
-.demoShell.conceptMarine .marineSectionTail{margin-left:auto;color:#6a8796;font-size:12px}
-.demoShell.conceptMarine .marineServiceStrip{display:grid;grid-template-columns:repeat(4,minmax(185px,1fr));gap:0;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 0 8px;scrollbar-width:thin;scrollbar-color:#7fb4c6 #e2ebee}
-.demoShell.conceptMarine .marineService{position:relative;display:flex;flex-direction:column;justify-content:space-between;text-align:left;align-items:flex-start;scroll-snap-align:start;overflow:hidden;min-height:235px;padding:19px 16px 15px;border:0;border-right:1px solid rgba(255,255,255,.12);color:white;background:#0a476e}
-.demoShell.conceptMarine .marineService:before{content:"";position:absolute;inset:0;pointer-events:none;
- background:linear-gradient(155deg,rgba(255,255,255,.12),transparent 45%,rgba(2,32,61,.55)),repeating-linear-gradient(95deg,transparent 0 24px,rgba(221,247,255,.06) 25px 26px);opacity:.9}
-.demoShell.conceptMarine .marineServiceA{background:#074a72}
-.demoShell.conceptMarine .marineServiceB{background:#087fa0}
-.demoShell.conceptMarine .marineServiceC{background:#064363}
-.demoShell.conceptMarine .marineServiceD{background:#397b90}
-.demoShell.conceptMarine .marineServiceNumber{position:relative;font-size:9px;letter-spacing:.13em;color:#c9e5ed;font-weight:740}
-.demoShell.conceptMarine .marineService>strong{position:relative;font-size:29px;letter-spacing:-.07em;font-weight:760;margin-top:20px}
-.demoShell.conceptMarine .marineServiceSymbol{position:absolute;right:18px;top:43%;font-size:71px;color:#b3e2e6;opacity:.23;transform:rotate(-9deg)}
-.demoShell.conceptMarine .marineServiceBottom{position:relative;width:100%;display:flex;justify-content:space-between;gap:5px;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.3);font-size:11px;color:#d4ebf0}
-.demoShell.conceptMarine .marineServiceBottom>span{font-size:18px}
-.demoShell.conceptMarine .marineService:hover{filter:brightness(1.08)}
-.demoShell.conceptMarine .marineSpending{width:100%;display:flex;flex-direction:column;text-align:left;gap:18px;min-height:176px;padding:25px 28px;border:0;color:#fff;background:
- radial-gradient(circle at 87% 40%,rgba(70,180,203,.2),transparent 30%),
- linear-gradient(115deg,#0a3c65,#063254);
-}
-.demoShell.conceptMarine .marineSpendingLabel{display:flex;justify-content:space-between;font-size:12px;font-weight:680;color:#d9e8f2}
-.demoShell.conceptMarine .marineSpendingLabel span{font-size:19px}
-.demoShell.conceptMarine .marineSpending strong{font-size:clamp(31px,8vw,44px);letter-spacing:-.065em;font-weight:790;line-height:1.2}
-.demoShell.conceptMarine .marineSpendingBottom{font-size:11px;color:#a9c8d9}
-.demoShell.conceptMarine .marineMetricRow{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#d5e3e8;border:1px solid #d5e3e8}
-.demoShell.conceptMarine .marineMetricRow button{display:flex;align-items:flex-start;flex-direction:column;gap:8px;min-width:0;padding:21px 18px;background:#fff;text-align:left;border:0;color:#183c56}
-.demoShell.conceptMarine .marineMetricRow button>span{font-size:11px;color:#7892a2}
-.demoShell.conceptMarine .marineMetricRow button>strong{font-size:clamp(17px,5vw,25px);font-weight:750;letter-spacing:-.06em;overflow-wrap:anywhere}
-.demoShell.conceptMarine .marineMetricRow button>small{font-size:10px;color:#4c95a4}
-.demoShell.conceptMarine .marineTaskList{background:#fff;padding:8px 22px;border-top:2px solid #0f5b7f;border-bottom:1px solid #d6e3e7}
-.demoShell.conceptMarine .marineTaskList .listitem{border-bottom-color:#e6ebee}
-.demoShell.conceptMarine .marinePress{background:#073b65;color:#fff;padding:26px 25px 18px}
-.demoShell.conceptMarine .marinePressTop{display:flex;justify-content:space-between;gap:12px;padding-bottom:19px;border-bottom:1px solid rgba(255,255,255,.19);font-size:10px;letter-spacing:.16em;color:#a4d4e3}
-.demoShell.conceptMarine .marinePressHeading{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:26px 0 14px}
-.demoShell.conceptMarine .marinePressHeading small{font-size:10px;letter-spacing:.13em;color:#8dc3d6}
-.demoShell.conceptMarine .marinePressHeading h2{font-size:28px;color:#fff;margin:6px 0 0;letter-spacing:-.07em}
-.demoShell.conceptMarine .marinePressHeading button{border:1px solid #618ea7;color:#d2eaf1;background:transparent;padding:9px 11px;font-size:11px;white-space:nowrap}
-.demoShell.conceptMarine .marinePressList>button{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:17px 0;border:0;border-bottom:1px solid rgba(255,255,255,.16);background:transparent;color:#eaf4f7}
-.demoShell.conceptMarine .marinePressList>button:last-of-type{border-bottom:0}
-.demoShell.conceptMarine .marinePressNo{font-size:11px;color:#67bbcf;font-weight:800}
-.demoShell.conceptMarine .marinePressCopy{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
-.demoShell.conceptMarine .marinePressCopy small{font-size:10px;color:#98c9d6}
-.demoShell.conceptMarine .marinePressCopy strong{font-size:13px;line-height:1.55;font-weight:650}
-.demoShell.conceptMarine .marinePressArrow{font-size:18px;color:#8dd3df}
-.demoShell.conceptMarine .marinePress .empty{color:#c2d7e1}
-.demoShell.conceptMarine .bottom{background:#063c61;border:0;border-radius:0;box-shadow:0 -8px 25px rgba(4,38,62,.17);width:min(100%,740px);bottom:0}
-.demoShell.conceptMarine .bottom button{color:#a1c6d7;border-radius:0}
-.demoShell.conceptMarine .bottom button.active{color:white;background:#0d6987}
-.demoShell.conceptMarine .bottom button.active:before{display:block;background:#69bfd3}
-.demoShell.conceptMarine .panel,
-.demoShell.conceptMarine .calendarPanel,
-.demoShell.conceptMarine .calendarAgenda,
-.demoShell.conceptMarine .calendarSearchPanel{
- background:#fff;border:1px solid #dbe6ea;box-shadow:none;border-radius:3px;color:#213e4f;
-}
-.demoShell.conceptMarine .panel h2,.demoShell.conceptMarine .calendarHeader h2,.demoShell.conceptMarine .calendarAgendaHeading h2{color:#0b486b}
-.demoShell.conceptMarine .metric{background:#f0f7f9;border-color:#d1e2e8;box-shadow:none;color:#1a455d;border-radius:3px}
-.demoShell.conceptMarine .metric strong,.demoShell.conceptMarine .financeSummary .financeTotal .metric strong{color:#0a496e}
-.demoShell.conceptMarine .financeSummary .financeTotal .metric,.demoShell.conceptMarine .pointOverview{background:#dfedf2;border:1px solid #c5dee7;border-radius:3px;box-shadow:none}
-.demoShell.conceptMarine .financeSummary .metricgrid .metric{background:#fff}
-.demoShell.conceptMarine .sectionTitle span{color:#2086a2}
-.demoShell.conceptMarine .barheading{color:#496f82}
-.demoShell.conceptMarine .track{background:#e5eef0}
-.demoShell.conceptMarine .track>div{background:#2b97ae}
-.demoShell.conceptMarine .seg button.selected,.demoShell.conceptMarine .calendarFilters button.active{background:#0a5b81;color:#fff}
-.demoShell.conceptMarine .categorySection{background:#f1f7f9;border-color:#d1e1e8;border-radius:3px}
-.demoShell.conceptMarine .expenseCategoryToggle>b,.demoShell.conceptMarine .newsCategoryName{color:#0d4869}
-.demoShell.conceptMarine .expenseCategoryMeta,.demoShell.conceptMarine .expenseCategoryChevron,.demoShell.conceptMarine .newsCategoryChevron{color:#597b90}
-.demoShell.conceptMarine .newsCategoryPanel{background:#fff;border-radius:3px;border-color:#d5e3e9}
-.demoShell.conceptMarine .newsCategorySymbol{background:#dcecf1;color:#156386;border:0;border-radius:2px}
-.demoShell.conceptMarine .digestPanel .newsCategorySymbol{background:#bde5ed;color:#075a77}
-.demoShell.conceptMarine .newsCategoryMore{background:#e2f0f5;color:#0f6583;border-color:#b8d8e3}
-.demoShell.conceptMarine .newsDetail{color:#214152;background:#fff;border-color:#d4e5ea}
-.demoShell.conceptMarine .newsDetailSummary{background:#e8f4f7;border-left-color:#318cad;color:#22546c}
-.demoShell.conceptMarine .newsDetailBody,.demoShell.conceptMarine .newsDetailBody p{color:#253f50}
-.demoShell.conceptMarine .newsBack,.demoShell.conceptMarine .newsOriginal{background:#e8f2f6;color:#135d7b;border-color:#c2dce5}
-.demoShell.conceptMarine .dailyLineCanvas svg path[stroke]{stroke:#2385a7}
-.demoShell.conceptMarine .dailyLineCanvas svg circle{fill:#258ba5}
-.demoShell.conceptMarine .dailyLineScroller{background:#f2f8fa;border-color:#dbeaf0}
-.demoShell.conceptMarine .dailyDetails,.demoShell.conceptMarine .dailyDetailsEmpty{background:#ebf5f8;border:1px solid #cde2e9;color:#1f4c62;border-radius:3px}
-.demoShell.conceptMarine .dailyDetails strong,.demoShell.conceptMarine .dailyTransaction strong{color:#113d57}
-.demoShell.conceptMarine .dailyTransaction small{color:#688a9d}
-.demoShell.conceptMarine .aiSubscriptionTotal{background:#e5f1f4;border-color:#c7e0e7;border-radius:3px}
-.demoShell.conceptMarine .aiSubscriptionTotal strong,.demoShell.conceptMarine .pointOverview>strong{color:#0d4c70}
-.demoShell.conceptMarine .pointProvider{border-bottom-color:#dce6e8}
-.demoShell.conceptMarine .pointAmounts strong{color:#0e4e6e}
-.demoShell.conceptMarine .calendarDay.chosen{background:#0f6589;border-color:#0f6589;color:#fff}
-.demoShell.conceptMarine .calendarToday,.demoShell.conceptMarine .calendarArrows button{background:#eaf3f6;border-color:#c9e1e8;color:#155a78}
-.demoShell.conceptMarine .calendarSearchField{background:#f3f8fa;border-color:#cadfe8}
-.demoShell.conceptMarine .calendarSearchField input{color:#183d52}
-.demoShell.conceptMarine .calendarSearchPanel>label{color:#0f4867}
-.demoShell.conceptMarine .calendarAgendaEntry,.demoShell.conceptMarine .calendarSearchResult{border-bottom-color:#d9e7ec;color:#23465a}
-.demoShell.conceptMarine .calendarEntryInfo strong,.demoShell.conceptMarine .calendarSearchResultText strong{color:#174864}
-.demoShell.conceptMarine .calendarPointAmount.positive{color:#147f76}
-.demoShell.conceptMarine .calendarPointAmount.negative{color:#bc725f}
-.demoShell.conceptMarine .applicationCounts>div{background:#e8f1f5;border-color:#d1e3e8}
-.demoShell.conceptMarine .applicationCounts strong,.demoShell.conceptMarine .applicationsTable td{color:#174762}
-.demoShell.conceptMarine .applicationsTable th{color:#537e90;border-bottom-color:#cbdfe6}
-.demoShell.conceptMarine .error{background:#ffefeb;border-color:#edcecb;color:#9a4d49}
-@media(max-width:520px){
- .demoShell.designPreview.conceptMarine{padding:14px 13px 113px}
- .demoShell.conceptMarine .marineHome{gap:30px}
- .demoShell.conceptMarine .marineHero{min-height:280px;padding:23px 20px 18px}
- .demoShell.conceptMarine .marineHeroTitle{margin-top:30px}
- .demoShell.conceptMarine .marineServiceStrip{grid-template-columns:repeat(4,minmax(155px,1fr))}
- .demoShell.conceptMarine .marineService{min-height:200px;padding:16px 13px}
- .demoShell.conceptMarine .marineService>strong{font-size:27px}
- .demoShell.conceptMarine .marineSectionLabel small{font-size:9px}
- .demoShell.conceptMarine .marineSectionLabel b{font-size:18px}
- .demoShell.conceptMarine .marineSpending{padding:23px 20px}
- .demoShell.conceptMarine .marinePress{padding:22px 19px}
- .demoShell.conceptMarine .marinePressHeading h2{font-size:26px}
- .demoShell.conceptMarine .marineTaskList{padding:8px 16px}
- .demoShell.conceptMarine .bottom{width:100%}
-}
-@media(prefers-reduced-motion:reduce){.demoShell.conceptMarine .marineService:hover{filter:none}}
-
-
-/* REFINED GREEN — 현재 미사용 실험 스타일 */
-html:has(.demoShell.conceptRefined),body:has(.demoShell.conceptRefined){
- background:#f5f6f1;
- color:#26372e;
-}
-.demoShell.designPreview.conceptRefined{
- --refined-bg:#f5f6f1;
- --refined-white:#fffefa;
- --refined-green:#244736;
- --refined-green-mid:#486d54;
- --refined-sage:#e4ebdf;
- --refined-orange:#b77f61;
- --refined-line:#e3e8de;
- max-width:660px;
- background:transparent;
- color:#26372e;
- padding:22px 19px 128px;
-}
-.demoShell.conceptRefined .demoBanner{
- background:#edf1e9;
- border:1px solid #dce5d8;
- color:#465e4b;
- border-radius:12px;
- padding:12px 14px;
- margin-bottom:24px;
- box-shadow:none;
-}
-.demoShell.conceptRefined .demoBanner strong{color:#4e7256}
-.demoShell.conceptRefined .demoBanner span{color:#7b8a79}
-.demoShell.conceptRefined .demoBanner button{background:#fffefa;border:1px solid #d4dfd0;color:#375640;border-radius:9px}
-.demoShell.conceptRefined .top{
- border:0;
- padding:0;
- margin-bottom:29px;
- align-items:center;
-}
-.demoShell.conceptRefined .brand{
- color:#69806f;
- font-size:10px;
- letter-spacing:.16em;
-}
-.demoShell.conceptRefined .brandMark{
- background:#30543d;
- color:#fffdf7;
- border-radius:11px;
- width:28px;height:28px;
- display:inline-grid;place-items:center;
- font-size:15px;
-}
-.demoShell.conceptRefined .brandEdition{color:#a0aaa0}
-.demoShell.conceptRefined .top h1{
- color:#223a2b;
- font-size:clamp(28px,7vw,36px);
- letter-spacing:-.065em;
- font-weight:780;
- margin-top:14px;
-}
-.demoShell.conceptRefined .refreshButton,
-.demoShell.conceptRefined .profile{
- width:39px;height:39px;
- border-radius:13px;
- border:1px solid #d9e3d8;
- box-shadow:none;
- background:#fffefa;
- color:#365e43;
-}
-.demoShell.conceptRefined .refreshButton:hover,
-.demoShell.conceptRefined .profile:hover{
- background:#e6efe3;
-}
-.demoShell.conceptRefined .refreshNotice{color:#3c7952}
-.demoShell.conceptRefined .refinedHome{display:flex;flex-direction:column;gap:22px}
-.demoShell.conceptRefined .refinedSpendingCard{
- position:relative;
- display:flex;
- flex-direction:column;
- width:100%;
- text-align:left;
- gap:19px;
- padding:24px 24px 23px;
- color:#fffefa;
- background:
-  radial-gradient(ellipse at 99% -20%,rgba(185,219,174,.19),transparent 59%),
-  linear-gradient(125deg,#315b41,#223f31);
- border:1px solid #244a36;
- border-radius:24px;
- box-shadow:0 13px 30px rgba(30,70,43,.13);
- overflow:hidden;
-}
-.demoShell.conceptRefined .refinedSpendingCard:hover{background-color:#2e573e}
-.demoShell.conceptRefined .refinedCardTop{
- display:flex;
- align-items:center;
- justify-content:space-between;
- color:#d8e7d5;
- font-size:12px;
- font-weight:650;
-}
-.demoShell.conceptRefined .refinedCardArrow{
- display:grid;place-items:center;
- width:34px;height:34px;border-radius:12px;
- background:rgba(255,255,255,.13);
- font-size:20px;
- color:#fff;
-}
-.demoShell.conceptRefined .refinedSpendingCard>strong{
- font-size:clamp(32px,8.6vw,46px);
- line-height:1.12;
- font-weight:790;
- letter-spacing:-.075em;
- color:#fffefa;
- font-variant-numeric:tabular-nums;
- white-space:nowrap;
-}
-.demoShell.conceptRefined .refinedCardFoot{
- border-top:1px solid rgba(247,255,245,.17);
- display:flex;justify-content:space-between;align-items:center;gap:12px;
- padding-top:15px;
- color:#c9ddc7;
- font-size:11px;
- line-height:1.5;
-}
-.demoShell.conceptRefined .refinedCardFoot>span:last-child{white-space:nowrap;color:#edf6e8;font-weight:700}
-.demoShell.conceptRefined .refinedCategoryBar{
- display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
- gap:9px;
-}
-.demoShell.conceptRefined .refinedCategoryBar button{
- display:flex;flex-direction:column;align-items:center;gap:9px;
- border:0;background:transparent;
- padding:0 1px 7px;
- color:#596b5f;
- font-size:11px;
- font-weight:680;
-}
-.demoShell.conceptRefined .refinedCategoryIcon{
- display:grid;place-items:center;
- width:clamp(57px,16vw,76px);
- height:clamp(57px,16vw,76px);
- background:#fffefa;
- border:1px solid #e0e7df;
- border-radius:21px;
- font-size:26px;
- font-weight:500;
- color:#466a50;
- box-shadow:0 3px 12px rgba(39,67,46,.035);
-}
-.demoShell.conceptRefined .refinedCategoryBar button:nth-child(2) .refinedCategoryIcon{
- background:#f5ece3;
- color:#a9785c;
- border-color:#eee0d4;
-}
-.demoShell.conceptRefined .refinedCategoryBar button:nth-child(3) .refinedCategoryIcon{
- background:#e7efdd;
- color:#5b845b;
- border-color:#dce7d0;
-}
-.demoShell.conceptRefined .refinedCategoryBar button:hover .refinedCategoryIcon{
- border-color:#b6cdb7;
- background:#edf4e9;
-}
-.demoShell.conceptRefined .refinedBlock{margin-top:12px}
-.demoShell.conceptRefined .refinedBlockHeading{
- display:flex;align-items:end;justify-content:space-between;gap:12px;
- margin-bottom:15px;
-}
-.demoShell.conceptRefined .refinedSectionEyebrow{
- display:block;
- font-size:9px;
- font-weight:800;
- letter-spacing:.15em;
- color:#99a99b;
- margin-bottom:6px;
-}
-.demoShell.conceptRefined .refinedBlockHeading h2{
- font-size:19px;
- color:#273e2f;
- font-weight:770;
- margin:0;
-}
-.demoShell.conceptRefined .refinedCount{
- background:#e7eee3;
- color:#486a50;
- padding:7px 11px;
- border-radius:30px;
- font-size:11px;
- font-weight:700;
-}
-.demoShell.conceptRefined .refinedMore{
- border:0;background:transparent;
- color:#567b60;
- font-weight:750;
- font-size:11px;
- padding:7px 0;
-}
-.demoShell.conceptRefined .refinedTaskList,
-.demoShell.conceptRefined .refinedNewsList{
- background:#fffefa;
- border:1px solid #e2e8df;
- border-radius:19px;
- padding:7px 17px;
-}
-.demoShell.conceptRefined .refinedTaskList .listitem,
-.demoShell.conceptRefined .refinedNewsItem{
- border-bottom:1px solid #edf0e9;
-}
-.demoShell.conceptRefined .refinedNewsItem{
- display:flex;
- align-items:center;
- gap:14px;
- width:100%;
- padding:16px 0;
- text-align:left;
- border-top:0;border-left:0;border-right:0;
- background:transparent;
- color:#253b2c;
-}
-.demoShell.conceptRefined .refinedNewsItem:last-child{border-bottom:0}
-.demoShell.conceptRefined .refinedNewsIndex{
- color:#b58a71;
- font-variant-numeric:tabular-nums;
- font-size:11px;
- font-weight:750;
-}
-.demoShell.conceptRefined .refinedNewsText{display:flex;flex:1;flex-direction:column;min-width:0;gap:5px}
-.demoShell.conceptRefined .refinedNewsText small{
- color:#a07159;
- font-size:10px;
- font-weight:600;
-}
-.demoShell.conceptRefined .refinedNewsText strong{
- color:#283b2e;
- font-size:13px;
- font-weight:650;
- line-height:1.55;
-}
-.demoShell.conceptRefined .refinedNewsArrow{color:#9eac9c;font-size:17px}
-
-/* All remaining tabs share the same calm system; no layout or data behaviour changes. */
-.demoShell.conceptRefined .panel,
-.demoShell.conceptRefined .calendarPanel,
-.demoShell.conceptRefined .calendarAgenda,
-.demoShell.conceptRefined .calendarSearchPanel{
- background:#fffefa;
- border:1px solid #e1e7df;
- border-radius:20px;
- box-shadow:0 4px 20px rgba(34,64,39,.035);
- padding:21px;
- color:#293b30;
-}
-.demoShell.conceptRefined h2,
-.demoShell.conceptRefined .panel h2,
-.demoShell.conceptRefined .calendarHeader h2,
-.demoShell.conceptRefined .calendarAgendaHeading h2{color:#2c4934}
-.demoShell.conceptRefined .metric{
- background:#fffefa;
- border:1px solid #e0e7dc;
- border-radius:18px;
- box-shadow:none;
- color:#294431;
-}
-.demoShell.conceptRefined .metric strong{color:#274332}
-.demoShell.conceptRefined .metric .eyebrow{color:#6f8774}
-.demoShell.conceptRefined .financeSummary .financeTotal .metric,
-.demoShell.conceptRefined .pointOverview{
- background:#e5eee1;
- border:1px solid #d2e2ce;
- border-radius:20px;
- box-shadow:none;
- color:#2a4c33;
-}
-.demoShell.conceptRefined .financeSummary .financeTotal .metric strong,
-.demoShell.conceptRefined .pointOverview>strong{color:#274c31}
-.demoShell.conceptRefined .sectionTitle span{color:#729078}
-.demoShell.conceptRefined .categorySection{border-radius:13px;background:#f7f9f4;border-color:#e1e8db}
-.demoShell.conceptRefined .expenseCategoryToggle>b,
-.demoShell.conceptRefined .newsCategoryName{color:#2d4935}
-.demoShell.conceptRefined .newsCategoryPanel{border-radius:18px}
-.demoShell.conceptRefined .newsCategorySymbol{
- border-radius:13px;
- background:#e7eee1;
- color:#577b60;
-}
-.demoShell.conceptRefined .digestPanel .newsCategorySymbol{
- background:#f1e8df;
- color:#a0765b;
-}
-.demoShell.conceptRefined .newsCategoryChevron,
-.demoShell.conceptRefined .expenseCategoryChevron{color:#718d76}
-.demoShell.conceptRefined .newsCategoryMore{
- background:#eef3ea;
- border-color:#d9e4d7;
- color:#4b7253;
-}
-.demoShell.conceptRefined .newsDetail,
-.demoShell.conceptRefined .newsDetailBody,
-.demoShell.conceptRefined .newsDetailBody p{color:#304336}
-.demoShell.conceptRefined .newsDetailSummary{
- background:#f0f4ea;
- border-left:3px solid #91b397;
- color:#3b6249;
- border-radius:12px;
-}
-.demoShell.conceptRefined .newsBack,
-.demoShell.conceptRefined .newsOriginal{
- background:#edf3e9;
- color:#476e50;
- border-color:#d8e4d4;
- border-radius:11px;
-}
-.demoShell.conceptRefined .aiSubscriptionTotal{
- background:#f1f0e8;
- border:1px solid #e5e2d6;
- border-radius:17px;
-}
-.demoShell.conceptRefined .aiSubscriptionTotal strong,
-.demoShell.conceptRefined .pointAmounts strong{color:#2c4d35}
-.demoShell.conceptRefined .barheading{color:#607a66}
-.demoShell.conceptRefined .track{background:#e8ece5}
-.demoShell.conceptRefined .track>div{background:#8da991}
-.demoShell.conceptRefined .seg{background:#f0f3ed}
-.demoShell.conceptRefined .seg button.selected{background:#365e44;color:white}
-.demoShell.conceptRefined .dailyLineScroller{background:#f7f9f5;border-color:#e6ebe2}
-.demoShell.conceptRefined .dailyLineCanvas svg path[stroke]{stroke:#779a80}
-.demoShell.conceptRefined .dailyLineCanvas svg circle{fill:#7c9d84}
-.demoShell.conceptRefined .dailyDetails,
-.demoShell.conceptRefined .dailyDetailsEmpty{background:#f3f7f1;border-color:#e1e8df;color:#5c7561}
-.demoShell.conceptRefined .dailyTransaction strong,
-.demoShell.conceptRefined .dailyDetailsHeader strong{color:#2d4636}
-.demoShell.conceptRefined .calendarDay.chosen{background:#436c50;border-color:#436c50;color:#fffefa}
-.demoShell.conceptRefined .calendarFilters button.active{background:#365e44;color:#fffefa}
-.demoShell.conceptRefined .bottom{
- background:rgba(255,254,250,.98);
- border:1px solid #e1e7df;
- box-shadow:0 -5px 24px rgba(31,59,35,.08);
- bottom:12px;
- border-radius:22px;
- width:min(calc(100% - 26px),630px);
-}
-.demoShell.conceptRefined .bottom button{color:#869989;border-radius:15px}
-.demoShell.conceptRefined .bottom button.active{background:#e2eddf;color:#315a3b}
-.demoShell.conceptRefined .bottom button.active:before{display:none}
-.demoShell.conceptRefined button:focus-visible{outline-color:#739c75}
-@media(max-width:380px){
- .demoShell.designPreview.conceptRefined{padding:18px 14px 123px}
- .demoShell.conceptRefined .refinedSpendingCard{padding:21px 19px}
- .demoShell.conceptRefined .refinedCardFoot{font-size:10px}
- .demoShell.conceptRefined .refinedCategoryIcon{width:55px;height:55px}
- .demoShell.conceptRefined .panel,
- .demoShell.conceptRefined .calendarPanel,
- .demoShell.conceptRefined .calendarAgenda,
- .demoShell.conceptRefined .calendarSearchPanel{padding:18px 15px}
-}
-
-
-/* Shared finance / daily-chart memo controls — both live and demo. */
-.demoShell .dailyTransactionWrap{padding:0;border-bottom:1px solid #dde7dd}
-.demoShell .dailyTransactionWrap:last-child{border-bottom:0}
-.demoShell .dailyTransactionWrap .dailyTransaction{border-bottom:0;align-items:flex-start;gap:10px}
-.demoShell .dailyTransactionActions{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex-shrink:0}
-.demoShell .dailyTransactionActions>strong{white-space:nowrap;font-size:12px}
-.demoShell .dailyTransactionActions .memoInlineButton{padding:7px 10px;font-size:11px}
-.demoShell .dailyMemoEditor{padding:0 0 15px}
-.demoShell .dailyMemoEditor textarea{display:block;width:100%;border:1px solid #bacdb8;border-radius:11px;resize:vertical;min-height:72px;background:#fffefa;color:#2c4533;padding:11px 12px;font:inherit;font-size:13px;line-height:1.5;outline-offset:2px}
-.demoShell .dailyMemoActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:9px}
-.demoShell .dailyMemoActions small{margin-right:auto;font-size:11px;color:#87968a}
-.demoShell .dailyMemoActions button{padding:8px 13px;border-radius:9px;border:1px solid #d2ded0;background:#edf3ea;color:#3c5b44;font-size:12px}
-.demoShell .dailyMemoActions .dailyMemoSave{background:#315840;color:#fff;border-color:#315840;font-weight:700}
-.demoShell .dailyMemoActions button:disabled{opacity:.6;cursor:not-allowed}
-.demoShell .dailyMemoError{margin:8px 0 0;color:#b0493d;font-size:12px}
-.demoShell .dailyTransaction .savedMemo{color:#476f53;overflow-wrap:anywhere}
-@media(max-width:380px){.demoShell .dailyTransactionActions .memoInlineButton{padding:6px 8px}}
-
-
-/* Home task composer / remove controls — production and demo */
-.demoShell .taskPanel .sectionTitle{margin-bottom:12px}
-.demoShell .taskPanel .sectionTitle h2{margin-bottom:0}
-.demoShell .taskAddForm{display:flex;gap:9px;align-items:stretch;margin:0 0 12px}
-.demoShell .taskAddForm input{flex:1;min-width:0;padding:11px 13px;background:#fffefa;border:1px solid #d3dfd0;border-radius:11px;color:#263e2d;font:inherit;font-size:13px;outline-offset:2px}
-.demoShell .taskAddForm input::placeholder{color:#91a394}
-.demoShell .taskAddForm input:focus{border-color:#7ba284;outline:1px solid #a4bea6}
-.demoShell .taskAddForm button{flex-shrink:0;background:#335b43;border:1px solid #335b43;color:#fffef8;border-radius:11px;font-size:12px;font-weight:750;padding:10px 14px}
-.demoShell .taskAddForm button:hover:not(:disabled){background:#284a35}
-.demoShell .taskAddForm button:disabled{opacity:.5;cursor:not-allowed}
-.demoShell .taskListItem .itembody{overflow-wrap:anywhere}
-.demoShell .taskDeleteButton{border:1px solid transparent;background:transparent;color:#8c9b90;width:31px;height:31px;display:grid;place-items:center;border-radius:9px;font-size:24px;line-height:1;flex:none;margin-left:3px}
-.demoShell .taskDeleteButton:hover{background:#f6ebe5;border-color:#eedcd3;color:#a65c48}
-.demoShell .taskDeleteButton:focus-visible{outline:2px solid #a7ba9e;outline-offset:2px}
-.demoShell .taskDeleteButton:disabled{opacity:.5;cursor:wait}
-@media(max-width:380px){.demoShell .taskAddForm button{padding:10px 11px}}
-
-
-/* Collapsible, restrained task addition on both environments */
-.demoShell .taskPanel .taskPanelHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.demoShell .taskPanel .taskHeaderActions{display:flex;align-items:center;gap:13px}
-.demoShell .taskPanel .taskHeaderActions .taskCount{color:#839587;font-size:11px;font-weight:600}
-.demoShell .taskPanel .taskOpenButton{
- appearance:none;display:inline-flex;align-items:center;justify-content:center;
- background:transparent;border:0;border-radius:7px;padding:5px 2px;
- color:#587963;font-size:12px;font-weight:700;line-height:1.4;
- box-shadow:none;white-space:nowrap;
-}
-.demoShell .taskPanel .taskOpenButton:hover{background:#edf3e9;color:#305d3c}
-.demoShell .taskPanel .taskOpenButton:focus-visible{outline:2px solid #8ba98c;outline-offset:3px}
-.demoShell .taskPanel .taskAddForm{margin:0 0 14px;animation:task-compose-appear .16s ease-out}
-.demoShell .taskPanel .taskAddForm button{border-radius:10px}
+.shell .dailyTransactionWrap{padding:0;border-bottom:1px solid #dde7dd}
+.shell .dailyTransactionWrap:last-child{border-bottom:0}
+.shell .dailyTransactionWrap .dailyTransaction{border-bottom:0;align-items:flex-start;gap:10px}
+.shell .dailyTransactionActions{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex-shrink:0}
+.shell .dailyTransactionActions>strong{white-space:nowrap;font-size:12px}
+.shell .dailyTransactionActions .memoInlineButton{padding:7px 10px;font-size:11px}
+.shell .dailyMemoEditor{padding:0 0 15px}
+.shell .dailyMemoEditor textarea{display:block;width:100%;border:1px solid #bacdb8;border-radius:11px;resize:vertical;min-height:72px;background:#fffefa;color:#2c4533;padding:11px 12px;font:inherit;font-size:13px;line-height:1.5;outline-offset:2px}
+.shell .dailyMemoActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:9px}
+.shell .dailyMemoActions small{margin-right:auto;font-size:11px;color:#87968a}
+.shell .dailyMemoActions button{padding:8px 13px;border-radius:9px;border:1px solid #d2ded0;background:#edf3ea;color:#3c5b44;font-size:12px}
+.shell .dailyMemoActions .dailyMemoSave{background:#315840;color:#fff;border-color:#315840;font-weight:700}
+.shell .dailyMemoActions button:disabled{opacity:.6;cursor:not-allowed}
+.shell .dailyMemoError{margin:8px 0 0;color:#b0493d;font-size:12px}
+.shell .dailyTransaction .savedMemo{color:#476f53;overflow-wrap:anywhere}
+@media(max-width:380px){.shell .dailyTransactionActions .memoInlineButton{padding:6px 8px}
+}
+.shell .taskPanel .sectionTitle{margin-bottom:12px}
+.shell .taskPanel .sectionTitle h2{margin-bottom:0}
+.shell .taskAddForm{display:flex;gap:9px;align-items:stretch;margin:0 0 12px}
+.shell .taskAddForm input{flex:1;min-width:0;padding:11px 13px;background:#fffefa;border:1px solid #d3dfd0;border-radius:11px;color:#263e2d;font:inherit;font-size:13px;outline-offset:2px}
+.shell .taskAddForm input::placeholder{color:#91a394}
+.shell .taskAddForm input:focus{border-color:#7ba284;outline:1px solid #a4bea6}
+.shell .taskAddForm button{flex-shrink:0;background:#335b43;border:1px solid #335b43;color:#fffef8;border-radius:11px;font-size:12px;font-weight:750;padding:10px 14px}
+.shell .taskAddForm button:hover:not(:disabled){background:#284a35}
+.shell .taskAddForm button:disabled{opacity:.5;cursor:not-allowed}
+.shell .taskListItem .itembody{overflow-wrap:anywhere}
+.shell .taskDeleteButton{border:1px solid transparent;background:transparent;color:#8c9b90;width:31px;height:31px;display:grid;place-items:center;border-radius:9px;font-size:24px;line-height:1;flex:none;margin-left:3px}
+.shell .taskDeleteButton:hover{background:#f6ebe5;border-color:#eedcd3;color:#a65c48}
+.shell .taskDeleteButton:focus-visible{outline:2px solid #a7ba9e;outline-offset:2px}
+.shell .taskDeleteButton:disabled{opacity:.5;cursor:wait}
+@media(max-width:380px){.shell .taskAddForm button{padding:10px 11px}
+}
+.shell .taskPanel .taskPanelHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.shell .taskPanel .taskHeaderActions{display:flex;align-items:center;gap:13px}
+.shell .taskPanel .taskHeaderActions .taskCount{color:#839587;font-size:11px;font-weight:600}
+.shell .taskPanel .taskOpenButton{appearance:none;display:inline-flex;align-items:center;justify-content:center; background:transparent;border:0;border-radius:7px;padding:5px 2px; color:#587963;font-size:12px;font-weight:700;line-height:1.4; box-shadow:none;white-space:nowrap;}
+.shell .taskPanel .taskOpenButton:hover{background:#edf3e9;color:#305d3c}
+.shell .taskPanel .taskOpenButton:focus-visible{outline:2px solid #8ba98c;outline-offset:3px}
+.shell .taskPanel .taskAddForm{margin:0 0 14px;animation:task-compose-appear .16s ease-out}
+.shell .taskPanel .taskAddForm button{border-radius:10px}
 @keyframes task-compose-appear{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.demoShell .taskPanel .taskAddForm{animation:none}}
+@media(prefers-reduced-motion:reduce){.shell .taskPanel .taskAddForm{animation:none}
+}
+.shell .taskPanel .taskHeaderActions{gap:25px}
+.shell .taskPanel .taskHeaderActions .taskCount{min-width:31px;text-align:right}
+.shell .taskPanel .taskOpenButton{border-radius:0!important;padding:6px 5px}
+@media(max-width:380px){.shell .taskPanel .taskHeaderActions{gap:21px}
+}
+.shell .pageUpdateTime{display:block;max-width:100%;margin-top:7px; color:#718676;font-size:10px;font-weight:500;line-height:1.45; letter-spacing:-.015em;font-variant-numeric:tabular-nums; overflow-wrap:anywhere;}
+.shell .sectionUpdateMeta{display:flex;flex-direction:column;align-items:flex-end;gap:4px; flex-shrink:0;min-width:0;padding-bottom:9px;}
+.shell .sectionUpdateMeta>span{font-size:11px;line-height:1.35}
+.shell .sectionUpdateMeta>small{font-size:9px;color:#819084;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.shell .aiSubscriptionPanel .sectionTitle{align-items:flex-start}
+.shell .aiSubscriptionRow{display:grid;grid-template-columns:minmax(0,1fr) max-content; align-items:start;gap:14px;padding:16px 1px;}
+.shell .aiSubscriptionIdentity{min-width:0;gap:6px}
+.shell .aiSubscriptionIdentity>b{display:block;font-size:13px;line-height:1.5; white-space:normal;overflow-wrap:anywhere;text-overflow:clip; overflow:visible;}
+.shell .aiSubscriptionIdentity .subscriptionPlan{color:#738677;white-space:normal;overflow-wrap:anywhere; line-height:1.5;font-size:11px;}
+.shell .subscriptionDates{display:flex;flex-direction:column;gap:5px;min-width:0;margin-top:2px;}
+.shell .subscriptionDateLine{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px; color:#718675;font-size:11px;line-height:1.55;min-width:0;}
+.shell .subscriptionDateLine>span{color:#748677;white-space:nowrap}
+.shell .subscriptionDateLine>strong{color:#3f6049;font-weight:650;font-size:11px;line-height:1.55; white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
+.shell .aiSubscriptionPrice{min-width:0;gap:7px;padding-top:1px}
+.shell .aiSubscriptionPrice>strong{font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.shell .aiSubscriptionPrice>span{font-size:11px;white-space:nowrap;line-height:1.4}
+.shell .aiSubscriptionPrice .subscriptionActive{color:#497d54}
+.shell .aiSubscriptionPrice .subscriptionStopped{color:#a96f56}
+.shell .pointProvider{display:grid;grid-template-columns:minmax(0,1fr) max-content; align-items:start;column-gap:13px;row-gap:10px;padding:15px 0;}
+.shell .pointProviderIdentity{min-width:0;align-self:center}
+.shell .pointProviderIdentity>b{white-space:normal;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
+.shell .pointAmounts{gap:5px;align-self:start}
+.shell .pointAmounts>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.shell .pointAmounts>small{white-space:nowrap;font-size:11px}
+.shell .pointReasonLines{grid-column:1/-1;display:flex;flex-direction:column;gap:7px; padding:10px 11px;background:#f1f5ed;border:1px solid #e0e8dc;border-radius:10px; min-width:0;}
+.shell .pointReasonLines .pointReasonLine{display:flex;align-items:baseline;gap:8px; margin-top:0;font-size:11px;line-height:1.6;min-width:0;font-weight:550;}
+.shell .pointReasonValue{min-width:68px;flex-shrink:0;white-space:nowrap; font-weight:700;font-variant-numeric:tabular-nums;}
+.shell .pointReasonText{flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:normal; color:#546b59;}
+.shell .pointReasonLine.pointIncreaseReason .pointReasonValue{color:#27784d}
+.shell .pointReasonLine.pointDecreaseReason .pointReasonValue{color:#ad5a42}
+@media(max-width:380px){.shell .pageUpdateTime{font-size:9px}
+.shell .aiSubscriptionRow{column-gap:10px}
+.shell .aiSubscriptionPrice>strong{font-size:13px}
+.shell .pointReasonLines{padding:9px 10px}
+.shell .pointReasonValue{min-width:61px}
 
+}
+.shell .pointLogDate{font-size:10px;color:#809184;line-height:1.3;font-variant-numeric:tabular-nums;margin-bottom:1px}
+.shell .dailyTotal{align-items:flex-start}
+.shell .dailyTotal>span{padding-top:5px}
+.shell .dailyTotalAmounts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0}
+.shell .dailyTotalAmounts>strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.shell .dailyInstallmentTotal{color:#788b7a;font-size:11px;line-height:1.4;white-space:nowrap;font-variant-numeric:tabular-nums}
+.shell .bottom{padding-left:4px;padding-right:4px}
+.shell .bottom button{padding:8px 1px}
+.shell .archNavIcon{display:block;width:22px;height:22px}
+.shell .archScreen{min-width:0}
+.shell .archSection{margin:19px 0}
+.shell .archHead{padding:0 2px}
+.shell .archKicker{display:block;color:#7b8a7f;font-size:11px;font-weight:650;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.shell h2.archTitle{margin:4px 0 0;font-size:17px;line-height:1.35}
+.shell .panel.archBody{margin:10px 0 0;min-width:0;overflow:hidden}
+.shell .archLines p{margin:0;color:#334b39;font-size:13px;line-height:1.6}
+.shell .archLines p+p{margin-top:6px}
+.shell .archFigure{margin:0}
+.shell .archSvg{display:block;width:100%;height:auto;max-width:100%}
+.shell .archBox rect{fill:var(--card);stroke:#b9c4b6;stroke-width:1}
+.shell .archBox.accent rect{fill:var(--accent);stroke:#7c9654}
+.shell .archBox.deep rect{fill:var(--deep);stroke:var(--deep)}
+.shell .archBox text{fill:var(--ink)}
+.shell .archBox.deep text{fill:#f1f7e6}
+.shell .archBoxMain{font-size:11.5px;font-weight:750}
+.shell .archBoxSub{font-size:10px;opacity:.82}
+.shell .archColLabel{fill:var(--muted);font-size:10px;font-weight:650}
+.shell .archArrow{stroke:#5f7460;stroke-width:1.4}
+.shell .archArrowHead{fill:#5f7460}
+.shell .archLegend{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.5}
+.shell .archTable{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-size:12px;line-height:1.45}
+.shell .archTable+.archTable{margin-top:16px}
+.shell .archTable thead th{color:var(--muted);font-size:10.5px;font-weight:600;padding:0 6px 7px 0;border-bottom:1px solid #cad6c8}
+.shell .archTable tbody th,.shell .archTable td{padding:8px 6px 8px 0;border-bottom:1px solid #e1e7dd;overflow-wrap:anywhere;vertical-align:top}
+.shell .archTable tbody th{font-weight:750;color:#1f3027}
+.shell .archTable td{color:#334b39}
+.shell .archTable tbody tr:last-child>*{border-bottom:0}
+.shell .archTable code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700}
+.shell .archMethods{display:block;color:var(--muted);font-size:10px;font-weight:500}
+.shell .archTag{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:6px;background:#eef3e6;border:1px solid #cfdcc5;color:#47694a;font-size:10px;font-weight:650;white-space:nowrap}
+.shell .archNote{color:var(--muted);font-size:11px;line-height:1.5}
+.shell p.archNote{margin:12px 0 0}
+.shell .archFigure+.archTable{margin-top:16px}
+.shell .archTargetTable{font-size:11.5px;word-break:keep-all}
+.shell .archTargetTable th:first-child{width:22%}
+.shell .archTargetTable th:last-child,.shell .archTargetTable td:last-child{width:18%}
 
-/* Task header only — keep original rounded cards everywhere else. */
-.demoShell .taskPanel .taskHeaderActions{gap:25px}
-.demoShell .taskPanel .taskHeaderActions .taskCount{min-width:31px;text-align:right}
-.demoShell .taskPanel .taskOpenButton{border-radius:0!important;padding:6px 5px}
-@media(max-width:380px){.demoShell .taskPanel .taskHeaderActions{gap:21px}}
-
-
-/* Data freshness and multi-line billing / point breakdown. Shared by live and demo. */
-.demoShell.conceptLight .pageUpdateTime{
- display:block;max-width:100%;margin-top:7px;
- color:#718676;font-size:10px;font-weight:500;line-height:1.45;
- letter-spacing:-.015em;font-variant-numeric:tabular-nums;
- overflow-wrap:anywhere;
-}
-.demoShell.conceptLight .sectionUpdateMeta{
- display:flex;flex-direction:column;align-items:flex-end;gap:4px;
- flex-shrink:0;min-width:0;padding-bottom:9px;
-}
-.demoShell.conceptLight .sectionUpdateMeta>span{font-size:11px;line-height:1.35}
-.demoShell.conceptLight .sectionUpdateMeta>small{font-size:9px;color:#819084;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
-.demoShell.conceptLight .aiSubscriptionPanel .sectionTitle{align-items:flex-start}
-.demoShell.conceptLight .aiSubscriptionRow{
- display:grid;grid-template-columns:minmax(0,1fr) max-content;
- align-items:start;gap:14px;padding:16px 1px;
-}
-.demoShell.conceptLight .aiSubscriptionIdentity{min-width:0;gap:6px}
-.demoShell.conceptLight .aiSubscriptionIdentity>b{
- display:block;font-size:13px;line-height:1.5;
- white-space:normal;overflow-wrap:anywhere;text-overflow:clip;
- overflow:visible;
-}
-.demoShell.conceptLight .aiSubscriptionIdentity .subscriptionPlan{
- color:#738677;white-space:normal;overflow-wrap:anywhere;
- line-height:1.5;font-size:11px;
-}
-.demoShell.conceptLight .subscriptionDates{
- display:flex;flex-direction:column;gap:5px;min-width:0;margin-top:2px;
-}
-.demoShell.conceptLight .subscriptionDateLine{
- display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;
- color:#718675;font-size:11px;line-height:1.55;min-width:0;
-}
-.demoShell.conceptLight .subscriptionDateLine>span{color:#748677;white-space:nowrap}
-.demoShell.conceptLight .subscriptionDateLine>strong{
- color:#3f6049;font-weight:650;font-size:11px;line-height:1.55;
- white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;
-}
-.demoShell.conceptLight .aiSubscriptionPrice{min-width:0;gap:7px;padding-top:1px}
-.demoShell.conceptLight .aiSubscriptionPrice>strong{font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.demoShell.conceptLight .aiSubscriptionPrice>span{font-size:11px;white-space:nowrap;line-height:1.4}
-.demoShell.conceptLight .aiSubscriptionPrice .subscriptionActive{color:#497d54}
-.demoShell.conceptLight .aiSubscriptionPrice .subscriptionStopped{color:#a96f56}
-.demoShell.conceptLight .pointProvider{
- display:grid;grid-template-columns:minmax(0,1fr) max-content;
- align-items:start;column-gap:13px;row-gap:10px;padding:15px 0;
-}
-.demoShell.conceptLight .pointProviderIdentity{min-width:0;align-self:center}
-.demoShell.conceptLight .pointProviderIdentity>b{white-space:normal;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
-.demoShell.conceptLight .pointAmounts{gap:5px;align-self:start}
-.demoShell.conceptLight .pointAmounts>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
-.demoShell.conceptLight .pointAmounts>small{white-space:nowrap;font-size:11px}
-.demoShell.conceptLight .pointReasonLines{
- grid-column:1/-1;display:flex;flex-direction:column;gap:7px;
- padding:10px 11px;background:#f1f5ed;border:1px solid #e0e8dc;border-radius:10px;
- min-width:0;
-}
-.demoShell.conceptLight .pointReasonLines .pointReasonLine{
- display:flex;align-items:baseline;gap:8px;
- margin-top:0;font-size:11px;line-height:1.6;min-width:0;font-weight:550;
-}
-.demoShell.conceptLight .pointReasonValue{
- min-width:68px;flex-shrink:0;white-space:nowrap;
- font-weight:700;font-variant-numeric:tabular-nums;
-}
-.demoShell.conceptLight .pointReasonText{
- flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:normal;
- color:#546b59;
-}
-.demoShell.conceptLight .pointReasonLine.pointIncreaseReason .pointReasonValue{color:#27784d}
-.demoShell.conceptLight .pointReasonLine.pointDecreaseReason .pointReasonValue{color:#ad5a42}
-@media(max-width:380px){
- .demoShell.conceptLight .pageUpdateTime{font-size:9px}
- .demoShell.conceptLight .aiSubscriptionRow{column-gap:10px}
- .demoShell.conceptLight .aiSubscriptionPrice>strong{font-size:13px}
- .demoShell.conceptLight .pointReasonLines{padding:9px 10px}
- .demoShell.conceptLight .pointReasonValue{min-width:61px}
-}
-
-/* One quiet date heading per daily point log. */
-.demoShell.conceptLight .pointLogDate{font-size:10px;color:#809184;line-height:1.3;font-variant-numeric:tabular-nums;margin-bottom:1px}
-
-
-/* Monthly total retains installment payments; chart excludes them. */
-.demoShell.conceptLight .dailyTotal{align-items:flex-start}
-.demoShell.conceptLight .dailyTotal>span{padding-top:5px}
-.demoShell.conceptLight .dailyTotalAmounts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0}
-.demoShell.conceptLight .dailyTotalAmounts>strong{font-variant-numeric:tabular-nums;white-space:nowrap}
-.demoShell.conceptLight .dailyInstallmentTotal{color:#788b7a;font-size:11px;line-height:1.4;white-space:nowrap;font-variant-numeric:tabular-nums}
-
-/* Architecture screen */
-/* Six nav items must fit at 360px: tighter horizontal padding only. */
-.demoShell.conceptLight .bottom{padding-left:4px;padding-right:4px}
-.demoShell.conceptLight .bottom button{padding:8px 1px}
-.demoShell.conceptLight .archNavIcon{display:block;width:22px;height:22px}
-.demoShell.conceptLight .archScreen{min-width:0}
-.demoShell.conceptLight .archSection{margin:19px 0}
-.demoShell.conceptLight .archHead{padding:0 2px}
-.demoShell.conceptLight .archKicker{display:block;color:#7b8a7f;font-size:11px;font-weight:650;letter-spacing:.04em;font-variant-numeric:tabular-nums}
-.demoShell.conceptLight h2.archTitle{margin:4px 0 0;font-size:17px;line-height:1.35}
-.demoShell.conceptLight .panel.archBody{margin:10px 0 0;min-width:0;overflow:hidden}
-.demoShell.conceptLight .archLines p{margin:0;color:#334b39;font-size:13px;line-height:1.6}
-.demoShell.conceptLight .archLines p+p{margin-top:6px}
-.demoShell.conceptLight .archFigure{margin:0}
-.demoShell.conceptLight .archSvg{display:block;width:100%;height:auto;max-width:100%}
-.demoShell.conceptLight .archBox rect{fill:var(--card);stroke:#b9c4b6;stroke-width:1}
-.demoShell.conceptLight .archBox.accent rect{fill:var(--accent);stroke:#7c9654}
-.demoShell.conceptLight .archBox.deep rect{fill:var(--deep);stroke:var(--deep)}
-.demoShell.conceptLight .archBox text{fill:var(--ink)}
-.demoShell.conceptLight .archBox.deep text{fill:#f1f7e6}
-.demoShell.conceptLight .archBoxMain{font-size:11.5px;font-weight:750}
-.demoShell.conceptLight .archBoxSub{font-size:10px;opacity:.82}
-.demoShell.conceptLight .archColLabel{fill:var(--muted);font-size:10px;font-weight:650}
-.demoShell.conceptLight .archArrow{stroke:#5f7460;stroke-width:1.4}
-.demoShell.conceptLight .archArrowHead{fill:#5f7460}
-.demoShell.conceptLight .archLegend{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.5}
-.demoShell.conceptLight .archTable{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-size:12px;line-height:1.45}
-.demoShell.conceptLight .archTable+.archTable{margin-top:16px}
-.demoShell.conceptLight .archTable thead th{color:var(--muted);font-size:10.5px;font-weight:600;padding:0 6px 7px 0;border-bottom:1px solid #cad6c8}
-.demoShell.conceptLight .archTable tbody th,.demoShell.conceptLight .archTable td{padding:8px 6px 8px 0;border-bottom:1px solid #e1e7dd;overflow-wrap:anywhere;vertical-align:top}
-.demoShell.conceptLight .archTable tbody th{font-weight:750;color:#1f3027}
-.demoShell.conceptLight .archTable td{color:#334b39}
-.demoShell.conceptLight .archTable tbody tr:last-child>*{border-bottom:0}
-.demoShell.conceptLight .archTable code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700}
-.demoShell.conceptLight .archMethods{display:block;color:var(--muted);font-size:10px;font-weight:500}
-.demoShell.conceptLight .archTag{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:6px;background:#eef3e6;border:1px solid #cfdcc5;color:#47694a;font-size:10px;font-weight:650;white-space:nowrap}
-.demoShell.conceptLight .archNote{color:var(--muted);font-size:11px;line-height:1.5}
-.demoShell.conceptLight p.archNote{margin:12px 0 0}
-/* 01 target structure: table under the diagram, 4 columns must fit at 360px. */
-.demoShell.conceptLight .archFigure+.archTable{margin-top:16px}
-.demoShell.conceptLight .archTargetTable{font-size:11.5px;word-break:keep-all}
-.demoShell.conceptLight .archTargetTable th:first-child{width:22%}
-.demoShell.conceptLight .archTargetTable th:last-child,.demoShell.conceptLight .archTargetTable td:last-child{width:18%}

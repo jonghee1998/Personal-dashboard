@@ -85,11 +85,11 @@ test('dom-baseline.json 이 있고 다섯 탭 뼈대를 갖는다', () => {
 
 test('DOM 뼈대 비교는 처음 달라진 경로를 돌려준다', () => {
   const leaf = className => ({tag: 'section', className, children: []});
-  const tree = (cls) => ({tag: 'div', className: 'demoShell', children: [{tag: 'main', className: '', children: [leaf('a'), leaf('b'), leaf(cls)]}]});
+  const tree = (cls) => ({tag: 'div', className: 'shell uiV2', children: [{tag: 'main', className: '', children: [leaf('a'), leaf('b'), leaf(cls)]}]});
   const base = Object.fromEntries(TABS.map(t => [t, tree('c')]));
   const changed = {...base, finance: tree('x')};
   assert.match(firstDomDifference(base, changed, TABS), /^finance > main > section\[2\]\.className/);
-  const fewer = {...base, news: {tag: 'div', className: 'demoShell', children: []}};
+  const fewer = {...base, news: {tag: 'div', className: 'shell uiV2', children: []}};
   assert.match(firstDomDifference(base, fewer, TABS), /^news\.children/);
   const {journal, ...missing} = base;
   assert.match(firstDomDifference(missing, base, TABS), /^journal/);

@@ -1,63 +1,62 @@
-/* 11단계 새 디자인: 화이트·블루. 셸 루트의 .uiV2 아래에서만 옛 규칙(globals.css)을 덮어쓴다.
-   옛 .demoShell.designPreview.conceptLight 규칙보다 구체성이 높도록 루트 클래스를 모두 나열한다. */
+/* 11단계 새 디자인: 화이트·블루. 셸 루트의 .shell.uiV2 아래에서 globals.css 의 레이아웃 규칙(.shell 기반)을 덮어쓴다. */
 @font-face{font-family:'Pretendard';src:url('/fonts/PretendardVariable.woff2') format('woff2-variations');font-weight:45 920;font-style:normal;font-display:swap}
 :root{--ui-bg:#FFFFFF;--ui-card:#FFFFFF;--ui-border:#EBEBEB;--ui-line:#F0F0F0;--ui-line2:#F2F2F2;--ui-text:#0B0B0C;--ui-sub:#6B6B6B;--ui-faint:#8C8C8C;--ui-accent:#2B59C3;--ui-accent-dark:#1F44A0;--ui-low:#4E8B6E;--ui-mid:#C08A2B;--ui-high:#C4513A;--ui-installment:#9A6A1E;--ui-sun:#C4513A;--ui-sat:#3B6EA8;--ui-r-card:16px;--ui-r-box:12px;--ui-r-btn:8px}
 html,body{background:#FFFFFF;color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
 html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
-.shell.uiV2.demoShell.designPreview.conceptLight button,.shell.uiV2.demoShell.designPreview.conceptLight input,.shell.uiV2.demoShell.designPreview.conceptLight textarea{font-family:inherit}
-.shell.uiV2.demoShell.designPreview.conceptLight h1,.shell.uiV2.demoShell.designPreview.conceptLight h2{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight a{color:var(--ui-accent)}
+.shell.uiV2{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.shell.uiV2 button,.shell.uiV2 input,.shell.uiV2 textarea{font-family:inherit}
+.shell.uiV2 h1,.shell.uiV2 h2{color:var(--ui-text)}
+.shell.uiV2 a{color:var(--ui-accent)}
 
 /* 카드 */
-.shell.uiV2.demoShell.designPreview.conceptLight .panel,.shell.uiV2.demoShell.designPreview.conceptLight .metric,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary,.shell.uiV2.demoShell.designPreview.conceptLight .newsNavCard,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail{background:var(--ui-card);background-image:none;border:1px solid var(--ui-border);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .metric .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric small,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary small{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .metric strong,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary strong{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .listitem,.shell.uiV2.demoShell.designPreview.conceptLight .memoEntry,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading,.shell.uiV2.demoShell.designPreview.conceptLight .newsPreviewItem,.shell.uiV2.demoShell.designPreview.conceptLight .newsListButton,.shell.uiV2.demoShell.designPreview.conceptLight .todoRow{border-bottom-color:var(--ui-line)}
-.shell.uiV2.demoShell.designPreview.conceptLight .itembody small,.shell.uiV2.demoShell.designPreview.conceptLight .empty{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .sectionTitle span{color:var(--ui-accent)}
+.shell.uiV2 .panel,.shell.uiV2 .metric,.shell.uiV2 .metric.primary,.shell.uiV2 .newsNavCard,.shell.uiV2 .calendarPanel,.shell.uiV2 .newsDetail{background:var(--ui-card);background-image:none;border:1px solid var(--ui-border);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-text)}
+.shell.uiV2 .metric .eyebrow,.shell.uiV2 .metric.primary .eyebrow,.shell.uiV2 .metric small,.shell.uiV2 .metric.primary small{color:var(--ui-sub)}
+.shell.uiV2 .metric strong,.shell.uiV2 .metric.primary strong{color:var(--ui-text)}
+.shell.uiV2 .listitem,.shell.uiV2 .memoEntry,.shell.uiV2 .pointProvider,.shell.uiV2 .pointProviderHeading,.shell.uiV2 .newsPreviewItem,.shell.uiV2 .newsListButton,.shell.uiV2 .todoRow{border-bottom-color:var(--ui-line)}
+.shell.uiV2 .itembody small,.shell.uiV2 .empty{color:var(--ui-sub)}
+.shell.uiV2 .sectionTitle span{color:var(--ui-accent)}
 
 /* 버튼·칩 */
-.shell.uiV2.demoShell.designPreview.conceptLight .seg{background:#F5F5F5;border-radius:var(--ui-r-box);padding:4px;box-shadow:none}
-.shell.uiV2.demoShell.designPreview.conceptLight .seg button{background:transparent;color:var(--ui-sub);border-radius:var(--ui-r-btn);box-shadow:none}
-.shell.uiV2.demoShell.designPreview.conceptLight .seg button.selected{background:var(--ui-accent);color:#FFFFFF;box-shadow:none}
-.shell.uiV2.demoShell.designPreview.conceptLight .textbutton,.shell.uiV2.demoShell.designPreview.conceptLight .external{color:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
-.shell.uiV2.demoShell.designPreview.conceptLight .track{background:var(--ui-line2)}
-.shell.uiV2.demoShell.designPreview.conceptLight .track>div{background:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .error{background:#FDF1EE;color:#8A2F1D;border-radius:var(--ui-r-box)}
+.shell.uiV2 .seg{background:#F5F5F5;border-radius:var(--ui-r-box);padding:4px;box-shadow:none}
+.shell.uiV2 .seg button{background:transparent;color:var(--ui-sub);border-radius:var(--ui-r-btn);box-shadow:none}
+.shell.uiV2 .seg button.selected{background:var(--ui-accent);color:#FFFFFF;box-shadow:none}
+.shell.uiV2 .textbutton,.shell.uiV2 .external{color:var(--ui-accent)}
+.shell.uiV2 .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2 .track{background:var(--ui-line2)}
+.shell.uiV2 .track>div{background:var(--ui-accent)}
+.shell.uiV2 .error{background:#FDF1EE;color:#8A2F1D;border-radius:var(--ui-r-box)}
 
 /* 상단 */
-.shell.uiV2.demoShell.designPreview.conceptLight .top{align-items:flex-start;margin-bottom:20px}
-.shell.uiV2.demoShell.designPreview.conceptLight .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .brandMark{display:inline-flex;color:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .top h1{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ui-text);margin:6px 0 0}
-.shell.uiV2.demoShell.designPreview.conceptLight .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-faint);font-size:11px;line-height:1.5}
-.shell.uiV2.demoShell.designPreview.conceptLight .refreshButton,.shell.uiV2.demoShell.designPreview.conceptLight .profile{background:#FFFFFF;background-image:none;border:1px solid var(--ui-border);color:var(--ui-text);border-radius:var(--ui-r-btn);box-shadow:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
-.shell.uiV2.demoShell.designPreview.conceptLight .topActions{display:flex;gap:8px}
+.shell.uiV2 .top{align-items:flex-start;margin-bottom:20px;border-bottom:1px solid var(--ui-border)}
+.shell.uiV2 .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ui-accent)}
+.shell.uiV2 .brandMark{display:inline-flex;color:var(--ui-accent);background:none;width:16px;height:16px;margin-right:0;border-radius:0}
+.shell.uiV2 .top h1{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ui-text);margin:6px 0 0}
+.shell.uiV2 .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-faint);font-size:11px;line-height:1.5}
+.shell.uiV2 .refreshButton,.shell.uiV2 .profile{background:#FFFFFF;background-image:none;border:1px solid var(--ui-border);color:var(--ui-text);border-radius:var(--ui-r-btn);box-shadow:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
+.shell.uiV2 .topActions{display:flex;gap:8px}
 
 /* 하단 탭 */
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom{background:#0B0B0C;background-image:none;box-shadow:none;backdrop-filter:none;border:0;border-radius:18px;bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),596px);padding:8px 6px;gap:2px;justify-content:space-between}
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{flex:1;min-width:0;color:#A0A0A6;background:none;border:0;border-radius:12px;padding:6px 2px;gap:3px;font-size:11px;font-weight:600;box-shadow:none}
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button.active{color:#FFFFFF;background:none}
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom .navicon{display:inline-flex;font-size:0;line-height:0}
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.shell.uiV2 nav.bottom{background:#0B0B0C;background-image:none;box-shadow:none;backdrop-filter:none;border:0;border-radius:18px;bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),596px);padding:8px 6px;gap:2px;justify-content:space-between}
+.shell.uiV2 nav.bottom button{flex:1;min-width:0;color:#A0A0A6;background:none;border:0;border-radius:12px;padding:6px 2px;gap:3px;font-size:11px;font-weight:600;box-shadow:none}
+.shell.uiV2 nav.bottom button.active{color:#FFFFFF;background:none}
+.shell.uiV2 nav.bottom .navicon{display:inline-flex;font-size:0;line-height:0}
+.shell.uiV2 nav.bottom button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* 옛 탭: 흰 바탕에서 읽히는 글자색 */
-.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail *{color:#2A2A2C}
-.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailHeadline{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailDate,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailCategory{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsBack,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsOriginal{color:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider *{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider small,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel button,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel strong,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel b{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel small,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel span{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen span{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay:not(.chosen) span{color:var(--ui-text)}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.sunday:not(.chosen) span{color:var(--ui-sun)}
-.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{transition:none}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday{color:var(--ui-sub)}
-.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday.sunday{color:var(--ui-sun)}
+.shell.uiV2 .newsDetail,.shell.uiV2 .newsDetail *{color:#2A2A2C}
+.shell.uiV2 .newsDetail .newsDetailHeadline{color:var(--ui-text)}
+.shell.uiV2 .newsDetail .newsDetailDate,.shell.uiV2 .newsDetail .newsDetailCategory{color:var(--ui-sub)}
+.shell.uiV2 .newsDetail .newsBack,.shell.uiV2 .newsDetail .newsOriginal{color:var(--ui-accent)}
+.shell.uiV2 .pointProvider,.shell.uiV2 .pointProvider *{color:var(--ui-text)}
+.shell.uiV2 .pointProvider small,.shell.uiV2 .pointProviderHeading{color:var(--ui-sub)}
+.shell.uiV2 .calendarPanel,.shell.uiV2 .calendarPanel button,.shell.uiV2 .calendarPanel strong,.shell.uiV2 .calendarPanel b{color:var(--ui-text)}
+.shell.uiV2 .calendarPanel small,.shell.uiV2 .calendarPanel span{color:var(--ui-sub)}
+.shell.uiV2 .calendarPanel .calendarDay.chosen,.shell.uiV2 .calendarPanel .calendarDay.chosen span{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2 .calendarPanel .calendarDay:not(.chosen) span{color:var(--ui-text)}
+.shell.uiV2 .calendarPanel .calendarDay.sunday:not(.chosen) span{color:var(--ui-sun)}
+.shell.uiV2 nav.bottom button{transition:none}
+.shell.uiV2 .calendarWeekday{color:var(--ui-sub)}
+.shell.uiV2 .calendarWeekday.sunday{color:var(--ui-sun)}
 
 /* 금융 상단 */
 .shell.uiTheme .financeCycle h2,.shell.uiTheme .dailyDetailsHeader h2{margin:0}
@@ -108,8 +107,9 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme .dailyDetailsHeader,.shell.uiTheme .dailyTransactionWrap{border-bottom-color:var(--ui-line)}
 .shell.uiTheme .dailyDetailsHeader strong,.shell.uiTheme .dailyTransaction strong{color:var(--ui-text)}
 .shell.uiTheme .dailyDetailsHeader small,.shell.uiTheme .dailyTransaction small,.shell.uiTheme .dailyMemoActions small{color:var(--ui-sub)}
-.shell.uiTheme .dailyTransaction .dailyInstallment{color:var(--ui-installment)}
-.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTransaction .dailyInstallment{font-size:10px;color:var(--ui-installment)}
+/* globals.css 의 옛 .savedMemo 색이 !important 라 같은 방식으로 덮는다 */
+.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)!important}
 .shell.uiTheme .dailyTransaction strong{overflow-wrap:anywhere}
 .shell.uiTheme .dailyMemoEditor textarea{background:#fff;color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-r-box)}
 .shell.uiTheme .dailyMemoActions .dailyMemoSave{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
@@ -237,9 +237,11 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme.uiV2 .pointSummary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:4px 0 14px;border-bottom:1px solid var(--ui-line)}
 .shell.uiTheme.uiV2 .pointSummaryTotal{font-size:clamp(28px,8vw,36px);font-weight:800;letter-spacing:-.03em;color:var(--ui-text)}
 .shell.uiTheme.uiV2 .pointSummaryDelta{font-size:13px;color:var(--ui-sub)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaUp{color:var(--ui-accent-dark)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaDown{color:var(--ui-high)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaFlat{color:var(--ui-sub)}
+/* globals.css 의 옛 증감 색(.deltaUp 등)이 !important 라 같은 방식으로 덮는다 */
+.shell.uiTheme.uiV2 .pointsPanel .deltaUp{color:var(--ui-accent-dark)!important}
+.shell.uiTheme.uiV2 .pointsPanel .deltaDown{color:var(--ui-high)!important}
+.shell.uiTheme.uiV2 .pointsPanel .deltaFlat{color:var(--ui-sub)!important}
+.shell.uiTheme.uiV2 .pointIncreaseReason,.shell.uiTheme.uiV2 .pointDecreaseReason{color:var(--ui-sub)!important}
 .shell.uiTheme.uiV2 .pointRow{display:block;padding:0;border:0;border-bottom:1px solid var(--ui-line);background:none}
 .shell.uiTheme.uiV2 .pointRow:last-of-type{border-bottom:0}
 .shell.uiTheme.uiV2 .pointRowHead{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 0;border:0;background:none;color:var(--ui-text);text-align:left;font:inherit}
@@ -329,3 +331,21 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme.uiV2 .calendarSearchResultText>span{font-size:12px;color:var(--ui-sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .shell.uiTheme.uiV2 .calendarNoEntries{display:flex;flex-direction:column;align-items:center;padding:28px 12px;color:var(--ui-sub);font-size:14px}
 .shell.uiTheme.uiV2 .calendarDemoNote{margin:0;font-size:12px;color:var(--ui-faint);text-align:center}
+
+/* 구조 */
+.shell.uiTheme.uiV2 .archKicker{color:var(--ui-faint)}
+.shell.uiTheme.uiV2 h2.archTitle{color:var(--ui-text)}
+.shell.uiTheme.uiV2 .archLines p,.shell.uiTheme.uiV2 .archTable td{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archTable tbody th{color:var(--ui-text)}
+.shell.uiTheme.uiV2 .archTable thead th{color:var(--ui-sub);border-bottom-color:var(--ui-border)}
+.shell.uiTheme.uiV2 .archTable tbody th,.shell.uiTheme.uiV2 .archTable td{border-bottom-color:var(--ui-line)}
+.shell.uiTheme.uiV2 .archMethods,.shell.uiTheme.uiV2 .archNote,.shell.uiTheme.uiV2 .archLegend{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archTag{background:#fff;border-color:var(--ui-border);color:var(--ui-accent-dark)}
+.shell.uiTheme.uiV2 .archBox rect{fill:#fff;stroke:var(--ui-border)}
+.shell.uiTheme.uiV2 .archBox.accent rect{fill:var(--ui-accent);stroke:var(--ui-accent)}
+.shell.uiTheme.uiV2 .archBox.deep rect{fill:var(--ui-text);stroke:var(--ui-text)}
+.shell.uiTheme.uiV2 .archBox text{fill:var(--ui-text)}
+.shell.uiTheme.uiV2 .archBox.accent text,.shell.uiTheme.uiV2 .archBox.deep text{fill:#fff}
+.shell.uiTheme.uiV2 .archColLabel{fill:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archArrow{stroke:var(--ui-faint)}
+.shell.uiTheme.uiV2 .archArrowHead{fill:var(--ui-faint)}

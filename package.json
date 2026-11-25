@@ -11,7 +11,11 @@
     "pii-scan": "node scripts/orch/pii-scan.mjs",
     "check-env": "node scripts/check-env.mjs",
     "screens": "node scripts/screens/run.mjs",
-    "screens:baseline": "SCREENS_UPDATE_BASELINE=1 node scripts/screens/run.mjs"
+    "screens:baseline": "SCREENS_UPDATE_BASELINE=1 node scripts/screens/run.mjs",
+    "screens:chromium": "node scripts/screens/ensure-chromium.mjs",
+    "screens:ref": "node scripts/screens/snap-ref.mjs",
+    "screens:compare": "node scripts/screens/compare.mjs",
+    "screens:base-sha": "node scripts/screens/base-sha.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

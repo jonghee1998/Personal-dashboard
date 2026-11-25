@@ -1,7 +1,7 @@
 {
  "home": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -485,7 +485,7 @@
  },
  "finance": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -1456,6 +1456,11 @@
               "tag": "small",
               "className": "",
               "children": []
+             },
+             {
+              "tag": "small",
+              "className": "dailyInstallment",
+              "children": []
              }
             ]
            },
@@ -1756,7 +1761,7 @@
                  },
                  {
                   "tag": "small",
-                  "className": "",
+                  "className": "financeInstallment",
                   "children": []
                  },
                  {
@@ -1805,7 +1810,7 @@
                  },
                  {
                   "tag": "small",
-                  "className": "",
+                  "className": "financeInstallment",
                   "children": []
                  },
                  {
@@ -2683,7 +2688,7 @@
  },
  "news": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -3080,7 +3085,7 @@
  },
  "benefits": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -3551,7 +3556,7 @@
  },
  "journal": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",

@@ -48,7 +48,7 @@ export default function HomeTab({
   <button type="button" className="panel homeCycleCard" onClick={openFinance} aria-label={'이번 결제 주기 사용액 '+won(summary.total)+', 금융 탭으로 이동'}>
     <span className="homeCycleHeading"><span>이번 결제 주기 사용액</span><Icon d={ICON.chevron}/></span>
     <strong className="homeCycleTotal">{won(summary.total)}</strong>
-    <small className="homeCycleSplit">일시불 {won(summary.lumpTotal)} · 할부 {won(summary.installmentTotal)}</small>
+    {summary.status==='ok'&&<small className="homeCycleSplit">(일시불 {won(summary.lumpTotal)} · 할부 {won(summary.installmentTotal)})</small>}
     <small className="homeCycleMeta">{summary.cycle.payMonth}월 21일 결제 예정 · 주기 마감까지 {summary.daysLeft}일</small>
   </button>
   <section className="panel taskPanel">
