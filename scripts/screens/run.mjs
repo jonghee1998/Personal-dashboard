@@ -13,7 +13,7 @@ import {checkApiAuth, fakeAppEnv, startFakeSupabase, validSessionCookie} from '.
 import {checkApiLogs} from './api-log.mjs';
 import {checkApiIngest} from './api-ingest.mjs';
 import {checkApiItems} from './api-items.mjs';
-import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW, FIXTURE_TEXT} from './dashboard-fixture.mjs';
+import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from './dashboard-fixture.mjs';
 import {firstDomDifference} from './dom-skeleton.mjs';
 
 const PORT = process.env.PORT || '3100';
@@ -228,6 +228,9 @@ async function checkTabContent(page, id) {
     await expect(cycle.getByText('지난 주기 등록 내역 없음', {exact: true})).toBeVisible();
     await expect(cycle.getByText('지난 주기 비교 없음', {exact: true})).toBeVisible();
     await expect(cycle.locator('progress')).toHaveCount(0);
+    await expect(main.locator('.financeSeg').getByRole('button', {name: '거래내역 (3)', exact: true})).toBeVisible();
+    await expect(main.locator('.financeSeg').getByRole('button', {name: '메모 (1)', exact: true})).toBeVisible();
+    await expect(main.locator('.expenseCategoryMeta')).toHaveText([/₩42,000 · 2건/, /₩8,000 · 1건/]);
 
     const hit = chart.getByRole('button', {name: `${m}월 ${d}일, 지출 ${lumpAmount}`, exact: true});
     await chart.getByRole('button', {name: `${m}월 1일, 지출 0원`, exact: true}).click();
@@ -284,6 +287,21 @@ const domSkeleton = page => page.evaluate(() => {
 const TASK_B = '합성할일B';
 const MEMO_A = '합성메모A';
 const fixtureItem = title => dashboardSnapshot().items.find(x => x.title === title);
+const previousDraft = '합성메모초안C';
+const financeDay = (page, date) => page.locator(`.financeCalendar [data-date="${date}"]`);
+const dayMemoArea = (page, title) => page.getByRole('textbox', {name: title + ' 결제 메모', exact: true});
+async function openPreviousDayMemo(page) {
+  await clickTab(page, '금융');
+  await page.getByRole('button', {name: '이전 달'}).click();
+  await expect(page.locator('.financeCalendar [aria-pressed="true"]')).toHaveCount(0);
+  await financeDay(page, FIXTURE_PREVIOUS_DAY).click();
+  await expect(page.locator('.dailyDetailsTotal')).toHaveText('8,000원');
+  await page.getByRole('button', {name: FIXTURE_TEXT.previousMerchant + ' 메모 수정', exact: true}).click();
+  const area = dayMemoArea(page, FIXTURE_TEXT.previousMerchant);
+  await area.fill(previousDraft);
+  return area;
+}
+
 /** 합성할일B: 할 일 추가 성공 응답·두 번째 할 일 */
 const taskB = () => ({...fixtureItem(FIXTURE_TEXT.task), id: '00000000-0000-4000-8000-000000000910', title: TASK_B, kind: 'task', status: 'pending', due_date: null, event_date: null, metadata: {created_manually: true}});
 const json = (status, body) => ({status, contentType: 'application/json', body: JSON.stringify(body)});
@@ -362,6 +380,21 @@ async function checkTabInteractions(browser) {
     await clickTab(page, '홈');
     await clickTab(page, '금융');
     await expect(draft).toHaveValue('합성메모초안A');
+  });
+
+  await run('금융 다른 달 그날 내역 초안 유지', async page => {
+    const area = await openPreviousDayMemo(page);
+    await clickTab(page, '홈');
+    await clickTab(page, '금융');
+    await expect(page.locator('.dailyMonthNav strong')).toHaveText('2026.10');
+    await expect(financeDay(page, FIXTURE_PREVIOUS_DAY)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.dailyDetails h2')).toHaveText('10월 20일 거래내역');
+    await expect(area).toHaveValue(previousDraft);
+    await page.getByRole('button', {name: '다음 달'}).click();
+    await page.getByRole('button', {name: '이전 달'}).click();
+    await expect(page.locator('.financeCalendar [aria-pressed="true"]')).toHaveCount(0);
+    await financeDay(page, FIXTURE_PREVIOUS_DAY).click();
+    await expect(area).toHaveValue(previousDraft);
   });
 
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
@@ -591,6 +624,78 @@ async function checkDataBoundaries(browser) {
     errs.push(...memoBody(log));
     if (await area.inputValue().catch(() => null) !== MEMO_A) errs.push(`입력란에 '${MEMO_A}' 초안이 남지 않음`);
     return errs;
+  });
+
+  const delayedMerchant = fixtureItem(FIXTURE_TEXT.previousMerchant);
+  const delayedRequest = {action: 'memo', id: delayedMerchant.id, memo: previousDraft};
+  const daySave = page => page.locator('.dailyMemoSave');
+  const previousMemoEntry = page => page.locator('.memoEntry', {hasText: FIXTURE_TEXT.previousMerchant});
+  const checkDelayedMemo = async (name, changeEditor) => {
+    const response = gate();
+    await boundary(browser, name, {
+      dashboard: okDashboard(),
+      items: async (route, entry) => {
+        await response.wait;
+        const item = {...delayedMerchant, metadata: {...delayedMerchant.metadata, memo: previousDraft}};
+        await route.fulfill(entry.method === 'PATCH' && same(entry.body, delayedRequest)
+          ? json(200, {item}) : json(500, {}));
+      },
+    }, async (page, log) => {
+      try {
+        const open = await openDashboard(page);
+        if (open.length) return open;
+        const area = await openPreviousDayMemo(page);
+        const save = daySave(page);
+        // 같은 렌더 안에서 두 번 클릭해 비동기 요청 진입도 중복 차단되는지 검사한다.
+        await save.evaluate(button => { button.click(); button.click(); });
+        await expect(save).toBeDisabled();
+        const verifyEditor = await changeEditor(page, area);
+        const pendingResponse = page.waitForResponse(res => res.url().endsWith('/api/items') && res.request().method() === 'PATCH');
+        response.open();
+        expect((await pendingResponse).status()).toBe(200);
+        await verifyEditor();
+        expect(log.filter(entry => entry.method === 'PATCH').map(entry => entry.body)).toEqual([delayedRequest]);
+        return [];
+      } finally {
+        response.open();
+      }
+    });
+  };
+
+  await checkDelayedMemo('금융 메모 중복 클릭 PATCH 1회 · 늦은 응답 뒤 다른 거래 편집 유지', async page => {
+    await page.getByRole('button', {name: '다음 달'}).click();
+    await financeDay(page, FIXTURE_DAY).click();
+    await page.getByRole('button', {name: FIXTURE_TEXT.installment + ' 메모 추가', exact: true}).click();
+    const other = dayMemoArea(page, FIXTURE_TEXT.installment);
+    await other.fill('합성메모초안D');
+    return async () => {
+      // 저장된 값이 화면에 반영된 뒤에도 다른 편집창이 남아 있어야 한다.
+      await page.locator('.financeSeg button', {hasText: '메모'}).click();
+      await expect(previousMemoEntry(page).locator('.memoRead')).toContainText(previousDraft);
+      await expect(other).toHaveValue('합성메모초안D');
+    };
+  });
+  await checkDelayedMemo('금융 늦은 응답 뒤 같은 거래 새 초안 유지', async (page, area) => {
+    await area.fill('합성메모초안E');
+    return async () => {
+      await expect(daySave(page)).toBeEnabled();
+      await expect(area).toHaveValue('합성메모초안E');
+    };
+  });
+  await checkDelayedMemo('금융 늦은 응답 뒤 같은 거래 메모 탭 재열기 유지', async page => {
+    await page.locator('.dailyMemoEditor').getByRole('button', {name: '취소'}).click();
+    await page.locator('.financeSeg button', {hasText: '메모'}).click();
+    const entry = previousMemoEntry(page);
+    await entry.locator('.memoRead').click();
+    const area = entry.getByRole('textbox');
+    // 같은 초안을 입력해 편집 세션까지 일치해야 닫히는지 검사한다.
+    await area.fill(previousDraft);
+    await expect(entry.locator('.memoSave')).toBeDisabled();
+    await expect(page.locator('.dailyMemoEditor')).toHaveCount(0);
+    return async () => {
+      await expect(entry.locator('.memoSave')).toBeEnabled();
+      await expect(area).toHaveValue(previousDraft);
+    };
   });
 }
 

@@ -4,28 +4,39 @@ import {amountKnown,card,money} from './dashboard-display';
 import DailySpending from './daily-spending';
 import {paymentDateLabel} from '@/lib/transaction-time';
 import {subscriptionDisplay} from '@/lib/dashboard-display';
-import {registeredCoverageDay,seoulDay} from '@/lib/dashboard-freshness';
 import {cycleGroups,cycleSummary,detailRows,isAggregateWithoutDetail} from '@/lib/finance-view';
 
 const won=(amount:number|null)=>amount===null?'미확인':amount.toLocaleString('ko-KR')+'원';
 
+export type MemoPlace='day'|'memoTab';
+export type MemoEditorProps={
+ editingMemo:{id:string;place:MemoPlace;session:number}|null;
+ memoDraft:string;
+ memoError:string;
+ savingMemoIds:ReadonlySet<string>;
+ startMemo:(item:Item,place:MemoPlace)=>void;
+ cancelMemo:()=>void;
+ setMemoDraft:(draft:string)=>void;
+ saveMemo:(item:Item)=>Promise<void>;
+};
+
 type Props={
  items:Item[];
  transactions:Item[];
- lastTransactionSourceAt:string|null;
+ today:string;
+ coverageDay:string|null;
+ month:string;
+ selectedDate:string|null;
+ setMonth:(month:string)=>void;
+ selectDay:(date:string)=>void;
  updateLabel:(key:string)=>string;
  statusBusy:string[];
  change:ReturnType<typeof useDashboardData>['change'];
- saveMemoValue:ReturnType<typeof useDashboardData>['saveMemoValue'];
- saveMemo:(item:Item)=>Promise<void>;
+ memoEditor:MemoEditorProps;
  settleTab:'pending'|'done';
  setSettleTab:(tab:'pending'|'done')=>void;
  financeView:'transactions'|'memos';
  setFinanceView:(view:'transactions'|'memos')=>void;
- editingMemo:string|null;
- setEditingMemo:(id:string|null)=>void;
- memoDraft:string;
- setMemoDraft:(draft:string)=>void;
  openExpenseCategories:string[];
  setOpenExpenseCategories:Dispatch<SetStateAction<string[]>>;
  expandedExpenseCategories:string[];
@@ -33,20 +44,18 @@ type Props={
 };
 
 export default function FinanceTab({
- items,transactions,lastTransactionSourceAt,updateLabel,statusBusy,change,saveMemoValue,saveMemo,
- settleTab,setSettleTab,financeView,setFinanceView,editingMemo,setEditingMemo,memoDraft,setMemoDraft,
+ items,transactions,today,coverageDay,month,selectedDate,setMonth,selectDay,updateLabel,statusBusy,change,memoEditor,
+ settleTab,setSettleTab,financeView,setFinanceView,
  openExpenseCategories,setOpenExpenseCategories,expandedExpenseCategories,setExpandedExpenseCategories
 }:Props){
- const now=new Date();
- const today=seoulDay(now)!;
- const coverageDay=registeredCoverageDay(lastTransactionSourceAt,transactions.map(x=>x.event_date),now);
+ const {editingMemo,memoDraft,setMemoDraft,savingMemoIds,cancelMemo,saveMemo}=memoEditor;
  const summary=cycleSummary(transactions,today,coverageDay);
  const emptyPrevious=summary.prevTotal===0&&cycleGroups(transactions,today,coverageDay,2)[1].items.length===0;
  const settlements=items.filter(x=>x.kind==='settlement'),pending=settlements.filter(x=>x.status!=='done'),done=settlements.filter(x=>x.status==='done');
  const pendingAmount=pending.reduce((a,x)=>a+Number(x.amount??0),0);
  const settledAmount=done.reduce((a,x)=>a+Number(x.amount??0),0);
  const getMemo=(x:Item)=>typeof x.metadata.memo==='string'?x.metadata.memo:'';
- const startMemo=(x:Item)=>{setFinanceView('memos');setEditingMemo(x.id);setMemoDraft(getMemo(x));};
+ const startMemo=(x:Item)=>{setFinanceView('memos');memoEditor.startMemo(x,'memoTab');};
  const settleItem=(x:Item)=> <article className="listitem" key={x.id}><button className={'check '+(x.status==='done'?'checked':'')} onClick={()=>void change(x,x.status==='done'?'pending':'done')} aria-busy={statusBusy.includes(x.id)||undefined} aria-label={x.status==='done'?'정산 복원':'정산 완료'}>{x.status==='done'?'✓':''}</button><div className="itembody"><b>{x.title}</b><small>{x.due_date?'마감 '+x.due_date:'정산'}</small></div><strong>{money(Number(x.amount??0))}</strong></article>;
  const categoryGroups=Object.entries(transactions.reduce<Record<string,{total:number;rows:Item[]}>>((groups,x)=>{
    const category=(x.category??'기타').trim()||'기타';
@@ -87,7 +96,8 @@ export default function FinanceTab({
     </section>
     <div className="metricgrid">{card('미정산',money(pendingAmount),pending.length+'건')}{card('정산 완료',money(settledAmount),done.length+'건 완료')}</div>
   </div>
-  <DailySpending transactions={transactions} today={today} coverageDay={coverageDay} onSaveMemo={async(id,memo)=>{const item=items.find(x=>x.id===id&&x.kind==='transaction');if(!item)throw new Error('거래 내역을 찾을 수 없습니다');await saveMemoValue(item,memo);}}/>
+  <DailySpending transactions={transactions} today={today} coverageDay={coverageDay}
+    month={month} selectedDate={selectedDate} setMonth={setMonth} selectDay={selectDay} memoEditor={memoEditor}/>
   <section className="panel">
     <h2>카테고리별 지출 분석</h2>
     {barData.length?barData.map(([label,group],i)=><div className="barrow" key={label}>
@@ -135,10 +145,10 @@ export default function FinanceTab({
     {financeView==='memos'&&<div>
       {orderedTransactions.map(x=><div className="memoEntry" key={x.id}>
         <div className="memoEntryHeader"><div className="itembody"><b>{x.title}</b><small>{x.category??'기타'} · {paymentDateLabel(x)}</small></div><strong>{money(Number(x.amount??0))}</strong></div>
-        {editingMemo===x.id?
+        {editingMemo?.id===x.id&&editingMemo.place==='memoTab'?
           <div className="memoEditor">
             <textarea aria-label={x.title+' 메모'} value={memoDraft} maxLength={400} placeholder="예: 친구들과 점심, 생일 기념 식사, 출장 중 교통비" rows={3} onChange={e=>setMemoDraft(e.target.value)}/>
-            <div className="memoActions"><span>{memoDraft.length}/400</span><button type="button" onClick={()=>{setEditingMemo(null);setMemoDraft('')}}>취소</button><button type="button" className="memoSave" onClick={()=>void saveMemo(x)}>저장</button></div>
+            <div className="memoActions"><span>{memoDraft.length}/400</span><button type="button" onClick={cancelMemo}>취소</button><button type="button" className="memoSave" disabled={savingMemoIds.has(x.id)} onClick={()=>void saveMemo(x)}>저장</button></div>
           </div>
           :<button type="button" className="memoRead" onClick={()=>startMemo(x)}>{getMemo(x)?<span>{getMemo(x)}</span>:<span className="memoPlaceholder">+ 누구와 함께했는지 메모 추가</span>}<span className="memoEditHint">{getMemo(x)?'수정 ↗':''}</span></button>
         }
