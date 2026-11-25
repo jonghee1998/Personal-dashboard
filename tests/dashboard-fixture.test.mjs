@@ -28,7 +28,7 @@ test('FIXTURE_DAY 는 FIXTURE_NOW 의 한국 날짜이고 지난달 합성 거�
   const {items, syncHealth} = dashboardSnapshot();
   const transactions = items.filter(x => x.kind === 'transaction');
   assert.ok(transactions.some(x => x.event_date === FIXTURE_DAY && x.amount > 0 && x.title === '합성가맹점A'));
-  const previous = items.filter(x => x.event_date !== null && x.event_date !== FIXTURE_DAY);
+  const previous = transactions.filter(x => x.event_date && x.event_date.slice(0, 7) === FIXTURE_PREVIOUS_DAY.slice(0, 7));
   assert.equal(previous.length, 1);
   const [record] = previous;
   assert.equal(record.kind, 'transaction');

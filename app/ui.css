@@ -114,3 +114,58 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme .dailyMemoEditor textarea{background:#fff;color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-r-box)}
 .shell.uiTheme .dailyMemoActions .dailyMemoSave{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
 .shell.uiTheme .dailyMemoError{color:var(--ui-high)}
+
+/* 금융 하단 */
+.shell.uiTheme .financeSearchField{
+ display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--ui-sub);
+ border:1px solid var(--ui-border);border-radius:var(--ui-r-box);
+}
+.shell.uiTheme .financeSearchField:focus-within{outline:2px solid var(--ui-accent)}
+.shell.uiTheme .financeSearchField input{width:100%;min-width:0;min-height:42px;padding:0;border:0;outline:0;background:#fff;color:var(--ui-text);font-size:16px}
+.shell.uiTheme .financeSearchChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.shell.uiTheme .financeAction{
+ padding:6px 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);
+ background:#fff;color:var(--ui-accent-dark);font-size:12px;box-shadow:none;
+}
+.shell.uiTheme .financeAction[aria-pressed="true"]{border-color:var(--ui-accent);background:var(--ui-accent);color:#fff}
+.shell.uiTheme .financeSearchSummary{margin:14px 0 0;font-size:13px;color:var(--ui-sub);overflow-wrap:anywhere}
+.shell.uiTheme .financeExpenseGroup+.financeExpenseGroup{border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeGroupToggle{
+ display:block;width:100%;padding:12px 0;border:0;background:none;color:var(--ui-text);
+ text-align:left;font-size:13px;
+}
+.shell.uiTheme .financeGroupHeading{display:grid;grid-template-columns:minmax(0,1fr) auto 16px;gap:10px;align-items:center}
+.shell.uiTheme .financeGroupHeading>span{display:grid;gap:4px;overflow-wrap:anywhere}
+.shell.uiTheme .financeGroupHeading small{color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeGroupAmount{text-align:right;max-width:145px}
+.shell.uiTheme .financeGroupToggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.shell.uiTheme .financeGroupTrack{display:block;height:5px;margin-top:9px;border-radius:8px;background:var(--ui-line2)}
+.shell.uiTheme .financeGroupTrack>span{display:block;height:100%;border-radius:inherit;background:var(--ui-accent)}
+.shell.uiTheme .financeGroupItems{margin:0 0 12px;padding:0 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .financeGroupItems>.financeAction{margin:0 0 10px}
+.shell.uiTheme .financeTransaction{border-bottom:1px solid var(--ui-line)}
+.shell.uiTheme .financeTransaction:last-of-type{border-bottom:0}
+.shell.uiTheme .financeTransactionRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 0;font-size:13px}
+.shell.uiTheme .financeTransactionIdentity,.shell.uiTheme .financeSearchResult,.shell.uiTheme .financeTransactionAmount{display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.shell.uiTheme .financeSearchResult{flex:1;border:0;border-radius:var(--ui-r-btn);padding:0;background:none;color:var(--ui-accent-dark);text-align:left}
+.shell.uiTheme .financeSearchResult:hover strong{text-decoration:underline}
+.shell.uiTheme .financeTransactionAmount{text-align:right;justify-items:end;flex-shrink:0}
+.shell.uiTheme .financeTransactionRow small,.shell.uiTheme .financeSubItems small{color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeTransactionAmount small{font-size:10px}
+.shell.uiTheme .financeTransactionAmount .financeInstallment{color:var(--ui-installment)}
+.shell.uiTheme .financeTransactionRow .financeSavedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .financeSubItems{list-style:none;margin:0 0 10px;padding:0 9px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .financeSubItems li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:12px}
+.shell.uiTheme .financeSubItems li+li{border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeSubItems li>div{display:grid;gap:3px;overflow-wrap:anywhere;min-width:0}
+.shell.uiTheme .financeSubItems li>strong{flex-shrink:0}
+.shell.uiTheme .financeAggregateNote{margin:0 0 10px;color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeSettlements .check{display:grid;place-items:center;padding:0;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal{background:#fff;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);box-shadow:none}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal strong,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice strong,
+.shell.uiTheme .aiSubscriptionPanel .subscriptionDateLine>strong,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionIdentity>b{color:var(--ui-text)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal small,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal .eyebrow,
+.shell.uiTheme .aiSubscriptionPanel .subscriptionDateLine>span,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice .subscriptionStopped{color:var(--ui-sub)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice .subscriptionActive{color:var(--ui-accent-dark)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionRow{border-bottom-color:var(--ui-line)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionIdentity .subscriptionPlan,.shell.uiTheme .aiSubscriptionPanel .sectionUpdateMeta>small{color:var(--ui-sub)}

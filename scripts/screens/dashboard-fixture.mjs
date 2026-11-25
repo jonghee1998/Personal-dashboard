@@ -14,6 +14,8 @@ export const FIXTURE_TEXT = {
   merchant: '합성가맹점A',
   installment: '합성가맹점C',
   previousMerchant: '합성가맹점D',
+  aggregateMerchant: '합성가맹점E',
+  undatedMerchant: '합성가맹점F',
   news: '합성뉴스A',
   points: '합성포인트A',
   event: '합성일정A',
@@ -44,6 +46,11 @@ export function dashboardSnapshot() {
     item(7, {kind: 'event', title: FIXTURE_TEXT.event, description: '합성 일정 설명A', status: 'active', category: '일정', source: '합성달력A', event_date: FIXTURE_DAY}),
     item(8, {kind: 'transaction', title: FIXTURE_TEXT.installment, amount: 30000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A', event_date: FIXTURE_DAY, metadata: {installment_months: 3, paid_at: at('09:00')}}),
     item(9, {kind: 'transaction', title: FIXTURE_TEXT.previousMerchant, amount: 8000, status: 'confirmed', category: '합성지출분류B', source: '합성카드A', event_date: FIXTURE_PREVIOUS_DAY, metadata: {payment_type: '일시불', memo: '합성정산메모B 정산'}}),
+    item(11, {kind: 'transaction', title: FIXTURE_TEXT.aggregateMerchant, amount: 15000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A', event_date: '2026-11-11', metadata: {line_items: [
+      {title: '합성하위항목A', amount: 6000, date: '2026-11-11', time: '09:10'},
+      {title: '합성하위항목B', amount: 9000, date: '2026-11-11', time: '09:20'},
+    ]}}),
+    item(12, {kind: 'transaction', title: FIXTURE_TEXT.undatedMerchant, amount: 3000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A'}),
   ];
   const stamp = at('10:00');
   const tabs = ['home', 'finance', 'news', 'benefits', 'journal', 'subscriptions', 'points', 'applications'];

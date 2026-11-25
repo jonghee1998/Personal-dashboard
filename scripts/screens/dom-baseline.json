@@ -1464,7 +1464,66 @@
      },
      {
       "tag": "section",
-      "className": "panel",
+      "className": "panel financeMemoSearch",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "label",
+        "className": "financeSearchField",
+        "children": [
+         {
+          "tag": "svg",
+          "className": "lucide lucide-search",
+          "children": [
+           {
+            "tag": "circle",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "input",
+          "className": "",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeSearchChips",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeAction",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "financeAction",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "financeAction",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel financeMonthly",
       "children": [
        {
         "tag": "h2",
@@ -1473,32 +1532,224 @@
        },
        {
         "tag": "div",
-        "className": "barrow",
+        "className": "financeExpenseGroup",
         "children": [
          {
-          "tag": "div",
-          "className": "barheading",
+          "tag": "button",
+          "className": "financeGroupToggle",
           "children": [
            {
             "tag": "span",
-            "className": "",
-            "children": []
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
            },
            {
-            "tag": "b",
-            "className": "",
-            "children": []
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
            }
           ]
          },
          {
           "tag": "div",
-          "className": "track",
+          "className": "financeGroupItems",
           "children": [
            {
-            "tag": "div",
-            "className": "",
-            "children": []
+            "tag": "article",
+            "className": "financeTransaction",
+            "children": [
+             {
+              "tag": "div",
+              "className": "financeTransactionRow",
+              "children": [
+               {
+                "tag": "div",
+                "className": "financeTransactionIdentity",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "",
+                  "children": []
+                 }
+                ]
+               },
+               {
+                "tag": "div",
+                "className": "financeTransactionAmount",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "financeInstallment",
+                  "children": []
+                 },
+                 {
+                  "tag": "button",
+                  "className": "financeAction",
+                  "children": []
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "article",
+            "className": "financeTransaction",
+            "children": [
+             {
+              "tag": "div",
+              "className": "financeTransactionRow",
+              "children": [
+               {
+                "tag": "div",
+                "className": "financeTransactionIdentity",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "",
+                  "children": []
+                 }
+                ]
+               },
+               {
+                "tag": "div",
+                "className": "financeTransactionAmount",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "button",
+                  "className": "financeAction",
+                  "children": []
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "article",
+            "className": "financeTransaction",
+            "children": [
+             {
+              "tag": "div",
+              "className": "financeTransactionRow",
+              "children": [
+               {
+                "tag": "div",
+                "className": "financeTransactionIdentity",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "",
+                  "children": []
+                 }
+                ]
+               },
+               {
+                "tag": "div",
+                "className": "financeTransactionAmount",
+                "children": [
+                 {
+                  "tag": "strong",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "small",
+                  "className": "",
+                  "children": []
+                 },
+                 {
+                  "tag": "button",
+                  "className": "financeAction",
+                  "children": []
+                 }
+                ]
+               }
+              ]
+             }
+            ]
            }
           ]
          }
@@ -1506,32 +1757,334 @@
        },
        {
         "tag": "div",
-        "className": "barrow",
+        "className": "financeExpenseGroup",
         "children": [
          {
-          "tag": "div",
-          "className": "barheading",
+          "tag": "button",
+          "className": "financeGroupToggle",
           "children": [
            {
             "tag": "span",
-            "className": "",
-            "children": []
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
            },
            {
-            "tag": "b",
-            "className": "",
-            "children": []
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
            }
           ]
-         },
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
          {
-          "tag": "div",
-          "className": "track",
+          "tag": "button",
+          "className": "financeGroupToggle",
           "children": [
            {
-            "tag": "div",
-            "className": "",
-            "children": []
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeGroupToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeGroupToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeGroupToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
            }
           ]
          }
@@ -1541,7 +2094,162 @@
      },
      {
       "tag": "section",
-      "className": "panel",
+      "className": "panel financeCategories",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeGroupToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "financeExpenseGroup",
+        "children": [
+         {
+          "tag": "button",
+          "className": "financeGroupToggle",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeGroupHeading",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "className": "financeGroupAmount",
+              "children": [
+               {
+                "tag": "b",
+                "className": "",
+                "children": []
+               },
+               {
+                "tag": "small",
+                "className": "",
+                "children": []
+               }
+              ]
+             },
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-down",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "tag": "span",
+            "className": "financeGroupTrack",
+            "children": [
+             {
+              "tag": "span",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel financeSettlements",
       "children": [
        {
         "tag": "h2",
@@ -1593,95 +2301,6 @@
           "tag": "strong",
           "className": "",
           "children": []
-         }
-        ]
-       }
-      ]
-     },
-     {
-      "tag": "section",
-      "className": "panel",
-      "children": [
-       {
-        "tag": "h2",
-        "className": "",
-        "children": []
-       },
-       {
-        "tag": "div",
-        "className": "seg financeSeg",
-        "children": [
-         {
-          "tag": "button",
-          "className": "selected",
-          "children": []
-         },
-         {
-          "tag": "button",
-          "className": "",
-          "children": []
-         }
-        ]
-       },
-       {
-        "tag": "div",
-        "className": "",
-        "children": [
-         {
-          "tag": "div",
-          "className": "categorySection",
-          "children": [
-           {
-            "tag": "button",
-            "className": "categoryHeading expenseCategoryToggle",
-            "children": [
-             {
-              "tag": "b",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "span",
-              "className": "expenseCategoryMeta",
-              "children": [
-               {
-                "tag": "span",
-                "className": "expenseCategoryChevron collapsed",
-                "children": []
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "className": "categorySection",
-          "children": [
-           {
-            "tag": "button",
-            "className": "categoryHeading expenseCategoryToggle",
-            "children": [
-             {
-              "tag": "b",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "span",
-              "className": "expenseCategoryMeta",
-              "children": [
-               {
-                "tag": "span",
-                "className": "expenseCategoryChevron collapsed",
-                "children": []
-               }
-              ]
-             }
-            ]
-           }
-          ]
          }
         ]
        }
