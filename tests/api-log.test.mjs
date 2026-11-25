@@ -14,7 +14,7 @@ const withCapturedConsole=fn=>{
 };
 
 test('allow-listed PostgREST code is kept, message is never logged',()=>{
- const line=apiFailureLog('/api/sync-runs','read',{code:'PGRST301',message:'https://fake.example.invalid fake-secret'});
+ const line=apiFailureLog('/api/ingest','run_lookup',{code:'PGRST301',message:'https://fake.example.invalid fake-secret'});
  assert.equal(parse(line).code,'PGRST301');
  assert.ok(!line.includes('fake.example.invalid'));
  assert.ok(!line.includes('fake-secret'));
@@ -115,15 +115,15 @@ test('odd route or stage becomes invalid',()=>{
 });
 
 test('logApiFailure writes exactly one apiFailureLog line',()=>{
- const lines=withCapturedConsole(()=>logApiFailure('/api/sync-runs','read',{code:'PGRST301',message:'fake-message'}));
- assert.deepEqual(lines,[apiFailureLog('/api/sync-runs','read',{code:'PGRST301'})]);
+ const lines=withCapturedConsole(()=>logApiFailure('/api/ingest','run_lookup',{code:'PGRST301',message:'fake-message'}));
+ assert.deepEqual(lines,[apiFailureLog('/api/ingest','run_lookup',{code:'PGRST301'})]);
 });
 
 // Static check: every 5xx response in a collector POST handler logs on the same line or the line above.
 // A computed status like {status:o.status,...} can be 5xx too, so it is counted with the literal 5xx lines.
 const routes=[
- ['app/api/ingest/route.ts',5],
- ['app/api/sync-runs/route.ts',5],
+ // ingest: 설정 503·v2failure 503·예외 503 (v1 분기는 12단계에서 제거). /api/sync-runs 는 12단계에서 삭제.
+ ['app/api/ingest/route.ts',3],
 ];
 const fivexx=/status:\s*(5\d\d|o\.status)\b/;
 function postFiveXxLines(source){

@@ -29,6 +29,20 @@ from scripts.ingest_gate import (
 
 ORIGIN = "https://dashboard.example.invalid"
 
+# Synthetic v2 run (fake uuid, zero real data)
+SYNTHETIC_RUN = {
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "dataset": "points",
+    "source_system": "samsungcard",
+    "source_as_of": "2026-11-12T10:00:00+09:00",
+    "collected_at": "2026-11-12T10:05:00+09:00",
+}
+
+def sent_body(opener):
+    """JSON body of the single request handed to the mock opener."""
+    (req,), _ = opener.open.call_args
+    return json.loads(req.data.decode("utf-8"))
+
 class TestIngestGate(unittest.TestCase):
 
     def setUp(self):
@@ -72,10 +86,21 @@ class TestIngestGate(unittest.TestCase):
         for p in ALLOWED_INGEST_PATHS:
             validate_endpoint_url(ORIGIN + p)  # Should not raise
 
-    def test_allowlist_is_exactly_ingest_and_sync_runs(self):
-        self.assertEqual(ALLOWED_INGEST_PATHS, ("/api/ingest", "/api/sync-runs"))
+    def test_allowlist_is_exactly_ingest(self):
+        self.assertEqual(ALLOWED_INGEST_PATHS, ("/api/ingest",))
         validate_endpoint_url(ORIGIN + "/api/ingest")
-        validate_endpoint_url(ORIGIN + "/api/sync-runs")
+
+    def test_removed_sync_runs_rejected_without_network(self):
+        with self.assertRaises(IngestGateError) as ctx:
+            validate_endpoint_url(ORIGIN + "/api/sync-runs")
+        self.assertEqual(str(ctx.exception), "UNAUTHORIZED_ENDPOINT")
+        mock_opener = MagicMock()
+        with self.assertRaises(IngestGateError) as ctx:
+            transmit_gated_ingest(ORIGIN + "/api/sync-runs", "test-token", "points",
+                                  self.synthetic_points_manifest, self.synthetic_points_items,
+                                  opener=mock_opener, run=dict(SYNTHETIC_RUN))
+        self.assertEqual(str(ctx.exception), "UNAUTHORIZED_ENDPOINT")
+        self.assertEqual(mock_opener.open.call_count, 0)
 
     def test_removed_backfill_preview_rejected_without_network(self):
         with self.assertRaises(IngestGateError) as ctx:
@@ -198,13 +223,68 @@ class TestIngestGate(unittest.TestCase):
             "points",
             self.synthetic_points_manifest,
             self.synthetic_points_items,
-            validate_only=True,
-            opener=mock_opener
+            validate_only=False,
+            opener=mock_opener,
+            run=dict(SYNTHETIC_RUN)
         )
 
         self.assertEqual(mock_opener.open.call_count, 1)
         self.assertEqual(res["status"], "success")
         self.assertTrue(res["_gate_audit"]["binding_verified"])
+        body = sent_body(mock_opener)
+        self.assertEqual(set(body), {"version", "run", "items", "manifest"})
+        self.assertNotIn("validate_only", body)
+        self.assertIs(type(body["version"]), int)
+        self.assertEqual(body["version"], 2)
+        self.assertEqual(body["run"], SYNTHETIC_RUN)
+        self.assertEqual(body["items"], self.synthetic_points_items)
+        self.assertEqual(body["manifest"], {"item_count": 1, "amount_total": 10300})  # pii-allow
+        (req,), _ = mock_opener.open.call_args
+        self.assertEqual(req.full_url, ORIGIN + "/api/ingest")
+        self.assertEqual(req.get_header("X-payload-digest"), res["_gate_audit"]["payload_digest"])
+        self.assertEqual(req.get_header("X-request-body-sha256"), res["_gate_audit"]["request_body_sha256"])
+
+    def test_validate_only_true_sends_nothing(self):
+        mock_opener = MagicMock()
+        res = transmit_gated_ingest(
+            ORIGIN + "/api/ingest", "valid-bearer-token", "points",
+            self.synthetic_points_manifest, self.synthetic_points_items,
+            validate_only=True, opener=mock_opener, run=dict(SYNTHETIC_RUN))
+        self.assertEqual(mock_opener.open.call_count, 0)
+        self.assertIs(res["sent"], False)
+        self.assertEqual(res["validated"], 1)
+        self.assertEqual(res["upserted"], 0)
+        self.assertTrue(res["_gate_audit"]["binding_verified"])
+        # run 이 없어도 검증 전용은 네트워크 없이 로컬 결과만
+        res2 = transmit_gated_ingest(
+            ORIGIN + "/api/ingest", "valid-bearer-token", "points",
+            self.synthetic_points_manifest, self.synthetic_points_items,
+            validate_only=True, opener=mock_opener)
+        self.assertIs(res2["sent"], False)
+        self.assertEqual(mock_opener.open.call_count, 0)
+
+    def test_validate_only_true_still_checks_binding_first(self):
+        mock_opener = MagicMock()
+        tampered_items = [{**self.synthetic_points_items[0], "amount": 99999}]
+        with self.assertRaises(IngestGateError):
+            transmit_gated_ingest(ORIGIN + "/api/ingest", "tok", "points",
+                                  self.synthetic_points_manifest, tampered_items,
+                                  validate_only=True, opener=mock_opener)
+        self.assertEqual(mock_opener.open.call_count, 0)
+
+    def test_write_without_run_is_rejected_without_network(self):
+        cases = [None, "not-a-dict", {}]
+        for key in ("run_id", "dataset", "source_system", "source_as_of", "collected_at"):
+            cases.append({k: v for k, v in SYNTHETIC_RUN.items() if k != key})
+        for run in cases:
+            with self.subTest(run=run):
+                mock_opener = MagicMock()
+                with self.assertRaises(IngestGateError) as ctx:
+                    transmit_gated_ingest(ORIGIN + "/api/ingest", "tok", "points",
+                                          self.synthetic_points_manifest, self.synthetic_points_items,
+                                          validate_only=False, opener=mock_opener, run=run)
+                self.assertEqual(str(ctx.exception), "RUN_REQUIRED")
+                self.assertEqual(mock_opener.open.call_count, 0)
 
     def test_statement_requires_explicit_count_and_principal_binding(self):
         manifest = {"account_key":"opaque-a","billing_month":"2026-11","domestic_lump_sum_krw":100,"overseas_lump_sum_krw":0,"installment_principal_krw":0,"fee_krw":5,"point_deduction_krw":0,"total_billed_krw":105,"net_due_krw":105}
@@ -224,7 +304,7 @@ class TestIngestGate(unittest.TestCase):
     def test_ingest_body_cannot_be_sent_to_sync_endpoint(self):
         mock_opener = MagicMock()
         with self.assertRaises(IngestGateError):
-            transmit_gated_ingest("https://dashboard.example.invalid/api/sync-runs","token","points",self.synthetic_points_manifest,self.synthetic_points_items,opener=mock_opener)
+            transmit_gated_ingest("https://dashboard.example.invalid/api/sync-runs","token","points",self.synthetic_points_manifest,self.synthetic_points_items,opener=mock_opener,run=dict(SYNTHETIC_RUN))
         self.assertEqual(mock_opener.open.call_count,0)
 
 class TestIngestBaseUrlEnv(unittest.TestCase):
@@ -289,7 +369,7 @@ class TestIngestBaseUrlEnv(unittest.TestCase):
         resp.read.return_value = b'{"status":"ok"}'
         opener.open.return_value.__enter__.return_value = resp
         with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": ORIGIN}):
-            res = transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener)
+            res = transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener, run=dict(SYNTHETIC_RUN))
         self.assertEqual(res["status"], "ok")
         self.assertEqual(opener.open.call_count, 1)
 
@@ -305,7 +385,7 @@ class TestIngestBaseUrlEnv(unittest.TestCase):
         opener.open.side_effect = IngestGateError("HTTP_REDIRECT_FORBIDDEN")
         with mock.patch.dict(os.environ, {"DASHBOARD_INGEST_BASE_URL": ORIGIN}):
             with self.assertRaises(IngestGateError) as ctx:
-                transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener)
+                transmit_gated_ingest(self.URL, "tok", "points", manifest, items, opener=opener, run=dict(SYNTHETIC_RUN))
         self.assertEqual(opener.open.call_count, 1)
         self.assertNotIn("example.invalid", str(ctx.exception))
 

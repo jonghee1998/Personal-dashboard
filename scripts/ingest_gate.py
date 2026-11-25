@@ -2,7 +2,7 @@
 """
 ingest_gate.py
 
-Strict execution gate for all Ingest and Sync API transmissions.
+Strict execution gate for all /api/ingest v2 transmissions.
 Enforces:
 1. Strict HTTPS host/path allowlist (prevents token leakage to arbitrary URLs, rejects redirects).
 2. Cryptographic and mathematical binding between verified manifest and items payload.
@@ -29,8 +29,9 @@ from verify_report_invariants import (
 )
 
 INGEST_BASE_URL_ENV = "DASHBOARD_INGEST_BASE_URL"
-ALLOWED_INGEST_PATHS = ("/api/ingest", "/api/sync-runs")
+ALLOWED_INGEST_PATHS = ("/api/ingest",)
 INGEST_PATH = "/api/ingest"
+RUN_REQUIRED_KEYS = ("run_id", "dataset", "source_system", "source_as_of", "collected_at")
 
 class IngestGateError(InvariantError):
     pass
@@ -171,13 +172,17 @@ def transmit_gated_ingest(
     manifest: Dict[str, Any],
     items: List[Dict[str, Any]],
     validate_only: bool = False,
-    opener: Optional[urllib.request.OpenerDirector] = None
+    opener: Optional[urllib.request.OpenerDirector] = None,
+    run: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Fail-closed execution pipeline:
     1. Validates endpoint against HTTPS allowlist.
     2. Enforces manifest invariants & cryptographic items binding.
-    3. ONLY if all checks pass, performs network transmission with redirect disabled.
+    3. validate_only=True: /api/ingest v2 has no validation-only mode, so nothing is sent
+       (network call count 0) and only the local check result is returned.
+    4. Otherwise requires a v2 run dict and sends ONLY a numeric version 2 body
+       {version, run, items, manifest} with redirect disabled.
     """
     # Fail-closed step 1: Validate destination URL allowlist
     validate_endpoint_url(endpoint_url)
@@ -191,10 +196,22 @@ def transmit_gated_ingest(
     # Fail-closed step 2: Invariant and binding verification
     audit = bind_and_verify_ingest_payload(domain, manifest, items)
 
-    # Prepare ingest body
+    # v2 has no validate_only mode (lib/ingest-v2.ts ingestV2Schema is strict): never turn a check into a write.
+    if validate_only:
+        return {"validated": len(items), "upserted": 0, "sent": False, "_gate_audit": audit}
+
+    if not isinstance(run, dict) or any(k not in run for k in RUN_REQUIRED_KEYS):
+        raise IngestGateError("RUN_REQUIRED")
+
+    # Prepare /api/ingest v2 body (manifest rules: lib/ingest-v2.ts item_count·amount_total)
     body = {
+        "version": 2,
+        "run": run,
         "items": items,
-        "validate_only": validate_only
+        "manifest": {
+            "item_count": len(items),
+            "amount_total": audit["item_amount_sum"]
+        }
     }
     encoded_body = canonical_json_bytes(body)
     audit["request_body_sha256"] = hashlib.sha256(encoded_body).hexdigest()

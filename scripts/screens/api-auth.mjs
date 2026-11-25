@@ -10,15 +10,6 @@ export const FAKE_USER_ID = '00000000-0000-4000-8000-0000000000a1';
 /** 가짜 PostgREST 오류 본문. message·details 는 서버 로그에 나오면 안 되는 표시용 문자열이다. */
 export const FAKE_PGRST_MESSAGE = 'fake-message-should-not-be-logged';
 export const FAKE_PGRST_DETAILS = 'fake-details-should-not-be-logged';
-/** 가짜 서버가 '이미 기록된 실행'으로 돌려주는 run_id (api-log 검사 (d)) */
-export const FAKE_EXISTING_RUN_ID = '00000000-0000-4000-8000-0000000000f2';
-export function fakeExistingRun() {
-  return {
-    user_id: FAKE_USER_ID, run_id: FAKE_EXISTING_RUN_ID, dataset: 'transactions', source_system: 'fake-source',
-    status: 'failed', source_as_of: null, collected_at: null, expected_count: null,
-    received_count: 0, rejected_count: 0, error_code: 'FAKE_CHECK', payload_digest: null,
-  };
-}
 
 /** 수신(/api/ingest) 검사(api-ingest.mjs)용 run_id: f3 정상, f4 커밋 RPC 가 503, f5 최대 배치·페이지, f6 재전송·실행 키 충돌,
  *  f7 별도 보고(report)가 먼저 기록된 실행, f8 실패 보고(run.status 'failed'·items []) */
@@ -31,6 +22,11 @@ export const INGEST_RUN_FAILED = '00000000-0000-4000-8000-0000000000f8';
 /** parseIngestV2(v2Body(INGEST_RUN_REPORT), NOW).payloadDigest 를 한 번 계산해 적은 값(이 파일은 lib 를 import 하지 않는다).
  *  tests/api-ingest-report.test.mjs 가 같은지 확인한다. */
 export const REPORT_PAYLOAD_DIGEST = 'dbd9504e5ddaad475c923a7f8700cbfbe55c01fd114d2623df3675d2173b8504';
+/** 로그 검사(api-log.mjs 경우 d) 전용 run_id: 가짜 서버가 처음부터 ingest_v2 실행 기록을 가진 것으로 돌려준다(멱등 재전송 → 200).
+ *  api-ingest 경우들은 이 run_id 를 쓰지 않으므로 f6 등 그쪽 상태와 섞이지 않는다. */
+export const LOG_REPLAY_RUN = '00000000-0000-4000-8000-0000000000f9';
+/** parseIngestV2(v2Body(LOG_REPLAY_RUN), NOW).payloadDigest 를 한 번 계산해 적은 값. tests/api-log-screen.test.mjs 가 같은지 확인한다. */
+export const LOG_REPLAY_PAYLOAD_DIGEST = '0fa48789a9ce9b90152612014c8cfd4d8fad258d42def751efc484b38996fb8c';
 /** 이 접두사의 external_id 는 가짜 dashboard_ingest_existing 이 기존 행으로 돌려준다(한 페이지 FAKE_PAGE_ROWS 개). */
 export const PAGED_EXTERNAL_PREFIX = 'txn-page-';
 export const PAGED_UPDATED_AT = '2026-01-01T00:00:00+00:00';
@@ -158,6 +154,17 @@ export function fakeReportRunLookup(query, accept) {
   return lookupRunRow(fakeReportRun(), query, accept);
 }
 
+/** 로그 검사용 f9 실행 기록(commit_source 'ingest_v2'). v2Body(LOG_REPLAY_RUN) 와 키·status·error_code·expected_count·payload_digest 가
+ *  같으므로 앱은 그 본문을 멱등 재전송(200 idempotent)으로 판정한다. */
+export function fakeLogReplayRun() {
+  return {
+    user_id: FAKE_USER_ID, run_id: LOG_REPLAY_RUN, dataset: 'transactions', source_system: 'samsungcard',
+    status: 'success', error_code: null, expected_count: 1, payload_digest: LOG_REPLAY_PAYLOAD_DIGEST,
+    commit_source: 'ingest_v2', accepted_count: 1,
+    source_as_of: '2026-01-01T09:00:00+09:00', collected_at: '2026-01-01T09:10:00+09:00',
+  };
+}
+
 /** 가짜 서버 응답 결정 → {status, body}. body: 요청 본문(JSON 이면 객체).
  *  ctx: {authorization: Authorization 헤더, items: 메모리 행(fakePatchItems 가 바꿈), runs: f6 실행 기록 Map(선택)}.
  *  ctx 없으면 순수 함수(f6 기록을 저장하지 않고 조회는 항상 []).
@@ -174,9 +181,8 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${INGEST_RUN_REPORT}`)) {
     return fakeReportRunLookup(query, accept);
   }
-  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${FAKE_EXISTING_RUN_ID}`)) {
-    const row = fakeExistingRun();
-    return {status: 200, body: (accept || '').includes('vnd.pgrst.object') ? row : [row]};
+  if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs' && new URLSearchParams(query).getAll('run_id').includes(`eq.${LOG_REPLAY_RUN}`)) {
+    return lookupRunRow(fakeLogReplayRun(), query, accept);
   }
   if (method === 'GET' && path === '/rest/v1/dashboard_sync_runs'
     && new URLSearchParams(query).getAll('run_id').some(v => [INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_FAILED].some(id => v === `eq.${id}`))) {
@@ -196,7 +202,7 @@ export function fakeSupabaseResponse(method, path, query, accept, body, ctx = {}
 }
 
 /** 받은 요청을 기록하고, 데이터 요청(rest/v1)은 PostgREST 모양 401, 그 밖은 401 로 거부하는 가짜 Supabase 서버.
- *  예외: 기존 실행(FAKE_EXISTING_RUN_ID) 조회만 200, 수신 검사용 경로(fakeSupabaseResponse 참고)는 200·503.
+ *  예외: 로그 검사용 기존 실행(LOG_REPLAY_RUN) 조회는 200, 수신 검사용 경로(fakeSupabaseResponse 참고)는 200·503.
  *  requests 는 judge 용으로 경로만, queries 는 쿼리 문자열까지, calls 는 요청 본문(JSON)과 응답 상태까지 기록한다. */
 export async function startFakeSupabase() {
   const requests = [], queries = [], calls = [], items = fakeItemRows(), runs = new Map();
@@ -250,7 +256,9 @@ export function validSessionCookie(fakeUrl) {
   return sessionCookie(fakeUrl, VALID_ACCESS_TOKEN);
 }
 
-const TOKEN_ROUTES = ['/api/ingest', '/api/sync-runs'];
+const TOKEN_ROUTES = ['/api/ingest'];
+/** 12단계에서 지운 실행 보고 API. 토큰·쿠키가 있어도 404 또는 405, 가짜 서버 호출(데이터·인증) 0건 */
+export const REMOVED_SYNC_RUNS = '/api/sync-runs';
 const SESSION_ROUTES = [
   ['GET', '/api/dashboard'], ['PATCH', '/api/items'], ['POST', '/api/items'], ['DELETE', '/api/items'],
 ];
@@ -278,17 +286,24 @@ export function apiAuthCases(origin, cookie) {
   for (const [method, path] of REMOVED_SESSION_ROUTES) {
     cases.push({name: `없어진 경로 합성 세션 ${method} ${path}`, method, path, headers: method === 'GET' ? {cookie} : {...json, cookie, origin}, expect: 404, authUser: 'zero'});
   }
-  // 없어진 경로: GET /api/sync-runs 는 6단계 ④에서 삭제 → 쿠키가 있어도 405, 세션 확인·데이터 요청 없음
-  const removed = '/api/sync-runs';
-  cases.push({name: `없어진 경로 쿠키 없음 GET ${removed}`, method: 'GET', path: removed, headers: {}, expect: 405, authUser: 'zero'});
-  cases.push({name: `없어진 경로 합성 세션 GET ${removed}`, method: 'GET', path: removed, headers: {cookie}, expect: 405, authUser: 'zero'});
+  // 없어진 경로: /api/sync-runs 는 12단계에서 삭제(GET 은 6단계 ④) → 토큰·쿠키가 있어도 404 또는 405, 가짜 서버 호출 0건
+  const removed = REMOVED_SYNC_RUNS;
+  const token = {authorization: `Bearer ${FAKE_TOKEN}`};
+  const gone = {expect: [404, 405], authUser: 'zero', noFakeCalls: true};
+  cases.push({name: `없어진 경로 쿠키 없음 GET ${removed}`, method: 'GET', path: removed, headers: {}, ...gone});
+  cases.push({name: `없어진 경로 합성 세션 GET ${removed}`, method: 'GET', path: removed, headers: {cookie}, ...gone});
+  cases.push({name: `없어진 경로 올바른 토큰 GET ${removed}`, method: 'GET', path: removed, headers: token, ...gone});
+  cases.push({name: `없어진 경로 올바른 토큰 POST ${removed}`, method: 'POST', path: removed, headers: {...json, ...token}, ...gone});
+  cases.push({name: `없어진 경로 토큰·합성 세션 POST ${removed}`, method: 'POST', path: removed, headers: {...json, ...token, cookie, origin}, ...gone});
   return cases;
 }
 
 /** 한 검사 결과 판정. got: 응답 코드, seen: 그 요청 동안 가짜 서버가 받은 요청들 → 문제 문자열 목록 */
 export function judge(c, got, seen) {
   const errs = [];
-  if (got !== c.expect) errs.push(`상태 ${got} (기대 ${c.expect})`);
+  const expect = Array.isArray(c.expect) ? c.expect : [c.expect];
+  if (!expect.includes(got)) errs.push(`상태 ${got} (기대 ${expect.join(' 또는 ')})`);
+  if (c.noFakeCalls && seen.length) errs.push(`가짜 Supabase 호출 ${seen.length}건 (기대 0)`);
   const data = seen.filter(r => r.path.startsWith('/rest/v1')).length;
   if (data) errs.push(`데이터 요청 rest/v1 ${data}건 (기대 0)`);
   const authUser = seen.filter(r => r.path === '/auth/v1/user').length;

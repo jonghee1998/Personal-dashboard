@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readdirSync,readFileSync} from 'node:fs';
 import {join,relative,sep} from 'node:path';
 import * as content from '../lib/architecture-content.ts';
-import {architectureSections,apiRows,vercelEnv,githubSecrets,flowSteps,targetRows,targetDiagram} from '../lib/architecture-content.ts';
+import {architectureSections,apiRows,vercelEnv,githubSecrets,flowSteps,targetRows,targetDiagram,safeguardRows} from '../lib/architecture-content.ts';
 
 const root=new URL('..',import.meta.url).pathname;
 const routeFiles=(dir)=>readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?routeFiles(join(dir,e.name)):e.name==='route.ts'?[join(dir,e.name)]:[]);
@@ -71,8 +71,22 @@ test('target diagram text names dev/ops areas and the legend',()=>{
 
 test('API table lists every app/api/**/route.ts exactly once',()=>{
  const files=apiPaths();
- assert.equal(files.length,4);
+ assert.equal(files.length,3);
  assert.deepEqual([...apiRows.map(r=>r.path)].sort(),files);
+});
+
+test('removed /api/sync-runs has no row and 수신 API row no longer says 호환용 (12단계)',()=>{
+ assert.ok(!apiRows.some(r=>r.path==='/api/sync-runs'));
+ const doc=readFileSync(join(root,'docs','architecture.json'),'utf8');
+ assert.ok(!doc.includes('/api/sync-runs'));
+ assert.ok(!doc.includes('호환용으로 남김'));
+ const row=targetRows.find(r=>r.area==='수신 API');
+ assert.ok(row);
+ assert.doesNotMatch(row.now,/호환용/);
+ assert.equal(row.now,'v2 수신 전용 (v1·실행 보고는 12단계에서 제거)');
+ const token=safeguardRows.find(r=>r.name==='ingest 토큰');
+ assert.ok(token.desc.includes('수집기 API(/api/ingest)'));
+ assert.ok(!token.desc.includes('sync-runs'));
 });
 
 test('API methods match the exported handlers of each route',()=>{
