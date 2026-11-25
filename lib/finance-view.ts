@@ -19,7 +19,7 @@ const addDays = (date: string, days: number) =>
   new Date((dayNumber(date) + days) * DAY_MS).toISOString().slice(0, 10);
 const earlier = (a: string, b: string) => a < b ? a : b;
 
-function koreanDate(value: string | Date): string {
+export function koreanDate(value: string | Date): string {
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}(?:$|[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$)/.test(value)) {
     return value.slice(0, 10);
   }
@@ -176,6 +176,16 @@ export function cycleGroups<T extends FinanceTransaction>(
     cycle = billingCycle(addDays(cycle.start, -1));
     return group;
   });
+}
+
+/** 월별 줄 금액 문구. 이력이 일부만 있는 주기(no_history 인데 등록 거래가 있음)는 '등록 내역 없음'과 구분한다. */
+export function cycleAmountLabel(group: {status: CycleStatus; total: number | null; missingCount: number; items: readonly unknown[]}) {
+  const won = (value: number) => value.toLocaleString('ko-KR') + '원';
+  if (group.status === 'no_history') {
+    return group.items.length ? `미확인 · 이력 일부 (등록 ${group.items.length}건)` : '등록 내역 없음';
+  }
+  if (group.status === 'amount_missing') return `미확인 · 금액 미등록 ${group.missingCount}건`;
+  return group.total === null ? '미확인' : won(group.total);
 }
 
 function summarizeDay<T extends FinanceTransaction>(items: readonly T[], covered: boolean) {

@@ -2,6 +2,7 @@
 import {ChevronLeft,ChevronRight} from 'lucide-react';
 import {paymentTime} from '@/lib/transaction-time';
 import {amountTier,chartPath,dayRows,dayTotals,installmentLabel,manwon} from '@/lib/finance-view';
+import TransactionMemoEditor from './transaction-memo-editor';
 import type {MemoEditorProps} from './finance-tab';
 import type {Item} from './use-dashboard-data';
 
@@ -23,7 +24,7 @@ type Props={
 };
 
 export default function DailySpending({transactions,today,coverageDay,month,selectedDate,setMonth,selectDay,memoEditor}:Props){
- const {editingMemo,memoDraft,memoError,savingMemoIds,setMemoDraft,startMemo,cancelMemo,saveMemo}=memoEditor;
+ const {editingMemo,startMemo,cancelMemo}=memoEditor;
  const isEditing=(id:string)=>editingMemo?.id===id&&editingMemo.place==='day';
  const [year,monthNumber]=month.split('-').map(Number);
  const currentMonth=today.slice(0,7);
@@ -57,7 +58,7 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
  ]:[];
  const shiftMonth=(offset:number)=>{
    const next=new Date(Date.UTC(year,monthNumber-1+offset,1)).toISOString().slice(0,7);
-   if(next>currentMonth)return;
+   if(offset>0&&next>currentMonth)return;
    setMonth(next);
  };
 
@@ -68,7 +69,7 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
        <div className="dailyMonthNav">
          <button type="button" onClick={()=>shiftMonth(-1)} aria-label="이전 달"><ChevronLeft size={16}/></button>
          <strong>{year}.{pad(monthNumber)}</strong>
-         <button type="button" onClick={()=>shiftMonth(1)} aria-label="다음 달" disabled={month===currentMonth}><ChevronRight size={16}/></button>
+         <button type="button" onClick={()=>shiftMonth(1)} aria-label="다음 달" disabled={month>=currentMonth}><ChevronRight size={16}/></button>
        </div>
      </div>
      <div className="dailyChart" role="region" aria-label="일별 지출 라인차트">
@@ -140,11 +141,7 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
              aria-label={x.title+' 메모 '+(x.metadata.memo?'수정':'추가')}>{isEditing(x.id)?'닫기':x.metadata.memo?'수정':'메모 추가'}</button>
          </div>
        </div>
-       {isEditing(x.id)&&<div className="dailyMemoEditor">
-         <textarea aria-label={x.title+' 결제 메모'} value={memoDraft} maxLength={400} rows={3} placeholder="결제 메모를 입력하세요" onChange={e=>setMemoDraft(e.target.value)}/>
-         {memoError&&<p className="dailyMemoError" role="alert">{memoError}</p>}
-         <div className="dailyMemoActions"><small>{memoDraft.length}/400</small><button type="button" onClick={cancelMemo}>취소</button><button type="button" className="dailyMemoSave" disabled={savingMemoIds.has(x.id)} onClick={()=>void saveMemo(x)}>{savingMemoIds.has(x.id)?'저장 중…':'저장'}</button></div>
-       </div>}
+       {isEditing(x.id)&&<TransactionMemoEditor item={x} editor={memoEditor} label={x.title+' 결제 메모'}/>}
      </div>)}
    </section>}
  </>;

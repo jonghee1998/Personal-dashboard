@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  amountTier, billingCycle, chartPath, cycleGroups, cycleSummary, dayRows, dayTotals,
+  amountTier, billingCycle, chartPath, cycleAmountLabel, cycleGroups, cycleSummary, dayRows, dayTotals,
   detailRows, installmentInfo, installmentLabel, isAggregateWithoutDetail, manwon, memoSearch,
 } from '../lib/finance-view.ts';
 
@@ -130,12 +130,15 @@ test('지난 주기 이력 없음, 등록 0건, 일부 등록 내역을 구분',
   assert.equal(group.total, null);
   assert.equal(group.installmentTotal, null);
   assert.deepEqual(group.items, [partial]);
+  assert.equal(cycleAmountLabel(group), '미확인 · 이력 일부 (등록 1건)');
+  assert.equal(cycleAmountLabel(cycleGroups([current], '2026-11-12', '2026-11-12')[1]), '등록 내역 없음');
   const older = [current, tx('2026-10-08', 10)];
   const empty = cycleSummary(older, '2026-11-12', '2026-11-12');
   assert.equal(empty.prevStatus, 'ok');
   assert.equal(empty.prevTotal, 0);
   assert.equal(empty.progress, null);
   assert.equal(cycleGroups(older, '2026-11-12', '2026-11-12')[1].total, 0);
+  assert.equal(cycleAmountLabel(cycleGroups(older, '2026-11-12', '2026-11-12')[1]), '0원'); // pii-allow 합성 금액
 });
 
 test('할부 판정과 표시, 상세 없는 합산 거래', () => {

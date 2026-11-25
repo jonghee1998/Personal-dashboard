@@ -22,8 +22,9 @@ const navPaths:Record<string,string>={
 };
 function NavIcon({id}:{id:string}){return id==='architecture'?<ArchitectureIcon/>:<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d={navPaths[id]}/></svg>}
 export default function DashboardShell(){
- const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
+ const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
  const [financeMonth,setFinanceMonth]=useState<string|null>(null);
+ const [memoQuery,setMemoQuery]=useState('');
  const [financeDate,setFinanceDate]=useState<string|null>(null);
  const [memo,setMemo]=useState<{editingMemo:MemoEditorProps['editingMemo'];memoDraft:string;memoError:string}>({
    editingMemo:null,memoDraft:'',memoError:'',
@@ -106,7 +107,8 @@ export default function DashboardShell(){
  {tab==='finance'&&<FinanceTab items={items} transactions={transactions}
    today={today} coverageDay={coverageDay} updateLabel={updateLabel}
    statusBusy={statusBusy} change={change} memoEditor={memoEditor}
-   settleTab={settleTab} setSettleTab={setSettleTab} financeView={financeView} setFinanceView={setFinanceView}
+   memoQuery={memoQuery} setMemoQuery={setMemoQuery}
+   settleTab={settleTab} setSettleTab={setSettleTab}
    month={financeMonth??currentMonth} selectedDate={financeMonth===null?initialDate:financeDate} setMonth={changeFinanceMonth} selectDay={setFinanceDate}
    openExpenseCategories={openExpenseCategories} setOpenExpenseCategories={setOpenExpenseCategories}
    expandedExpenseCategories={expandedExpenseCategories} setExpandedExpenseCategories={setExpandedExpenseCategories}/>}
