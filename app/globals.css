@@ -268,7 +268,7 @@ a{color:#afc6ff}
 .dailyTransaction small{font-size:11px;color:#8fa3bd;overflow-wrap:anywhere}
 .dailyTransaction>strong{white-space:nowrap}
 .dailyDetailsEmpty{text-align:center;padding:18px 6px;color:#8598b3;font-size:12px;border:1px dashed #36465e;border-radius:12px}
-.shell{--surface:#192331; --line:#303e54; --muted:#9cabbe; --accent:#bfd1ff; padding:26px 20px 120px; background:radial-gradient(ellipse 460px 260px at 100% -40px,rgba(93,127,192,.13),transparent 74%); letter-spacing:-.015em;}
+.shell{  --muted:#9cabbe; --accent:#bfd1ff; padding:26px 20px 120px; background:radial-gradient(ellipse 460px 260px at 100% -40px,rgba(93,127,192,.13),transparent 74%); letter-spacing:-.015em;}
 .shell .top{align-items:center;margin-bottom:27px;gap:12px}
 .shell .topIdentity{min-width:0}
 .shell .brand{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.16em;color:#a1b7dc;font-weight:800}
@@ -359,7 +359,7 @@ a{color:#afc6ff}
 .shell .calendarPointAmount{display:block;font-size:15px;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:4px 0}
 .shell .calendarPointAmount.positive{color:#96e2b3}
 .shell .calendarPointAmount.negative{color:#ffb5a4}
-.shell{--preview-ink:#edf3fb; --preview-muted:#99aec8; color:var(--preview-ink); background:radial-gradient(ellipse 110% 380px at 50% -110px,rgba(77,118,170,.14),transparent 75%);}
+.shell{--preview-ink:#edf3fb;  color:var(--preview-ink); background:radial-gradient(ellipse 110% 380px at 50% -110px,rgba(77,118,170,.14),transparent 75%);}
 html:has(.shell),body:has(.shell){background:#101722;}
 .shell .top{margin-bottom:29px;align-items:flex-start}
 .shell .brand{font-size:10px;letter-spacing:.17em;color:#8ca6c5}
@@ -422,7 +422,7 @@ html:has(.shell),body:has(.shell){background:#101722;}
 @media(prefers-reduced-motion:reduce){.shell .refreshButton.refreshing span{animation:none}
 }
 html:has(.shell),body:has(.shell){background:#f3f1e9; color:#192521;}
-.shell{--paper:#f3f1e9;--card:#fffef9;--ink:#192521;--muted:#6c7771;--line:#d9dcd2;--accent:#d6ef82;--deep:#243a32; max-width:690px; padding:24px 22px 133px; background:transparent; color:var(--ink); font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif;}
+.shell{--card:#fffef9;--ink:#192521;--muted:#6c7771;--accent:#d6ef82;--deep:#243a32; max-width:690px; padding:24px 22px 133px; background:transparent; color:var(--ink); font-family:Inter,system-ui,-apple-system,'Pretendard',sans-serif;}
 .shell .top{position:relative; border-bottom:2px solid #222c27; padding-bottom:25px; margin-bottom:26px; align-items:flex-end;}
 .shell .brand{font-size:10px; color:#4d6156; letter-spacing:.16em; gap:5px;}
 .shell .brandMark{width:26px;height:26px; display:inline-grid; place-items:center; border-radius:50%; background:#243a32; color:#ddf7a1; font-size:17px; margin-right:4px;}
@@ -563,7 +563,6 @@ html:has(.shell),body:has(.shell){background:#f3f1e9; color:#192521;}
 .shell .bottom{width:calc(100% - 18px)}
 
 }
-.shell{--soft-green:#edf3e8;--light-green:#dceacb;--soft-border:#d4decf;}
 .shell .dailySpendingPanel,.shell .aiSubscriptionPanel,.shell .newsDetail,.shell .lifeCalendar{color:#25392c}
 .shell .dailySpendingHeader p,.shell .dailyChartHint,.shell .dailyTotal span,.shell .dailyDetailsHeader small,.shell .dailyTransaction small{color:#728472}
 .shell .dailyMonthNav strong,.shell .dailyTotal strong,.shell .dailyDetailsHeader strong,.shell .dailyTransaction strong{color:#263e2e}

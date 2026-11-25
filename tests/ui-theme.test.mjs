@@ -74,3 +74,43 @@ test('header line and brand mark use theme colors, architecture tab uses theme p
  assert.match(css,/\.archBox\.deep rect\{fill:var\(--ui-text\)/);
  assert.match(css,/\.archKicker\{color:var\(--ui-faint\)\}/);
 });
+
+function walkFiles(dir,pred,out=[]){
+ for(const e of readdirSync(dir,{withFileTypes:true})){
+  const p=join(dir,e.name);
+  if(e.isDirectory()){ if(e.name!=='node_modules'&&e.name!=='.next') walkFiles(p,pred,out); }
+  else if(pred(p)) out.push(p);
+ }
+ return out;
+}
+const selfPath=join(root,'tests','ui-theme.test.mjs');
+const LEGACY=/conceptLight|demoShell|designPreview|demoBanner|\borbit-|\bmarine-|\brefined-/;
+
+test('legacy theme classes are gone from app, components and scripts/screens',()=>{
+ const files=[
+  ...walkFiles(join(root,'app'),p=>/\.(css|tsx)$/.test(p)),
+  ...walkFiles(join(root,'components'),()=>true),
+  ...walkFiles(join(root,'scripts','screens'),()=>true),
+ ].filter(p=>p!==selfPath);
+ assert.ok(files.length>5);
+ for(const f of files) assert.ok(!LEGACY.test(readFileSync(f,'utf8')),f);
+});
+
+test('tests do not expect legacy classes as className values',()=>{
+ const files=walkFiles(join(root,'tests'),p=>/\.(mjs|ts|js)$/.test(p)).filter(p=>p!==selfPath);
+ for(const f of files){
+  const src=readFileSync(f,'utf8');
+  assert.ok(!/className[\s\S]{0,12}(conceptLight|demoShell|designPreview)/.test(src),f);
+ }
+});
+
+test('every CSS variable declared in globals.css is used via var()',()=>{
+ const g=readFileSync(join(root,'app','globals.css'),'utf8');
+ const all=[
+  ...walkFiles(join(root,'app'),p=>/\.(css|tsx)$/.test(p)),
+  ...walkFiles(join(root,'components'),p=>/\.(css|tsx|ts)$/.test(p)),
+ ].map(p=>readFileSync(p,'utf8')).join('\n');
+ const names=[...new Set([...g.matchAll(/(?<![\w-])(--[\w-]+)\s*:/g)].map(m=>m[1]))];
+ const unused=names.filter(n=>!all.includes('var('+n));
+ assert.deepEqual(unused,[]);
+});
