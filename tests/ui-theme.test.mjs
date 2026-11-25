@@ -36,7 +36,7 @@ test('no symbol glyph icons anywhere in components/dashboard',()=>{
 });
 
 test('shell root keeps existing classes and adds uiTheme; layout imports ui.css after globals.css',()=>{
- assert.match(shell,/className="shell demoShell designPreview conceptLight uiV2 uiTheme"/);
+ assert.match(shell,/className="shell uiV2 uiTheme"/);
  const layout=readFileSync(join(root,'app','layout.tsx'),'utf8');
  assert.ok(layout.indexOf("'./globals.css'")>=0&&layout.indexOf("'./ui.css'")>layout.indexOf("'./globals.css'"));
 });
@@ -67,8 +67,8 @@ test('old !important colors (delta, saved memo) are overridden with theme colors
 });
 
 test('header line and brand mark use theme colors, architecture tab uses theme palette',()=>{
- assert.match(css,/conceptLight \.top\{[^}]*border-bottom:1px solid var\(--ui-border\)/);
- assert.match(css,/conceptLight \.brandMark\{[^}]*background:none/);
+ assert.match(css,/\.shell\.uiV2 \.top\{[^}]*border-bottom:1px solid var\(--ui-border\)/);
+ assert.match(css,/\.shell\.uiV2 \.brandMark\{[^}]*background:none/);
  assert.match(css,/\.archBox rect\{fill:#fff;stroke:var\(--ui-border\)\}/);
  assert.match(css,/\.archBox\.accent rect\{fill:var\(--ui-accent\)/);
  assert.match(css,/\.archBox\.deep rect\{fill:var\(--ui-text\)/);
