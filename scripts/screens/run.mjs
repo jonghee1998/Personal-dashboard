@@ -13,7 +13,7 @@ import {checkApiAuth, fakeAppEnv, startFakeSupabase, validSessionCookie} from '.
 import {checkApiLogs} from './api-log.mjs';
 import {checkApiIngest} from './api-ingest.mjs';
 import {checkApiItems} from './api-items.mjs';
-import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW, FIXTURE_TEXT} from './dashboard-fixture.mjs';
+import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from './dashboard-fixture.mjs';
 import {firstDomDifference} from './dom-skeleton.mjs';
 
 const PORT = process.env.PORT || '3100';
@@ -82,6 +82,59 @@ const clickTab = (page, label) => page.locator('nav.bottom button', {hasText: la
 const overflow = page => page.evaluate(() => ({sw: document.documentElement.scrollWidth, iw: window.innerWidth}));
 
 /** 기존 구조 탭 검사 → 문제 목록 */
+/** 계산된 스타일 검사(새 디자인 바탕): body·카드·하단 탭·선택 탭·SVG 아이콘, 옛 탭 글자 대비 */
+async function checkComputedStyles(page) {
+  await clickTab(page, '홈');
+  const r = await page.evaluate(() => {
+    const cs = el => getComputedStyle(el);
+    const card = document.querySelector('.shell.uiV2 .panel') || document.querySelector('.shell.uiV2 .metric');
+    const nav = document.querySelector('nav.bottom');
+    const active = nav && nav.querySelector('button.active');
+    return {
+      body: cs(document.body).backgroundColor,
+      card: card ? {shadow: cs(card).boxShadow, image: cs(card).backgroundImage, border: cs(card).borderTopColor} : null,
+      nav: nav ? {bg: cs(nav).backgroundColor, shadow: cs(nav).boxShadow} : null,
+      activeColor: active ? cs(active).color : null,
+      svgs: nav ? nav.querySelectorAll('button svg').length : 0,
+    };
+  });
+  const errs = [];
+  if (r.body !== 'rgb(255, 255, 255)') errs.push(`body 배경 ${r.body}`);
+  if (!r.card) errs.push('홈 카드 없음');
+  else {
+    if (r.card.shadow !== 'none') errs.push(`카드 box-shadow ${r.card.shadow}`);
+    if (r.card.image !== 'none') errs.push(`카드 background-image ${r.card.image}`);
+    if (r.card.border !== 'rgb(235, 235, 235)') errs.push(`카드 테두리 ${r.card.border}`);
+  }
+  if (!r.nav) errs.push('nav.bottom 없음');
+  else {
+    if (r.nav.bg !== 'rgb(11, 11, 12)') errs.push(`하단 탭 배경 ${r.nav.bg}`);
+    if (r.nav.shadow !== 'none') errs.push(`하단 탭 box-shadow ${r.nav.shadow}`);
+  }
+  if (r.activeColor !== 'rgb(255, 255, 255)') errs.push(`선택 탭 글자 ${r.activeColor}`);
+  if (r.svgs !== 6) errs.push(`하단 탭 svg ${r.svgs}개 (기대 6)`);
+  // 옛 탭 글자 대비(뉴스 상세·기록 달력·혜택 포인트 줄): 4.5:1 이상
+  for (const [id, label] of [['news', '뉴스'], ['benefits', '혜택'], ['journal', '기록']]) {
+    await clickTab(page, label);
+    const low = await page.evaluate(() => {
+      const parse = c => { const m = c.match(/[\d.]+/g).map(Number); return {c: m.slice(0, 3), a: m.length > 3 ? m[3] : 1}; };
+      const lum = ([r, g, b]) => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+      const bgOf = el => { for (let e = el; e; e = e.parentElement) { const p = parse(getComputedStyle(e).backgroundColor); if (p.a > 0.5) return p.c; } return [255, 255, 255]; };
+      const out = [];
+      for (const el of document.querySelectorAll('.newsDetail *, .journalCalendar *, .pointRow, .pointRow *, .pointSummary *, .calendarAgendaEntry *, .applicationItem *')) {
+        if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+        const box = el.getBoundingClientRect(); if (!box.width || !box.height) continue;
+        const [hi, lo] = [lum(parse(getComputedStyle(el).color).c), lum(bgOf(el))].sort((x, y) => y - x);
+        const ratio = (hi + 0.05) / (lo + 0.05);
+        if (ratio < 4.5) out.push(`${el.className || el.tagName} ${ratio.toFixed(2)}`);
+      }
+      return out.slice(0, 5);
+    });
+    if (low.length) errs.push(`${id} 탭 글자 대비 4.5 미만: ${low.join(', ')}`);
+  }
+  return errs;
+}
+
 async function checkArchitecture(page, label) {
   await clickTab(page, '구조');
   await page.locator('section.archSection').first().waitFor();
@@ -148,17 +201,60 @@ async function checkTabContent(page, id) {
   const main = page.locator('div.demoShell > main');
   if (id === 'home') return await visible(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})) ? [] : [`'${FIXTURE_TEXT.task}' 없음`];
   if (id === 'finance') {
-    const panel = page.locator('section.dailySpendingPanel');
-    if (!await visible(panel)) return ['일별 지출 패널 없음'];
-    const errs = [];
-    if (!await panel.locator('svg path').count()) errs.push('일별 지출 패널에 차트 svg path 없음');
-    if (await panel.getByText('선택 월의 확인된 지출 내역이 없습니다').count()) errs.push('일별 지출 패널이 빈 안내를 표시');
+    const chart = main.locator('.dailyChart');
+    const cycle = main.locator('.financeCycle');
+    const details = main.locator('.dailyDetails');
+    const calendar = main.locator('.financeCalendar');
     const [, m, d] = FIXTURE_DAY.split('-').map(Number);
-    const hit = panel.locator(`.dailyHit[aria-label^="${m}월 ${d}일, 지출 "]`);
-    if (!await hit.count()) return [...errs, `${m}월 ${d}일 점 버튼 없음`];
-    await hit.first().click();
-    if (!await visible(panel.locator('.dailyDetails', {hasText: FIXTURE_TEXT.merchant}))) errs.push(`.dailyDetails 에 '${FIXTURE_TEXT.merchant}' 없음`);
-    return errs;
+    const nextDay = new Date(Date.parse(FIXTURE_DAY) + 86_400_000).toISOString().slice(0, 10);
+    const paymentDay = calendar.locator(`[data-date="${FIXTURE_DAY}"]`);
+    const unconfirmedDay = calendar.locator(`[data-date="${nextDay}"]`);
+    const formatWon = amount => `${amount.toLocaleString('ko-KR')}원`;
+    const lumpAmount = formatWon(12000);
+
+    await expect(chart).toBeVisible();
+    expect(await chart.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const paths = await chart.locator('path.dailyLine').evaluateAll(lines => lines.map(line => line.getAttribute('d')));
+    expect(paths.length).toBeGreaterThan(0);
+    for (const path of paths) {
+      const coordinates = [...path.matchAll(/(?:M|C) ([^MC]+)/g)]
+        .flatMap(([, values]) => values.trim().split(/\s+/).map(Number).filter((_, i) => i % 2 === 0));
+      expect(coordinates.length).toBeGreaterThan(1);
+      expect(coordinates.every((x, i) => Number.isFinite(x) && (i === 0 || x > coordinates[i - 1]))).toBe(true);
+    }
+    await expect(cycle).toContainText('결제 예정');
+    await expect(cycle.locator('.financeCycleTotal')).toHaveText(formatWon(57000));
+    await expect(cycle.locator('.financeCycleSplit')).toContainText(`할부 ${formatWon(30000)}`);
+    await expect(cycle.getByText('지난 주기 등록 내역 없음', {exact: true})).toBeVisible();
+    await expect(cycle.getByText('지난 주기 비교 없음', {exact: true})).toBeVisible();
+    await expect(cycle.locator('progress')).toHaveCount(0);
+    const hit = chart.getByRole('button', {name: `${m}월 ${d}일, 지출 ${lumpAmount}`, exact: true});
+    await chart.getByRole('button', {name: `${m}월 1일, 지출 0원`, exact: true}).click();
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText('0원');
+    await hit.click();
+    await expect(chart.locator('.dailyMarker')).toHaveCount(1);
+    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만원`);
+    await expect(hit).toHaveAttribute('aria-pressed', 'true');
+    await expect(paymentDay).toHaveAttribute('aria-pressed', 'true');
+    await expect(paymentDay.locator('.financeCalendarAmount')).toHaveText('1.2만');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
+    const rows = details.locator('.dailyTransactionWrap');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toContainText(FIXTURE_TEXT.merchant);
+    await expect(rows.last()).toContainText(FIXTURE_TEXT.installment);
+    await expect(rows.last().locator('.dailyInstallment')).toHaveText('(할부 3개월) · 일 합계 제외');
+
+    await unconfirmedDay.click();
+    await expect(unconfirmedDay).toHaveAttribute('aria-pressed', 'true');
+    await expect(unconfirmedDay.locator('.financeCalendarAmount')).toHaveCount(0);
+    await expect(chart.locator('.dailyPoint')).toHaveCount(0);
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText('미확인');
+    await expect(details.getByText('수집 확인 전')).toBeVisible();
+    await expect(rows).toHaveCount(0);
+    await paymentDay.click();
+    await expect(hit).toHaveAttribute('aria-pressed', 'true');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
+    return [];
   }
   if (id === 'news') {
     const toggle = main.locator(`.newsCategoryToggle[aria-label="${FIXTURE_NEWS_CATEGORY} 카테고리 펼치기"]`);
@@ -172,8 +268,22 @@ async function checkTabContent(page, id) {
     if (!await visible(article)) errs.push(`.newsListButton 에 '${FIXTURE_TEXT.news}' 없음`);
     return errs;
   }
-  if (id === 'benefits') return await visible(main.locator('.pointProvider', {hasText: FIXTURE_TEXT.points})) ? [] : [`'${FIXTURE_TEXT.points}' 포인트 항목 없음`];
-  if (id === 'journal') return await visible(page.locator('.calendarAgendaEntry', {hasText: FIXTURE_TEXT.event})) ? [] : [`기록 일정 '${FIXTURE_TEXT.event}' 없음`];
+  if (id === 'benefits') {
+    const errs = [];
+    if (!await visible(main.locator('.pointRow', {hasText: FIXTURE_TEXT.points}))) errs.push(`'${FIXTURE_TEXT.points}' 포인트 항목 없음`);
+    const delta = (await main.locator('.pointSummaryDelta').textContent().catch(() => '')) ?? '';
+    if (!delta.includes('어제보다 +500P')) errs.push(`'(어제보다 +500P)' 없음: ${delta}`); // pii-allow
+    for (const label of ['대기', '합격', '불합격']) if (!await visible(main.locator('.applicationCounts span', {hasText: new RegExp(`^${label}$`)}))) errs.push(`신청 숫자 칸 '${label}' 없음`);
+    return errs;
+  }
+  if (id === 'journal') {
+    const errs = [];
+    if (!await visible(page.locator('.calendarAgendaEntry', {hasText: FIXTURE_TEXT.event}))) errs.push(`기록 일정 '${FIXTURE_TEXT.event}' 없음`);
+    const dots = await page.locator(`.journalCalendar [data-date="${FIXTURE_DAY}"] .journalDot`).evaluateAll(list => list.map(x => x.getAttribute('data-kind')));
+    for (const kind of ['event', 'task', 'news', 'point']) if (!dots.includes(kind)) errs.push(`${FIXTURE_DAY} 종류 점 '${kind}' 없음 (${dots.join(',')})`);
+    if (!await visible(page.locator('.journalLegend'))) errs.push('기록 달력 범례 없음');
+    return errs;
+  }
   return [`알 수 없는 탭 ${id}`];
 }
 
@@ -187,6 +297,24 @@ const domSkeleton = page => page.evaluate(() => {
 const TASK_B = '합성할일B';
 const MEMO_A = '합성메모A';
 const fixtureItem = title => dashboardSnapshot().items.find(x => x.title === title);
+const previousDraft = '합성메모초안C';
+const financeDay = (page, date) => page.locator(`.financeCalendar [data-date="${date}"]`);
+const dayMemoArea = (page, title) => page.getByRole('textbox', {name: title + ' 결제 메모', exact: true});
+const memoButton = (section, title, action) => section.getByRole('button', {name: title + ' 메모 ' + action, exact: true});
+const monthly = page => page.locator('.financeMonthly');
+const monthlyRow = (page, title) => monthly(page).locator('.financeTransaction', {hasText: title});
+async function openPreviousDayMemo(page) {
+  await clickTab(page, '금융');
+  await page.getByRole('button', {name: '이전 달'}).click();
+  await expect(page.locator('.financeCalendar [aria-pressed="true"]')).toHaveCount(0);
+  await financeDay(page, FIXTURE_PREVIOUS_DAY).click();
+  await expect(page.locator('.dailyDetailsTotal')).toHaveText('8,000원');
+  await page.getByRole('button', {name: FIXTURE_TEXT.previousMerchant + ' 메모 수정', exact: true}).click();
+  const area = dayMemoArea(page, FIXTURE_TEXT.previousMerchant);
+  await area.fill(previousDraft);
+  return area;
+}
+
 /** 합성할일B: 할 일 추가 성공 응답·두 번째 할 일 */
 const taskB = () => ({...fixtureItem(FIXTURE_TEXT.task), id: '00000000-0000-4000-8000-000000000910', title: TASK_B, kind: 'task', status: 'pending', due_date: null, event_date: null, metadata: {created_manually: true}});
 const json = (status, body) => ({status, contentType: 'application/json', body: JSON.stringify(body)});
@@ -234,6 +362,12 @@ async function boundary(browser, name, routes, fn) {
   finally { await context.close(); }
 }
 
+async function captureFinanceState(page, filename) {
+  // 고정 하단 탭이 펼친 거래를 가리지 않도록 화면 끝에서 전체 페이지를 촬영한다.
+  await page.evaluate(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'}));
+  await page.screenshot({path: join(SCREENS_DIR, filename), fullPage: true});
+}
+
 async function checkTabInteractions(browser) {
   const run = (name, check) => boundary(browser, name, {dashboard: okDashboard()}, async page => {
     const errs = await openDashboard(page);
@@ -245,7 +379,7 @@ async function checkTabInteractions(browser) {
   const category = page => page.locator('.newsCategoryToggle', {hasText: FIXTURE_NEWS_CATEGORY});
   const article = page => page.locator('.newsListButton', {hasText: FIXTURE_TEXT.news});
   const openHomeNews = async page => {
-    await page.locator('button.newsNavCard').click();
+    await page.locator('.homeNewsPanel button.homeNewsAll').click();
     await expect(category(page)).toBeVisible();
     await expect(detail(page)).toHaveCount(0);
     await expect(category(page)).toHaveAttribute('aria-expanded', 'false');
@@ -255,19 +389,128 @@ async function checkTabInteractions(browser) {
     await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
   };
 
+  await run('금융 월별 진행 주기 기본 펼침·할부 표기', async page => {
+    await clickTab(page, '금융');
+    const section = monthly(page);
+    const toggles = section.locator('.financeGroupToggle');
+    await expect(toggles).toHaveCount(6);
+    await expect(toggles.first()).toHaveAttribute('aria-expanded', 'true');
+    await expect(toggles.first()).toContainText('(할부 30,000원)'); // pii-allow 합성 금액
+    await expect(monthlyRow(page, FIXTURE_TEXT.installment).locator('.financeInstallment')).toHaveText('(할부 3개월)');
+    await expect(monthlyRow(page, FIXTURE_TEXT.undatedMerchant)).toHaveCount(0);
+    await captureFinanceState(page, 'finance-monthly-open-390.png');
+  });
+
+  await run('금융 카테고리 부모 금액·하위 항목·날짜 없는 거래', async page => {
+    await clickTab(page, '금융');
+    const section = page.locator('.financeCategories');
+    const toggle = section.getByRole('button', {name: /합성지출분류A/});
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toContainText('5건');
+    await expect(toggle).toContainText('60,000원'); // pii-allow 합성 금액
+    await toggle.click();
+    const aggregate = section.locator('.financeTransaction', {hasText: FIXTURE_TEXT.aggregateMerchant});
+    const subItems = aggregate.locator('.financeSubItems li');
+    await expect(subItems).toHaveText([/합성하위항목A.*2026-11-11 · 09:10.*6,000원/, /합성하위항목B.*2026-11-11 · 09:20.*9,000원/]);
+    const undated = section.locator('.financeTransaction', {hasText: FIXTURE_TEXT.undatedMerchant});
+    await expect(undated).toContainText('날짜 없음 · 합성카드A');
+    const add = memoButton(undated, FIXTURE_TEXT.undatedMerchant, '추가');
+    await expect(add).toBeVisible();
+    await captureFinanceState(page, 'finance-category-open-390.png');
+    await add.click();
+    await expect(undated.getByRole('textbox')).toBeEditable();
+  });
+
+  await run('금융 메모 검색 결과에서 지난달 20일 선택', async page => {
+    await clickTab(page, '금융');
+    const section = page.locator('.financeMemoSearch');
+    await section.getByRole('searchbox', {name: '메모 검색'}).fill('정산');
+    await expect(section.getByRole('status')).toHaveText('"정산" 메모 1건 · 합계 8,000원');
+    const result = section.getByRole('button', {name: /합성정산메모B 정산/});
+    await expect(result).toBeVisible();
+    await captureFinanceState(page, 'finance-memo-search-390.png');
+    await result.click();
+    await expect(page.locator('.dailyMonthNav strong')).toHaveText('2026.10');
+    await expect(financeDay(page, FIXTURE_PREVIOUS_DAY)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.dailyChart [aria-pressed="true"]')).toHaveAttribute('aria-label', '10월 20일, 지출 8,000원');
+    await expect(page.locator('.dailyDetails h2')).toHaveText('10월 20일 거래내역');
+    const row = section.locator('.financeTransaction', {hasText: FIXTURE_TEXT.previousMerchant});
+    await memoButton(row, FIXTURE_TEXT.previousMerchant, '수정').click();
+    await expect(row.getByRole('textbox')).toHaveValue('합성정산메모B 정산');
+  });
+
   await run('금융 메모 초안 유지', async page => {
     await clickTab(page, '금융');
-    await page.locator('.financeSeg button', {hasText: '메모'}).click();
-    const entry = page.locator('.memoEntry', {hasText: FIXTURE_TEXT.merchant});
-    await entry.locator('button.memoRead').click();
-    const draft = entry.getByRole('textbox', {name: FIXTURE_TEXT.merchant + ' 메모', exact: true});
+    await financeDay(page, FIXTURE_DAY).click();
+    await memoButton(page.locator('.dailyDetails'), FIXTURE_TEXT.merchant, '추가').click();
+    const draft = dayMemoArea(page, FIXTURE_TEXT.merchant);
     await draft.fill('합성메모초안A');
     await clickTab(page, '홈');
     await clickTab(page, '금융');
     await expect(draft).toHaveValue('합성메모초안A');
   });
 
+  await run('금융 다른 달 그날 내역 초안 유지', async page => {
+    const area = await openPreviousDayMemo(page);
+    await clickTab(page, '홈');
+    await clickTab(page, '금융');
+    await expect(page.locator('.dailyMonthNav strong')).toHaveText('2026.10');
+    await expect(financeDay(page, FIXTURE_PREVIOUS_DAY)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.dailyDetails h2')).toHaveText('10월 20일 거래내역');
+    await expect(area).toHaveValue(previousDraft);
+    await page.getByRole('button', {name: '다음 달'}).click();
+    await page.getByRole('button', {name: '이전 달'}).click();
+    await expect(page.locator('.financeCalendar [aria-pressed="true"]')).toHaveCount(0);
+    await financeDay(page, FIXTURE_PREVIOUS_DAY).click();
+    await expect(area).toHaveValue(previousDraft);
+  });
+
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
+
+  await run('혜택 포인트 제공처 줄 펼침 → 증감·사유', async page => {
+    await clickTab(page, '혜택');
+    const row = page.locator('.pointRow', {hasText: FIXTURE_TEXT.points});
+    const head = row.locator('button.pointRowHead');
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+    await expect(row.locator('.pointDetail')).toHaveCount(0);
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await expect(row.locator('.pointIncreaseReason')).toContainText('+700P');
+    await expect(row.locator('.pointIncreaseReason')).toContainText('합성적립사유A');
+    await expect(row.locator('.pointDecreaseReason')).toContainText('−200P');
+    await expect(row.locator('.pointDecreaseReason')).toContainText('합성사용사유A');
+    await expect(row.locator('.pointLogDate')).toHaveText(FIXTURE_DAY.replace(/-/g, '.'));
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await page.screenshot({path: join(SCREENS_DIR, 'benefits-points-open-390.png'), fullPage: true});
+    await clickTab(page, '홈');
+    await clickTab(page, '혜택');
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  const pointB = {...fixtureItem(FIXTURE_TEXT.points), id: '00000000-0000-4000-8000-000000000920', title: '합성포인트B', source: '합성포인트B', amount: 100, metadata: {provider: '합성포인트B'}};
+  await boundary(browser, '혜택 전일 잔액 없는 포인트 → 어제 잔액 데이터 없음 · 증감 없는 줄은 펼침 버튼 없음', {dashboard: okDashboard([pointB])}, async page => {
+    const errs = await openDashboard(page);
+    if (errs.length) return errs;
+    await clickTab(page, '혜택');
+    await expect(page.locator('.pointSummaryDelta')).toHaveText('(어제 잔액 데이터 없음)');
+    await expect(page.locator('.pointSummaryDelta')).not.toContainText('어제보다');
+    const plain = page.locator('.pointRow', {hasText: '합성포인트B'});
+    await expect(plain).toBeVisible();
+    await expect(plain.locator('button')).toHaveCount(0);
+    await expect(plain.locator('small').first()).toHaveText('전일 데이터 없음');
+    await expect(page.locator('.pointRow', {hasText: FIXTURE_TEXT.points}).locator('button.pointRowHead')).toHaveCount(1);
+    return [];
+  });
+
+  await run('기록 달력 FIXTURE_DAY 종류 점 4가지', async page => {
+    await clickTab(page, '기록');
+    const dots = page.locator(`.journalCalendar [data-date="${FIXTURE_DAY}"] .journalDot`);
+    await expect(dots).toHaveCount(4);
+    for (const kind of ['event', 'task', 'news', 'point']) await expect(dots.and(page.locator(`[data-kind="${kind}"]`))).toHaveCount(1);
+    await expect(page.locator('.journalLegend span')).toHaveText(['일정', '할 일', '뉴스', '포인트']);
+  });
 
   await run('기록 뉴스 검색 결과 → 바로 상세', async page => {
     await clickTab(page, '기록');
@@ -283,6 +526,40 @@ async function checkTabInteractions(browser) {
     await expect(detail(page)).toHaveCount(0);
     await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
     await expect(article(page)).toBeVisible();
+  });
+
+  await run('홈 뉴스 항목 → 바로 상세', async page => {
+    const items = page.locator('.homeNewsPanel button.homeNewsItem');
+    await expect(items).toHaveCount(2);
+    await items.filter({hasText: FIXTURE_TEXT.news}).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+  });
+
+  await run('뉴스 칩 전환 → 그 분류만 · 전체로 돌아옴', async page => {
+    await clickTab(page, '뉴스');
+    const chips = page.locator('.newsChips button.newsChip');
+    const panels = page.locator('.newsCategoryPanel');
+    const chip = name => chips.filter({hasText: new RegExp(`^${name}$`)});
+    await expect(chips).toHaveText(['전체', FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panels).toHaveCount(2);
+    await chip(FIXTURE_NEWS_CATEGORY_B).click();
+    await expect(chip(FIXTURE_NEWS_CATEGORY_B)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'false');
+    await expect(panels).toHaveCount(1);
+    await expect(panels.locator('.newsCategoryName')).toHaveText(FIXTURE_NEWS_CATEGORY_B);
+    await chip('전체').click();
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panels.locator('.newsCategoryName')).toHaveText([FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+  });
+
+  await run('홈 결제 주기 카드 금액 = 금융 탭 카드 금액', async page => {
+    const home = page.locator('button.homeCycleCard .homeCycleTotal');
+    await expect(home).toHaveText(`${(57000).toLocaleString('ko-KR')}원`);
+    const amount = await home.textContent();
+    await page.locator('button.homeCycleCard').click();
+    await expect(page.locator('nav.bottom button.active')).toHaveText('금융');
+    await expect(page.locator('.financeCycle .financeCycleTotal')).toHaveText(amount);
   });
 
   await run('기록 탭 옛 안내 문구 없음', async page => {
@@ -422,6 +699,20 @@ async function checkDataBoundaries(browser) {
     if (del.length !== 1 || !same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del.map(x => x.body))}`);
     return errs;
   });
+  await boundary(browser, '홈 할 일 삭제 버튼 aria-label·선 SVG ✕ → DELETE 본문', {dashboard: okDashboard(), items: (route, e) => route.fulfill(e.method === 'DELETE' ? json(200, {deleted: true}) : json(500, {}))}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const errs = [];
+    const button = page.getByRole('button', {name: `${FIXTURE_TEXT.task} 삭제`, exact: true});
+    if (!await visible(button)) return [`aria-label '${FIXTURE_TEXT.task} 삭제' 버튼 없음`];
+    const shape = await button.evaluate(el => ({text: el.textContent.trim(), svg: el.querySelectorAll('svg path').length, fill: el.querySelector('svg')?.getAttribute('fill')}));
+    if (shape.text !== '' || shape.svg !== 1 || shape.fill !== 'none') errs.push(`삭제 버튼 모양 ${JSON.stringify(shape)}`);
+    await button.click();
+    try { await button.waitFor({state: 'detached', timeout: 5_000}); } catch { errs.push(`'${FIXTURE_TEXT.task}' 가 남음`); }
+    const del = log.filter(x => x.method === 'DELETE');
+    if (del.length !== 1 || !same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del.map(x => x.body))}`);
+    return errs;
+  });
   await boundary(browser, '경계 ⑥ 할 일 삭제 500 → 남음', {dashboard: okDashboard()}, async page => {
     const open = await openDashboard(page);
     if (open.length) return open;
@@ -464,14 +755,13 @@ async function checkDataBoundaries(browser) {
   // ⑦ 거래 메모 PATCH: 본문 {action:'memo', id, memo}, 200 + {item} → 편집창 닫힘·메모 표시 / 500 → 초안 유지·오류
   const merchant = fixtureItem(FIXTURE_TEXT.merchant);
   const memoRequest = {action: 'memo', id: merchant.id, memo: MEMO_A};
-  const memoEntry = page => page.locator('.memoEntry', {hasText: FIXTURE_TEXT.merchant});
   const editMemo = async page => {
     await clickTab(page, '금융');
-    await page.locator('.financeSeg button', {hasText: '메모'}).click();
-    await memoEntry(page).locator('button.memoRead').click();
-    const area = memoEntry(page).locator(`textarea[aria-label="${FIXTURE_TEXT.merchant} 메모"]`);
+    const row = monthlyRow(page, FIXTURE_TEXT.merchant);
+    await memoButton(row, FIXTURE_TEXT.merchant, '추가').click();
+    const area = row.getByRole('textbox', {name: FIXTURE_TEXT.merchant + ' 메모', exact: true});
     await area.fill(MEMO_A);
-    await memoEntry(page).locator('button.memoSave').click();
+    await row.locator('.dailyMemoSave').click();
     return area;
   };
   const memoBody = log => { const p = log.filter(x => x.method === 'PATCH'); return p.length === 1 && same(p[0].body, memoRequest) ? [] : [`PATCH 본문 ${JSON.stringify(p.map(x => x.body))}`]; };
@@ -481,7 +771,7 @@ async function checkDataBoundaries(browser) {
     const area = await editMemo(page);
     const errs = [...memoBody(log)];
     try { await area.waitFor({state: 'detached', timeout: 5_000}); } catch { errs.push('편집창이 닫히지 않음'); }
-    if (!await visible(memoEntry(page).locator('button.memoRead', {hasText: MEMO_A}))) errs.push(`저장된 메모 '${MEMO_A}' 안 보임`);
+    if (!await visible(monthlyRow(page, FIXTURE_TEXT.merchant).locator('.financeSavedMemo', {hasText: MEMO_A}))) errs.push(`저장된 메모 '${MEMO_A}' 안 보임`);
     if (await errorBox(page).count()) errs.push(`오류 표시: ${await errorBox(page).first().textContent()}`);
     return errs;
   });
@@ -491,9 +781,82 @@ async function checkDataBoundaries(browser) {
     const area = await editMemo(page);
     const errs = [];
     if (!await visible(errorBox(page).filter({hasText: '거래 메모를 저장하지 못했습니다'}))) errs.push("'거래 메모를 저장하지 못했습니다' 안 보임");
+    await expect(monthlyRow(page, FIXTURE_TEXT.merchant).getByRole('alert')).toContainText('메모 저장에 실패했습니다');
     errs.push(...memoBody(log));
     if (await area.inputValue().catch(() => null) !== MEMO_A) errs.push(`입력란에 '${MEMO_A}' 초안이 남지 않음`);
     return errs;
+  });
+
+  const delayedMerchant = fixtureItem(FIXTURE_TEXT.previousMerchant);
+  const delayedRequest = {action: 'memo', id: delayedMerchant.id, memo: previousDraft};
+  const daySave = page => page.locator('.dailyMemoSave');
+  const openPreviousCycle = page => monthly(page).getByRole('button', {name: /11월 결제/}).click();
+  const checkDelayedMemo = async (name, changeEditor) => {
+    const response = gate();
+    await boundary(browser, name, {
+      dashboard: okDashboard(),
+      items: async (route, entry) => {
+        await response.wait;
+        const item = {...delayedMerchant, metadata: {...delayedMerchant.metadata, memo: previousDraft}};
+        await route.fulfill(entry.method === 'PATCH' && same(entry.body, delayedRequest)
+          ? json(200, {item}) : json(500, {}));
+      },
+    }, async (page, log) => {
+      try {
+        const open = await openDashboard(page);
+        if (open.length) return open;
+        const area = await openPreviousDayMemo(page);
+        const save = daySave(page);
+        // 같은 렌더 안에서 두 번 클릭해 비동기 요청 진입도 중복 차단되는지 검사한다.
+        await save.evaluate(button => { button.click(); button.click(); });
+        await expect(save).toBeDisabled();
+        const verifyEditor = await changeEditor(page, area);
+        const pendingResponse = page.waitForResponse(res => res.url().endsWith('/api/items') && res.request().method() === 'PATCH');
+        response.open();
+        expect((await pendingResponse).status()).toBe(200);
+        await verifyEditor();
+        expect(log.filter(entry => entry.method === 'PATCH').map(entry => entry.body)).toEqual([delayedRequest]);
+        return [];
+      } finally {
+        response.open();
+      }
+    });
+  };
+
+  await checkDelayedMemo('금융 메모 중복 클릭 PATCH 1회 · 늦은 응답 뒤 다른 거래 편집 유지', async page => {
+    await page.getByRole('button', {name: '다음 달'}).click();
+    await financeDay(page, FIXTURE_DAY).click();
+    await memoButton(page.locator('.dailyDetails'), FIXTURE_TEXT.installment, '추가').click();
+    const other = dayMemoArea(page, FIXTURE_TEXT.installment);
+    await other.fill('합성메모초안D');
+    return async () => {
+      // 저장된 값이 화면에 반영된 뒤에도 다른 편집창이 남아 있어야 한다.
+      await openPreviousCycle(page);
+      await expect(monthlyRow(page, FIXTURE_TEXT.previousMerchant).locator('.financeSavedMemo')).toHaveText(previousDraft);
+      await expect(other).toHaveValue('합성메모초안D');
+    };
+  });
+  await checkDelayedMemo('금융 늦은 응답 뒤 같은 거래 새 초안 유지', async (page, area) => {
+    await area.fill('합성메모초안E');
+    return async () => {
+      await expect(daySave(page)).toBeEnabled();
+      await expect(area).toHaveValue('합성메모초안E');
+    };
+  });
+  await checkDelayedMemo('금융 늦은 응답 뒤 같은 거래 월별 펼침 재열기 유지', async page => {
+    await page.locator('.dailyMemoEditor').getByRole('button', {name: '취소'}).click();
+    await openPreviousCycle(page);
+    const entry = monthlyRow(page, FIXTURE_TEXT.previousMerchant);
+    await memoButton(entry, FIXTURE_TEXT.previousMerchant, '수정').click();
+    const area = entry.getByRole('textbox');
+    // 같은 초안을 입력해 편집 세션까지 일치해야 닫히는지 검사한다.
+    await area.fill(previousDraft);
+    await expect(entry.locator('.dailyMemoSave')).toBeDisabled();
+    await expect(page.locator('.dailyDetails .dailyMemoEditor')).toHaveCount(0);
+    return async () => {
+      await expect(entry.locator('.dailyMemoSave')).toBeEnabled();
+      await expect(area).toHaveValue(previousDraft);
+    };
   });
 }
 
@@ -544,6 +907,10 @@ try {
           if (errs.length) fail(name, errs); else console.log(`PASS ${name} 대표 문구·가로 넘침`);
         } catch (e) { fail(name, [e.message.split('\n')[0]]); }
       }
+      try {
+        const errs = await checkComputedStyles(page);
+        if (errs.length) fail(`계산된 스타일 ${label}`, errs); else console.log(`PASS 계산된 스타일 ${label}`);
+      } catch (e) { fail(`계산된 스타일 ${label}`, [e.message.split('\n')[0]]); }
     } catch (e) {
       fail(label, [e.message.split('\n')[0]]);
     } finally { await context.close(); }

@@ -1,0 +1,331 @@
+/* 11단계 새 디자인: 화이트·블루. 셸 루트의 .uiV2 아래에서만 옛 규칙(globals.css)을 덮어쓴다.
+   옛 .demoShell.designPreview.conceptLight 규칙보다 구체성이 높도록 루트 클래스를 모두 나열한다. */
+@font-face{font-family:'Pretendard';src:url('/fonts/PretendardVariable.woff2') format('woff2-variations');font-weight:45 920;font-style:normal;font-display:swap}
+:root{--ui-bg:#FFFFFF;--ui-card:#FFFFFF;--ui-border:#EBEBEB;--ui-line:#F0F0F0;--ui-line2:#F2F2F2;--ui-text:#0B0B0C;--ui-sub:#6B6B6B;--ui-faint:#8C8C8C;--ui-accent:#2B59C3;--ui-accent-dark:#1F44A0;--ui-low:#4E8B6E;--ui-mid:#C08A2B;--ui-high:#C4513A;--ui-installment:#9A6A1E;--ui-sun:#C4513A;--ui-sat:#3B6EA8;--ui-r-card:16px;--ui-r-box:12px;--ui-r-btn:8px}
+html,body{background:#FFFFFF;color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.shell.uiV2.demoShell.designPreview.conceptLight button,.shell.uiV2.demoShell.designPreview.conceptLight input,.shell.uiV2.demoShell.designPreview.conceptLight textarea{font-family:inherit}
+.shell.uiV2.demoShell.designPreview.conceptLight h1,.shell.uiV2.demoShell.designPreview.conceptLight h2{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight a{color:var(--ui-accent)}
+
+/* 카드 */
+.shell.uiV2.demoShell.designPreview.conceptLight .panel,.shell.uiV2.demoShell.designPreview.conceptLight .metric,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary,.shell.uiV2.demoShell.designPreview.conceptLight .newsNavCard,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail{background:var(--ui-card);background-image:none;border:1px solid var(--ui-border);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .metric .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric small,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary small{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .metric strong,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary strong{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .listitem,.shell.uiV2.demoShell.designPreview.conceptLight .memoEntry,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading,.shell.uiV2.demoShell.designPreview.conceptLight .newsPreviewItem,.shell.uiV2.demoShell.designPreview.conceptLight .newsListButton,.shell.uiV2.demoShell.designPreview.conceptLight .todoRow{border-bottom-color:var(--ui-line)}
+.shell.uiV2.demoShell.designPreview.conceptLight .itembody small,.shell.uiV2.demoShell.designPreview.conceptLight .empty{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .sectionTitle span{color:var(--ui-accent)}
+
+/* 버튼·칩 */
+.shell.uiV2.demoShell.designPreview.conceptLight .seg{background:#F5F5F5;border-radius:var(--ui-r-box);padding:4px;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .seg button{background:transparent;color:var(--ui-sub);border-radius:var(--ui-r-btn);box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .seg button.selected{background:var(--ui-accent);color:#FFFFFF;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .textbutton,.shell.uiV2.demoShell.designPreview.conceptLight .external{color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2.demoShell.designPreview.conceptLight .track{background:var(--ui-line2)}
+.shell.uiV2.demoShell.designPreview.conceptLight .track>div{background:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .error{background:#FDF1EE;color:#8A2F1D;border-radius:var(--ui-r-box)}
+
+/* 상단 */
+.shell.uiV2.demoShell.designPreview.conceptLight .top{align-items:flex-start;margin-bottom:20px}
+.shell.uiV2.demoShell.designPreview.conceptLight .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .brandMark{display:inline-flex;color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .top h1{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ui-text);margin:6px 0 0}
+.shell.uiV2.demoShell.designPreview.conceptLight .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-faint);font-size:11px;line-height:1.5}
+.shell.uiV2.demoShell.designPreview.conceptLight .refreshButton,.shell.uiV2.demoShell.designPreview.conceptLight .profile{background:#FFFFFF;background-image:none;border:1px solid var(--ui-border);color:var(--ui-text);border-radius:var(--ui-r-btn);box-shadow:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
+.shell.uiV2.demoShell.designPreview.conceptLight .topActions{display:flex;gap:8px}
+
+/* 하단 탭 */
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom{background:#0B0B0C;background-image:none;box-shadow:none;backdrop-filter:none;border:0;border-radius:18px;bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),596px);padding:8px 6px;gap:2px;justify-content:space-between}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{flex:1;min-width:0;color:#A0A0A6;background:none;border:0;border-radius:12px;padding:6px 2px;gap:3px;font-size:11px;font-weight:600;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button.active{color:#FFFFFF;background:none}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom .navicon{display:inline-flex;font-size:0;line-height:0}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 옛 탭: 흰 바탕에서 읽히는 글자색 */
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail *{color:#2A2A2C}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailHeadline{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailDate,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailCategory{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsBack,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsOriginal{color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider *{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider small,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel button,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel strong,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel b{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel small,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel span{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen span{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay:not(.chosen) span{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.sunday:not(.chosen) span{color:var(--ui-sun)}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{transition:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday.sunday{color:var(--ui-sun)}
+
+/* 금융 상단 */
+.shell.uiTheme .financeCycle h2,.shell.uiTheme .dailyDetailsHeader h2{margin:0}
+.shell.uiTheme .financeCycleTotal{display:block;font-size:clamp(30px,8vw,44px);margin-top:10px;letter-spacing:-.03em}
+.shell.uiTheme .financeCycle p{margin:6px 0 0;font-size:13px;color:var(--ui-sub)}
+.shell.uiTheme .financeCycle small{margin-left:6px;font-size:11px;color:var(--ui-faint)}
+.shell.uiTheme .financeCycleComparison{margin-top:14px;padding-top:8px;border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeCycle progress{display:block;width:100%;height:6px;margin:6px 0 10px;appearance:none;border:0;border-radius:8px;background:var(--ui-line2);color:var(--ui-accent)}
+.shell.uiTheme .financeCycle progress::-webkit-progress-bar{background:var(--ui-line2);border-radius:8px}
+.shell.uiTheme .financeCycle progress::-webkit-progress-value{background:var(--ui-accent);border-radius:8px}
+.shell.uiTheme .financeCycle progress::-moz-progress-bar{background:var(--ui-accent);border-radius:8px}
+
+.shell.uiTheme .dailySpendingHeader{align-items:center}
+.shell.uiTheme .dailySpendingHeader h2{margin:0}
+.shell.uiTheme .dailyMonthNav strong{color:var(--ui-text)}
+.shell.uiTheme .dailyMonthNav button,.shell.uiTheme .dailyTransactionActions .memoInlineButton,.shell.uiTheme .dailyMemoActions button{
+ border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-accent-dark);box-shadow:none;
+}
+.shell.uiTheme .dailyMonthNav button{display:grid;place-items:center;padding:0;width:32px;height:32px}
+.shell.uiTheme .dailyMonthNav button:disabled{opacity:.4}
+.shell.uiTheme .dailyChart{position:relative;width:100%;margin-top:14px}
+.shell.uiTheme .dailyChart svg{display:block;width:100%;height:auto}
+.shell.uiTheme .dailyChart text{font-size:11px;fill:var(--ui-sub)}
+.shell.uiTheme .dailyGridLine{stroke:var(--ui-line)}
+.shell.uiTheme .dailyLine{fill:none;stroke:var(--ui-accent);stroke-width:2.5;stroke-linecap:round}
+.shell.uiTheme .dailyMarker{stroke:var(--ui-accent);stroke-dasharray:3 4}
+.shell.uiTheme .dailyPoint{fill:var(--ui-accent);stroke:#fff;stroke-width:1.5}
+.shell.uiTheme .dailyTooltip rect{fill:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTooltip text{fill:#fff;font-weight:600}
+.shell.uiTheme .dailyChart .dailyHit{top:18%;height:66%;transform:translateX(-50%);border-radius:var(--ui-r-btn);padding:0}
+.shell.uiTheme .dailyHit:focus-visible{outline:2px solid var(--ui-accent)}
+
+.shell.uiTheme .financeCalendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;row-gap:5px}
+.shell.uiTheme .financeCalendarGrid>span{font-size:12px;color:var(--ui-sub);padding:5px 0}
+.shell.uiTheme .financeCalendarGrid>button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;min-height:43px;padding:0;border:0;border-radius:var(--ui-r-btn);background:none;color:var(--ui-text)}
+.shell.uiTheme .financeCalendarDay{display:grid;place-items:center;width:25px;height:25px;border:1px solid transparent;border-radius:50%;font-size:13px}
+.shell.uiTheme .financeCalendarGrid .sunday{color:var(--ui-sun)}
+.shell.uiTheme .financeCalendarGrid .saturday{color:var(--ui-sat)}
+.shell.uiTheme .financeCalendarGrid [aria-current="date"] .financeCalendarDay{border-color:var(--ui-text)}
+.shell.uiTheme .financeCalendarGrid [aria-pressed="true"] .financeCalendarDay{background:var(--ui-text);color:#fff}
+.shell.uiTheme .financeCalendarAmount{font-size:10px;line-height:1;white-space:nowrap}
+.shell.uiTheme .financeCalendar .low{color:var(--ui-low)}
+.shell.uiTheme .financeCalendar .mid{color:var(--ui-mid)}
+.shell.uiTheme .financeCalendar .high{color:var(--ui-high)}
+.shell.uiTheme .financeCalendarLegend{display:flex;gap:12px;margin-top:8px;font-size:12px}
+.shell.uiTheme .financeCalendarThresholds{margin:5px 0 0;color:var(--ui-sub);font-size:11px}
+
+.shell.uiTheme .dailyDetailsHeader,.shell.uiTheme .dailyTransactionWrap{border-bottom-color:var(--ui-line)}
+.shell.uiTheme .dailyDetailsHeader strong,.shell.uiTheme .dailyTransaction strong{color:var(--ui-text)}
+.shell.uiTheme .dailyDetailsHeader small,.shell.uiTheme .dailyTransaction small,.shell.uiTheme .dailyMemoActions small{color:var(--ui-sub)}
+.shell.uiTheme .dailyTransaction .dailyInstallment{color:var(--ui-installment)}
+.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTransaction strong{overflow-wrap:anywhere}
+.shell.uiTheme .dailyMemoEditor textarea{background:#fff;color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .dailyMemoActions .dailyMemoSave{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+.shell.uiTheme .dailyMemoError{color:var(--ui-high)}
+
+/* 금융 하단 */
+.shell.uiTheme .financeSearchField{
+ display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--ui-sub);
+ border:1px solid var(--ui-border);border-radius:var(--ui-r-box);
+}
+.shell.uiTheme .financeSearchField:focus-within{outline:2px solid var(--ui-accent)}
+.shell.uiTheme .financeSearchField input{width:100%;min-width:0;min-height:42px;padding:0;border:0;outline:0;background:#fff;color:var(--ui-text);font-size:16px}
+.shell.uiTheme .financeSearchChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.shell.uiTheme .financeAction{
+ padding:6px 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);
+ background:#fff;color:var(--ui-accent-dark);font-size:12px;box-shadow:none;
+}
+.shell.uiTheme .financeAction[aria-pressed="true"]{border-color:var(--ui-accent);background:var(--ui-accent);color:#fff}
+.shell.uiTheme .financeSearchSummary{margin:14px 0 0;font-size:13px;color:var(--ui-sub);overflow-wrap:anywhere}
+.shell.uiTheme .financeExpenseGroup+.financeExpenseGroup{border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeGroupToggle{
+ display:block;width:100%;padding:12px 0;border:0;background:none;color:var(--ui-text);
+ text-align:left;font-size:13px;
+}
+.shell.uiTheme .financeGroupHeading{display:grid;grid-template-columns:minmax(0,1fr) auto 16px;gap:10px;align-items:center}
+.shell.uiTheme .financeGroupHeading>span{display:grid;gap:4px;overflow-wrap:anywhere}
+.shell.uiTheme .financeGroupHeading small{color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeGroupAmount{text-align:right;max-width:145px}
+.shell.uiTheme .financeGroupToggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.shell.uiTheme .financeGroupTrack{display:block;height:5px;margin-top:9px;border-radius:8px;background:var(--ui-line2)}
+.shell.uiTheme .financeGroupTrack>span{display:block;height:100%;border-radius:inherit;background:var(--ui-accent)}
+.shell.uiTheme .financeGroupItems{margin:0 0 12px;padding:0 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .financeGroupItems>.financeAction{margin:0 0 10px}
+.shell.uiTheme .financeTransaction{border-bottom:1px solid var(--ui-line)}
+.shell.uiTheme .financeTransaction:last-of-type{border-bottom:0}
+.shell.uiTheme .financeTransactionRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 0;font-size:13px}
+.shell.uiTheme .financeTransactionIdentity,.shell.uiTheme .financeSearchResult,.shell.uiTheme .financeTransactionAmount{display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.shell.uiTheme .financeSearchResult{flex:1;border:0;border-radius:var(--ui-r-btn);padding:0;background:none;color:var(--ui-accent-dark);text-align:left}
+.shell.uiTheme .financeSearchResult:hover strong{text-decoration:underline}
+.shell.uiTheme .financeTransactionAmount{text-align:right;justify-items:end;flex-shrink:0}
+.shell.uiTheme .financeTransactionRow small,.shell.uiTheme .financeSubItems small{color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeTransactionAmount small{font-size:10px}
+.shell.uiTheme .financeTransactionAmount .financeInstallment{color:var(--ui-installment)}
+.shell.uiTheme .financeTransactionRow .financeSavedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .financeSubItems{list-style:none;margin:0 0 10px;padding:0 9px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .financeSubItems li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:12px}
+.shell.uiTheme .financeSubItems li+li{border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeSubItems li>div{display:grid;gap:3px;overflow-wrap:anywhere;min-width:0}
+.shell.uiTheme .financeSubItems li>strong{flex-shrink:0}
+.shell.uiTheme .financeAggregateNote{margin:0 0 10px;color:var(--ui-sub);font-size:11px}
+.shell.uiTheme .financeSettlements .check{display:grid;place-items:center;padding:0;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal{background:#fff;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);box-shadow:none}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal strong,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice strong,
+.shell.uiTheme .aiSubscriptionPanel .subscriptionDateLine>strong,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionIdentity>b{color:var(--ui-text)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal small,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionTotal .eyebrow,
+.shell.uiTheme .aiSubscriptionPanel .subscriptionDateLine>span,.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice .subscriptionStopped{color:var(--ui-sub)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionPrice .subscriptionActive{color:var(--ui-accent-dark)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionRow{border-bottom-color:var(--ui-line)}
+.shell.uiTheme .aiSubscriptionPanel .aiSubscriptionIdentity .subscriptionPlan,.shell.uiTheme .aiSubscriptionPanel .sectionUpdateMeta>small{color:var(--ui-sub)}
+
+/* 홈 */
+.shell.uiTheme .homeCycleCard{display:flex;flex-direction:column;gap:6px;width:100%;margin:0 0 14px;padding:20px;text-align:left;font:inherit;color:var(--ui-text);cursor:pointer;appearance:none}
+.shell.uiTheme .homeCycleCard:focus-visible{outline:2px solid var(--ui-accent);outline-offset:3px}
+.shell.uiTheme .homeCycleHeading{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;color:var(--ui-text)}
+.shell.uiTheme .homeCycleHeading svg{color:var(--ui-faint)}
+.shell.uiTheme .homeCycleTotal{display:block;margin-top:4px;font-size:clamp(28px,8vw,38px);font-weight:800;letter-spacing:-.03em;color:var(--ui-text)}
+.shell.uiTheme .homeCycleSplit{font-size:12px;color:var(--ui-sub)}
+.shell.uiTheme .homeCycleMeta{font-size:12px;color:var(--ui-faint)}
+.shell.uiTheme .taskPanel .taskHeaderActions .taskCount{color:var(--ui-faint);font-size:12px;font-weight:600}
+.shell.uiTheme .taskPanel .taskOpenButton{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn)!important;background:#fff;color:var(--ui-accent-dark);font-size:12px;font-weight:700}
+.shell.uiTheme .taskPanel .taskOpenButton:hover{background:#F5F7FC;color:var(--ui-accent-dark)}
+.shell.uiTheme .taskPanel .taskOpenButton:focus-visible,.shell.uiTheme .taskDeleteButton:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.shell.uiTheme .taskPanel .taskAddForm input{background:#fff;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);color:var(--ui-text);font-size:16px}
+.shell.uiTheme .taskPanel .taskAddForm input::placeholder{color:var(--ui-faint)}
+.shell.uiTheme .taskPanel .taskAddForm input:focus{border-color:var(--ui-accent);outline:1px solid var(--ui-accent)}
+.shell.uiTheme .taskPanel .taskAddForm button{background:var(--ui-accent);border:1px solid var(--ui-accent);color:#fff;border-radius:var(--ui-r-btn)}
+.shell.uiTheme .taskPanel .taskAddForm button:hover:not(:disabled){background:var(--ui-accent-dark)}
+.shell.uiTheme .taskPanel .listitem .itembody b{color:var(--ui-text)}
+.shell.uiTheme .taskPanel .struck{color:var(--ui-faint)}
+.shell.uiTheme .taskPanel .check{display:grid;place-items:center;padding:0;border:1.5px solid #C8C8C8;border-radius:6px;background:#fff;color:#fff}
+.shell.uiTheme .taskPanel .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+.shell.uiTheme .taskDeleteButton{display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:var(--ui-r-btn);background:transparent;color:var(--ui-faint);font-size:0}
+.shell.uiTheme .taskDeleteButton:hover{background:#FBF1EE;border-color:transparent;color:var(--ui-high)}
+.shell.uiTheme .homeNewsHeader{align-items:center;margin-bottom:4px}
+.shell.uiTheme .homeNewsHeader h2{margin:0}
+.shell.uiTheme .homeNewsAll{display:inline-flex;align-items:center;gap:2px;padding:6px 0;border:0;background:none;color:var(--ui-accent);font-size:12px;font-weight:700}
+.shell.uiTheme .homeNewsItem{display:flex;flex-direction:column;gap:4px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--ui-line);background:none;color:var(--ui-text);text-align:left;font:inherit}
+.shell.uiTheme .homeNewsItem:last-of-type{border-bottom:0}
+.shell.uiTheme .homeNewsItem small{font-size:11px;color:var(--ui-accent)}
+.shell.uiTheme .homeNewsItem b{font-size:14px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.shell.uiTheme .homeNewsAll:focus-visible,.shell.uiTheme .homeNewsItem:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px;border-radius:var(--ui-r-btn)}
+
+/* 뉴스 */
+.shell.uiTheme .newsChips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin-bottom:4px;scrollbar-width:none}
+.shell.uiTheme .newsChip{flex-shrink:0;padding:7px 14px;border:1px solid var(--ui-border);border-radius:999px;background:#fff;color:var(--ui-sub);font-size:13px;font-weight:600;white-space:nowrap}
+.shell.uiTheme .newsChip.selected{background:var(--ui-text);border-color:var(--ui-text);color:#fff}
+.shell.uiTheme .newsChip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.shell.uiTheme .newsCategoryPanel{padding:4px 18px;margin:12px 0}
+.shell.uiTheme .newsCategoryToggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border:0;background:none;color:var(--ui-text);text-align:left}
+.shell.uiTheme .newsCategoryLabel{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+.shell.uiTheme .newsCategoryName{font-size:15px;font-weight:700;color:var(--ui-text);overflow-wrap:anywhere}
+.shell.uiTheme .newsCategoryToggle:hover .newsCategoryName{color:var(--ui-accent-dark)}
+.shell.uiTheme .newsCategoryLabel small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme .newsCategoryChevron{display:inline-flex;color:var(--ui-faint);font-size:0;transition:none}
+.shell.uiTheme .newsCategoryToggle[aria-expanded="true"] .newsCategoryChevron svg{transform:rotate(180deg)}
+.shell.uiTheme .newsCategoryToggle:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px;border-radius:var(--ui-r-btn)}
+.shell.uiTheme .newsCategoryList{border-top:1px solid var(--ui-line);padding-bottom:6px}
+.shell.uiTheme .newsListButton{display:flex;align-items:center;gap:10px;min-height:0;padding:14px 0;border:0;border-bottom:1px solid var(--ui-line);background:none;color:var(--ui-text)}
+.shell.uiTheme .newsCategoryList .newsListButton:last-of-type{border-bottom:0}
+.shell.uiTheme .newsListText small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme .newsListText strong{font-size:14px;font-weight:600;line-height:1.5;color:var(--ui-text);overflow-wrap:anywhere}
+.shell.uiTheme .newsListArrow{display:inline-flex;color:var(--ui-faint);font-size:0}
+.shell.uiTheme .newsCategoryMore{display:block;width:100%;margin:6px 0 8px;padding:9px 10px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-accent-dark);font-size:12px;font-weight:600}
+.shell.uiTheme .newsDetail{padding:20px}
+.shell.uiTheme .newsDetail .newsBack{display:inline-flex;align-items:center;gap:4px;padding:8px 12px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;font-size:12px;font-weight:600}
+.shell.uiTheme .newsDetail .newsBackBottom{margin-top:12px}
+.shell.uiTheme .newsDetail .newsOriginal{display:inline-flex;align-items:center;gap:6px;margin:8px 0 6px;padding:10px 14px;border:1px solid var(--ui-accent);border-radius:var(--ui-r-btn);background:#fff;text-decoration:none;font-size:13px;font-weight:600}
+.shell.uiTheme .newsDetail .newsDetailSummary{padding:12px;border-radius:var(--ui-r-box);background:#F7F8FB}
+
+/* 혜택 */
+.shell.uiTheme.uiV2 .pointsPanel .sectionTitle,.shell.uiTheme.uiV2 .applicationsPanel .sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.shell.uiTheme.uiV2 .pointsPanel h2,.shell.uiTheme.uiV2 .applicationsPanel h2{margin:0;font-size:16px;font-weight:700;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .sectionUpdateMeta{display:flex;align-items:center;gap:8px}
+.shell.uiTheme.uiV2 .sectionUpdateMeta span,.shell.uiTheme.uiV2 .sectionUpdateMeta small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .pointSummary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:4px 0 14px;border-bottom:1px solid var(--ui-line)}
+.shell.uiTheme.uiV2 .pointSummaryTotal{font-size:clamp(28px,8vw,36px);font-weight:800;letter-spacing:-.03em;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .pointSummaryDelta{font-size:13px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .pointsPanel .deltaUp{color:var(--ui-accent-dark)}
+.shell.uiTheme.uiV2 .pointsPanel .deltaDown{color:var(--ui-high)}
+.shell.uiTheme.uiV2 .pointsPanel .deltaFlat{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .pointRow{display:block;padding:0;border:0;border-bottom:1px solid var(--ui-line);background:none}
+.shell.uiTheme.uiV2 .pointRow:last-of-type{border-bottom:0}
+.shell.uiTheme.uiV2 .pointRowHead{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 0;border:0;background:none;color:var(--ui-text);text-align:left;font:inherit}
+.shell.uiTheme.uiV2 button.pointRowHead:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px;border-radius:var(--ui-r-btn)}
+.shell.uiTheme.uiV2 .pointRowName{flex:1;min-width:0;font-size:14px;font-weight:600;overflow-wrap:anywhere;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .pointRowAmounts{display:grid;justify-items:end;gap:3px;flex-shrink:0}
+.shell.uiTheme.uiV2 .pointRowAmounts strong{font-size:15px;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .pointRowAmounts small{font-size:11px}
+.shell.uiTheme.uiV2 .pointRowChevron{flex-shrink:0;color:var(--ui-faint);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.shell.uiTheme.uiV2 .pointRowHead[aria-expanded="true"] .pointRowChevron{transform:rotate(180deg)}
+.shell.uiTheme.uiV2 .pointDetail{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);background:#fff}
+.shell.uiTheme.uiV2 .pointDetail .pointLogDate{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .pointReasonLine{display:flex;align-items:baseline;gap:10px;font-size:13px}
+.shell.uiTheme.uiV2 .pointReasonValue{flex-shrink:0;font-size:13px}
+.shell.uiTheme.uiV2 .pointIncreaseReason .pointReasonValue{color:var(--ui-accent-dark)}
+.shell.uiTheme.uiV2 .pointDecreaseReason .pointReasonValue{color:var(--ui-high)}
+.shell.uiTheme.uiV2 .pointReasonText{min-width:0;color:var(--ui-sub);overflow-wrap:anywhere}
+.shell.uiTheme.uiV2 .applicationCounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.shell.uiTheme.uiV2 .applicationCounts>div{display:grid;gap:4px;justify-items:center;padding:12px 6px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);background:#fff}
+.shell.uiTheme.uiV2 .applicationCounts strong{font-size:22px;font-weight:800;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .applicationCounts span{font-size:12px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .applicationList{list-style:none;margin:0;padding:0}
+.shell.uiTheme.uiV2 .applicationItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--ui-line)}
+.shell.uiTheme.uiV2 .applicationItem:last-child{border-bottom:0}
+.shell.uiTheme.uiV2 .applicationInfo{display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.shell.uiTheme.uiV2 .applicationInfo b{font-size:14px;font-weight:600;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .applicationInfo small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .applicationStatus{flex-shrink:0;padding:4px 10px;border:1px solid var(--ui-border);border-radius:999px;background:#fff;font-size:12px;font-weight:600;white-space:nowrap}
+.shell.uiTheme.uiV2 .applicationStatus.statusAccepted{color:var(--ui-accent-dark);border-color:var(--ui-accent)}
+.shell.uiTheme.uiV2 .applicationStatus.statusRejected{color:var(--ui-high);border-color:var(--ui-high)}
+.shell.uiTheme.uiV2 .applicationStatus.statusPending{color:var(--ui-sub)}
+
+/* 기록 */
+.shell.uiTheme.uiV2 .lifeCalendar{display:flex;flex-direction:column;gap:14px}
+.shell.uiTheme.uiV2 .lifeCalendar .calendarSearchPanel,.shell.uiTheme.uiV2 .lifeCalendar .calendarAgenda,.shell.uiTheme.uiV2 .lifeCalendar .journalCalendar{display:flex;flex-direction:column;gap:12px;margin:0;padding:18px;background:#fff;border:1px solid var(--ui-border);border-radius:var(--ui-r-card);box-shadow:none}
+.shell.uiTheme.uiV2 .calendarSearchPanel>label{font-size:13px;font-weight:700;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .calendarSearchField{display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--ui-border);border-radius:var(--ui-r-box);background:#fff;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarSearchField:focus-within{outline:2px solid var(--ui-accent);box-shadow:none}
+.shell.uiTheme.uiV2 .calendarSearchField svg,.shell.uiTheme.uiV2 .calendarArrows svg,.shell.uiTheme.uiV2 .calendarNewsOpen svg,.shell.uiTheme.uiV2 .calendarSearchResult>svg,.shell.uiTheme.uiV2 .calendarTaskToggle svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.shell.uiTheme.uiV2 .calendarSearchField input{width:100%;min-width:0;min-height:42px;padding:0;border:0;outline:0;background:#fff;color:var(--ui-text);font-size:16px}
+.shell.uiTheme.uiV2 .calendarSearchField button{display:grid;place-items:center;padding:4px;border:0;background:none;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarFilters{display:flex;gap:8px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.shell.uiTheme.uiV2 .calendarFilters button{flex-shrink:0;padding:7px 14px;border:1px solid var(--ui-border);border-radius:999px;background:#fff;color:var(--ui-sub);font-size:13px;font-weight:600;white-space:nowrap}
+.shell.uiTheme.uiV2 .calendarFilters button.active{background:var(--ui-text);border-color:var(--ui-text);color:#fff}
+.shell.uiTheme.uiV2 .calendarFilters button:focus-visible,.shell.uiTheme.uiV2 .calendarToday:focus-visible,.shell.uiTheme.uiV2 .calendarArrows button:focus-visible,.shell.uiTheme.uiV2 .calendarSearchResult:focus-visible,.shell.uiTheme.uiV2 .calendarNewsOpen:focus-visible,.shell.uiTheme.uiV2 .calendarTaskToggle:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.shell.uiTheme.uiV2 .lifeCalendar .calendarHeader,.shell.uiTheme.uiV2 .lifeCalendar .calendarMonthNav,.shell.uiTheme.uiV2 .lifeCalendar .calendarAgendaHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0}
+.shell.uiTheme.uiV2 .calendarHeader h2,.shell.uiTheme.uiV2 .calendarAgendaHeading h2{margin:0;font-size:16px;font-weight:700;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .calendarAgendaHeading span{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarAgendaHeading>strong{padding:5px 10px;border:1px solid var(--ui-border);border-radius:999px;background:#fff;color:var(--ui-sub);font-size:12px;white-space:nowrap}
+.shell.uiTheme.uiV2 .calendarToday{padding:6px 12px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-accent-dark);font-size:12px;font-weight:700}
+.shell.uiTheme.uiV2 .calendarMonthNav strong{font-size:15px;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .calendarArrows{display:flex;gap:6px}
+.shell.uiTheme.uiV2 .calendarArrows button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .journalCalendar .financeCalendarGrid>button{min-height:46px}
+.shell.uiTheme.uiV2 .journalDots{display:flex;justify-content:center;gap:3px;height:5px}
+.shell.uiTheme.uiV2 .journalDot{display:inline-block;width:5px;height:5px;border-radius:50%;flex-shrink:0;background:var(--ui-faint)}
+.shell.uiTheme.uiV2 .journalDot.event{background:var(--ui-sat)}
+.shell.uiTheme.uiV2 .journalDot.task{background:var(--ui-accent)}
+.shell.uiTheme.uiV2 .journalDot.news{background:var(--ui-faint)}
+.shell.uiTheme.uiV2 .journalDot.point{background:var(--ui-mid)}
+.shell.uiTheme.uiV2 .journalLegend{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.shell.uiTheme.uiV2 .journalLegend span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .journalKind{font-weight:700}
+.shell.uiTheme.uiV2 .journalKind.event{color:var(--ui-sat)}
+.shell.uiTheme.uiV2 .journalKind.task{color:var(--ui-accent)}
+.shell.uiTheme.uiV2 .journalKind.news{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .journalKind.point{color:var(--ui-installment)}
+.shell.uiTheme.uiV2 .calendarAgendaEntry{display:flex;align-items:center;gap:12px;padding:14px 0;border:0;border-bottom:1px solid var(--ui-line);background:none}
+.shell.uiTheme.uiV2 .calendarAgendaEntry:last-child{border-bottom:0}
+.shell.uiTheme.uiV2 .calendarEntryInfo{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.shell.uiTheme.uiV2 .calendarEntryInfo small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarEntryInfo strong{font-size:14px;font-weight:600;line-height:1.5;color:var(--ui-text)}
+.shell.uiTheme.uiV2 .calendarEntryInfo strong.struck{color:var(--ui-faint);text-decoration:line-through}
+.shell.uiTheme.uiV2 .calendarEntryInfo>span{font-size:12px;line-height:1.6;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarPointAmount{display:block;font-size:14px;margin:0}
+.shell.uiTheme.uiV2 .calendarPointAmount.positive{color:var(--ui-accent-dark)}
+.shell.uiTheme.uiV2 .calendarPointAmount.negative{color:var(--ui-high)}
+.shell.uiTheme.uiV2 .calendarTaskToggle{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;padding:0;border:1.5px solid #C8C8C8;border-radius:6px;background:#fff;color:#fff}
+.shell.uiTheme.uiV2 .calendarTaskToggle.checked{background:var(--ui-accent);border-color:var(--ui-accent)}
+.shell.uiTheme.uiV2 .calendarNewsOpen{display:inline-flex;align-items:center;gap:2px;flex-shrink:0;padding:6px 8px;border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-accent-dark);font-size:12px;font-weight:700;white-space:nowrap}
+.shell.uiTheme.uiV2 .calendarSearchResult{display:flex;align-items:center;gap:12px;width:100%;padding:14px 0;border:0;border-bottom:1px solid var(--ui-line);background:none;color:var(--ui-text);text-align:left;font:inherit}
+.shell.uiTheme.uiV2 .calendarSearchResult:last-of-type{border-bottom:0}
+.shell.uiTheme.uiV2 .calendarSearchResult>svg{color:var(--ui-faint)}
+.shell.uiTheme.uiV2 .calendarSearchResultText{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.shell.uiTheme.uiV2 .calendarSearchResultText small{font-size:11px;color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .calendarSearchResultText strong{font-size:14px;font-weight:600;line-height:1.5;color:var(--ui-text);overflow-wrap:anywhere}
+.shell.uiTheme.uiV2 .calendarSearchResultText>span{font-size:12px;color:var(--ui-sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shell.uiTheme.uiV2 .calendarNoEntries{display:flex;flex-direction:column;align-items:center;padding:28px 12px;color:var(--ui-sub);font-size:14px}
+.shell.uiTheme.uiV2 .calendarDemoNote{margin:0;font-size:12px;color:var(--ui-faint);text-align:center}

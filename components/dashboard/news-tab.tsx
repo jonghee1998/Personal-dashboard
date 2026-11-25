@@ -1,9 +1,13 @@
 import type {Dispatch,SetStateAction} from 'react';
 import type {Item} from './use-dashboard-data';
 
+export const ALL_NEWS='전체';
+
 type Props={
  items:Item[];
  selectedNewsId:string|null;
+ newsFilter:string;
+ setNewsFilter:(category:string)=>void;
  openNewsCategories:string[];
  setOpenNewsCategories:Dispatch<SetStateAction<string[]>>;
  expandedNewsCategory:string|null;
@@ -12,8 +16,11 @@ type Props={
  closeNews:()=>void;
 };
 
+const Icon=({d,size=16}:{d:string;size?:number})=><svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={d}/></svg>;
+const ICON={down:'M6 9l6 6 6-6',right:'M9 6l6 6-6 6',left:'M15 6l-6 6 6 6',external:'M14 4h6v6M20 4l-9 9M18 14v5H5V6h5'};
+
 export default function NewsTab({
- items,selectedNewsId,openNewsCategories,setOpenNewsCategories,expandedNewsCategory,
+ items,selectedNewsId,newsFilter,setNewsFilter,openNewsCategories,setOpenNewsCategories,expandedNewsCategory,
  setExpandedNewsCategory,openNews,closeNews
 }:Props){
  const allNews=items.filter(x=>x.kind==='news');
@@ -26,35 +33,46 @@ export default function NewsTab({
    return rank(a[0])-rank(b[0])||a[0].localeCompare(b[0],'ko');
  })
    .map(([category,articles])=>[category,[...articles].sort((a,b)=>(b.event_date??'').localeCompare(a.event_date??''))] as const);
- const newsCategoryEmoji=(category:string)=>/AI|인공지능|다이제스트/i.test(category)?'✦':/기술|테크|개발|IT/i.test(category)?'⌘':/경제|금융|시장/.test(category)?'↗':/국제|세계/.test(category)?'◎':'▣';
+ // 고른 분류가 사라졌으면 전체로 본다.
+ const filter=newsGroups.some(([category])=>category===newsFilter)?newsFilter:ALL_NEWS;
+ const shownGroups=filter===ALL_NEWS?newsGroups:newsGroups.filter(([category])=>category===filter);
  const selectedNews=allNews.find(x=>x.id===selectedNewsId);
  const getNewsBody=(x:Item)=>typeof x.metadata.full_body==='string'?x.metadata.full_body:(x.description??'기사 본문이 아직 제공되지 않았습니다.');
  return <main>
   {selectedNews?
     <article className="newsDetail">
-      <button type="button" className="newsBack" onClick={closeNews} aria-label="뉴스 목록으로 돌아가기">← 뉴스 목록</button>
+      <button type="button" className="newsBack" onClick={closeNews} aria-label="뉴스 목록으로 돌아가기"><Icon d={ICON.left} size={14}/>뉴스 목록</button>
       <div className="newsDetailCategory">{selectedNews.category??'뉴스'} · {selectedNews.source??'브리핑'}</div>
       <h2 className="newsDetailHeadline">{selectedNews.title}</h2>
       <div className="newsDetailDate">{selectedNews.event_date??''}</div>
       {selectedNews.description&&<p className="newsDetailSummary">{selectedNews.description}</p>}
       <div className="newsDetailBody">{getNewsBody(selectedNews).split(/\n\s*\n/).map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
-      {selectedNews.url&&<a className="newsOriginal" href={selectedNews.url} target="_blank" rel="noopener noreferrer">원문 기사 보기 ↗</a>}
-      <button type="button" className="newsBack newsBackBottom" onClick={closeNews}>← 뉴스 목록으로</button>
+      {selectedNews.url&&<a className="newsOriginal" href={selectedNews.url} target="_blank" rel="noopener noreferrer">원문 기사 보기<Icon d={ICON.external} size={14}/></a>}
+      <button type="button" className="newsBack newsBackBottom" onClick={closeNews}><Icon d={ICON.left} size={14}/>뉴스 목록으로</button>
     </article>:
     <>
-      {newsGroups.map(([category,articles])=><section className={'panel newsCategoryPanel '+(category==='AI 테크 다이제스트'?'digestPanel':'')} key={category}>
-        <div className="newsCategoryHeading">
-          <button type="button" className="newsCategoryToggle" aria-expanded={openNewsCategories.includes(category)} aria-label={category+' 카테고리 '+(openNewsCategories.includes(category)?'접기':'펼치기')} onClick={()=>setOpenNewsCategories(old=>old.includes(category)?old.filter(name=>name!==category):[...old,category])}>
-            <span className="newsCategoryLabel"><span className="newsCategorySymbol">{newsCategoryEmoji(category)}</span><span><strong className="newsCategoryName">{category}</strong><small>{articles.length}개 기사 · 최신순</small></span></span>
-            <span className={'newsCategoryChevron '+(!openNewsCategories.includes(category)?'collapsed':'')} aria-hidden="true">⌄</span>
+      {newsGroups.length>0&&<div className="newsChips" role="group" aria-label="뉴스 분류">
+        {[ALL_NEWS,...newsGroups.map(([category])=>category)].map(category=><button type="button" key={category}
+          className={'newsChip'+(filter===category?' selected':'')} aria-pressed={filter===category}
+          onClick={()=>setNewsFilter(category)}>{category}</button>)}
+      </div>}
+      {shownGroups.map(([category,articles])=>{
+        const open=openNewsCategories.includes(category);
+        return <section className="panel newsCategoryPanel" key={category}>
+          <button type="button" className="newsCategoryToggle" aria-expanded={open} aria-label={category+' 카테고리 '+(open?'접기':'펼치기')}
+            onClick={()=>setOpenNewsCategories(old=>old.includes(category)?old.filter(name=>name!==category):[...old,category])}>
+            <span className="newsCategoryLabel"><strong className="newsCategoryName">{category}</strong><small>{articles.length}개 기사 · 최신순</small></span>
+            <span className="newsCategoryChevron"><Icon d={ICON.down}/></span>
           </button>
-          {openNewsCategories.includes(category)&&articles.length>3&&<button type="button" className="newsCategoryMore" onClick={()=>setExpandedNewsCategory(old=>old===category?null:category)}>{expandedNewsCategory===category?'3개만 보기 ↑':'전체 보기 →'}</button>}
-        </div>
-        {openNewsCategories.includes(category)&&(expandedNewsCategory===category?articles:articles.slice(0,3)).map(x=><button type="button" className="newsListButton" key={x.id} onClick={()=>openNews(x.id)}>
-          <span className="newsListText"><small>{x.event_date??'날짜 미등록'} · {x.source??category}</small><strong>{x.title}</strong><span>{x.description??''}</span></span>
-          <span className="newsListArrow" aria-hidden="true">›</span>
-        </button>)}
-      </section>)}
+          {open&&<div className="newsCategoryList">
+            {(expandedNewsCategory===category?articles:articles.slice(0,3)).map(x=><button type="button" className="newsListButton" key={x.id} onClick={()=>openNews(x.id)}>
+              <span className="newsListText"><small>{x.event_date??'날짜 미등록'} · {x.source??category}</small><strong>{x.title}</strong></span>
+              <span className="newsListArrow"><Icon d={ICON.right} size={14}/></span>
+            </button>)}
+            {articles.length>3&&<button type="button" className="newsCategoryMore" onClick={()=>setExpandedNewsCategory(old=>old===category?null:category)}>{expandedNewsCategory===category?'3개만 보기':'전체 '+articles.length+'개 보기'}</button>}
+          </div>}
+        </section>;
+      })}
       {!newsGroups.length&&<section className="panel"><p className="empty">뉴스 없음</p></section>}
     </>
   }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync, readdirSync, readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {isDashboardSnapshot, monitoredSources, registeredCoverageDay, seoulDay} from '../lib/dashboard-freshness.ts';
-import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW} from '../scripts/screens/dashboard-fixture.mjs';
+import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from '../scripts/screens/dashboard-fixture.mjs';
 import {firstDomDifference} from '../scripts/screens/dom-skeleton.mjs';
 
 const TABS = ['home', 'finance', 'news', 'benefits', 'journal'];
@@ -23,12 +23,37 @@ test('필요한 kind 가 모두 있고 benefit 은 points·ai_subscription 을 �
   assert.equal(FIXTURE_NEWS_CATEGORY, '합성분류A');
 });
 
-test('FIXTURE_DAY 는 FIXTURE_NOW 의 한국 날짜이고 거래는 그날 양수 금액이다', () => {
+test('뉴스 칩 전환 검사용으로 서로 다른 뉴스 분류가 두 개 있다', () => {
+  const news = dashboardSnapshot().items.filter(x => x.kind === 'news');
+  assert.deepEqual([...new Set(news.map(x => x.category))].sort(), [FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+  assert.ok(news.some(x => x.title === FIXTURE_TEXT.newsB && x.category === FIXTURE_NEWS_CATEGORY_B));
+});
+
+test('홈·뉴스 탭은 분류 이모지·글자 아이콘을 쓰지 않고 할 일 삭제는 aria-label 을 갖는다', () => {
+  for (const f of ['home-tab.tsx', 'news-tab.tsx']) {
+    const src = readFileSync(`components/dashboard/${f}`, 'utf8');
+    assert.ok(!/[⌂▤▣✦◷⌘↗◎›⌄×]/.test(src), f);
+    assert.ok(!src.includes('newsCategoryEmoji'), f);
+  }
+  const home = readFileSync('components/dashboard/home-tab.tsx', 'utf8');
+  assert.ok(home.includes("aria-label={x.title+' 삭제'}"));
+  assert.ok(home.includes('cycleSummary(transactions,today,coverageDay)'));
+});
+
+test('FIXTURE_DAY 는 FIXTURE_NOW 의 한국 날짜이고 지난달 합성 거래가 한 건 있다', () => {
   assert.equal(seoulDay(FIXTURE_NOW), FIXTURE_DAY);
   const {items, syncHealth} = dashboardSnapshot();
   const transactions = items.filter(x => x.kind === 'transaction');
   assert.ok(transactions.some(x => x.event_date === FIXTURE_DAY && x.amount > 0 && x.title === '합성가맹점A'));
-  for (const x of items) for (const d of [x.event_date, x.due_date]) if (d) assert.equal(d, FIXTURE_DAY);
+  const previous = transactions.filter(x => x.event_date && x.event_date.slice(0, 7) === FIXTURE_PREVIOUS_DAY.slice(0, 7));
+  assert.equal(previous.length, 1);
+  const [record] = previous;
+  assert.equal(record.kind, 'transaction');
+  assert.equal(record.title, FIXTURE_TEXT.previousMerchant);
+  assert.equal(record.event_date, FIXTURE_PREVIOUS_DAY);
+  assert.equal(record.amount, 8000);
+  assert.deepEqual(record.metadata, {payment_type: '일시불', memo: '합성정산메모B 정산'});
+  for (const x of items) if (x.due_date) assert.equal(x.due_date, FIXTURE_DAY);
   assert.equal(registeredCoverageDay(syncHealth.transactions.last_source_at, transactions.map(x => x.event_date), new Date(FIXTURE_NOW)), FIXTURE_DAY);
 });
 
