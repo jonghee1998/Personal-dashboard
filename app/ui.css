@@ -83,3 +83,112 @@ html,body{background:#FFFFFF;color:#0B0B0C;font-family:'Pretendard',system-ui,-a
 .shell.uiTheme .deltaUp{color:var(--ui-lv-low)!important}
 .shell.uiTheme .deltaDown{color:var(--ui-lv-high)!important}
 .shell.uiTheme .deltaFlat{color:var(--ui-sub)!important}
+/* .conceptLight 가 덮던 하위 요소 글자색·안쪽 바탕을 새 팔레트로 옮김(부모 color 만으로는 자식의 명시 색이 바뀌지 않는다) */
+.shell.uiTheme h2,.shell.uiTheme .metric strong,.shell.uiTheme .listitem strong,.shell.uiTheme .itembody b,.shell.uiTheme .newsPreviewItem b,.shell.uiTheme .newsListText strong{color:var(--ui-ink)}
+.shell.uiTheme .metric .eyebrow,.shell.uiTheme .newsPreviewItem small,.shell.uiTheme .newsListText>span,.shell.uiTheme .homeSubtitle,.shell.uiTheme .sectionUpdateMeta small{color:var(--ui-sub)}
+.shell.uiTheme .navCard:hover .metric,.shell.uiTheme .newsNavCard:hover{border-color:var(--ui-accent)}
+.shell.uiTheme .newsNavCard .linkHint{color:var(--ui-accent)}
+.shell.uiTheme .struck{color:var(--ui-mute)}
+.shell.uiTheme .barheading{color:var(--ui-ink)}
+/* 금융: 카테고리 펼침·메모 */
+.shell.uiTheme .categorySection{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-box)}
+.shell.uiTheme .categoryHeading{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .categoryHeading b,.shell.uiTheme .expenseCategoryToggle>b{color:var(--ui-ink)}
+.shell.uiTheme .categoryHeading span,.shell.uiTheme .expenseCategoryMeta,.shell.uiTheme .expenseCategoryChevron{color:var(--ui-sub)}
+.shell.uiTheme .expenseCategoryToggle:hover>b{color:var(--ui-accent)}
+.shell.uiTheme .expenseItemWrap{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .expenseSubItems{border-left-color:var(--ui-line)}
+.shell.uiTheme .expenseSubItem{color:var(--ui-ink)}
+.shell.uiTheme .expenseSubItem small{color:var(--ui-sub)}
+.shell.uiTheme .expenseAggregateNote{background:var(--ui-div2);color:var(--ui-sub)}
+.shell.uiTheme .expenseCategoryMore,.shell.uiTheme .memoInlineButton,.shell.uiTheme .newsCategoryMore{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-accent)}
+.shell.uiTheme .memoEntryHeader strong{color:var(--ui-ink)}
+.shell.uiTheme .memoPlaceholder,.shell.uiTheme .memoEntry small,.shell.uiTheme .memoActions span{color:var(--ui-sub)}
+.shell.uiTheme .memoEditHint,.shell.uiTheme .savedMemo{color:var(--ui-accent)!important}
+.shell.uiTheme .memoEditor textarea{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-ink)}
+.shell.uiTheme .memoActions button{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-ink)}
+.shell.uiTheme .memoActions .memoSave,.shell.uiTheme .todoAdd button{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme .aiSubscriptionRow{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .aiSubscriptionTotal .eyebrow{color:var(--ui-sub)}
+.shell.uiTheme .aiSubscriptionPrice strong{color:var(--ui-ink)}
+.shell.uiTheme .aiSubscriptionPrice span{color:var(--ui-lv-low)}
+/* 금융: 일별 지출(차트 모양 개편은 4단계, 여기선 흰 바탕에서 읽히는 색만) */
+.shell.uiTheme .dailySpendingHeader p,.shell.uiTheme .dailyChartHint,.shell.uiTheme .dailyTotal span,.shell.uiTheme .dailyDetailsHeader small,.shell.uiTheme .dailyTransaction small,.shell.uiTheme .dailyMemoActions small{color:var(--ui-sub)}
+.shell.uiTheme .dailyMonthNav strong,.shell.uiTheme .dailyTotal strong,.shell.uiTheme .dailyDetailsHeader strong,.shell.uiTheme .dailyTransaction strong{color:var(--ui-ink)}
+.shell.uiTheme .dailyMonthNav button{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-ink)}
+.shell.uiTheme .dailyLineScroller{background:#FFFFFF;background-image:none;border:1px solid var(--ui-div1);border-radius:var(--ui-r-box)}
+.shell.uiTheme .dailyLineCanvas svg line{stroke:var(--ui-div2)}
+.shell.uiTheme .dailyLineCanvas svg text{fill:var(--ui-sub)}
+.shell.uiTheme .dailyLineCanvas svg path[stroke]{stroke:var(--ui-accent)}
+.shell.uiTheme .dailyLineCanvas svg circle{stroke:#FFFFFF;fill:var(--ui-accent)}
+.shell.uiTheme .dailyLineCanvas svg circle[fill="#f9d69a"]{fill:var(--ui-accent-deep)}
+.shell.uiTheme .dailyLineCanvas svg stop{stop-color:var(--ui-accent)}
+.shell.uiTheme .dailyHit.active{outline-color:var(--ui-accent);background:rgba(43,89,195,.08)}
+.shell.uiTheme .dailyDetails,.shell.uiTheme .dailyDetailsEmpty{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-box);color:var(--ui-sub)}
+.shell.uiTheme .dailyDetailsHeader,.shell.uiTheme .dailyTransaction{border-bottom-color:var(--ui-div1)}
+/* 뉴스 */
+.shell.uiTheme .newsCategoryHeading{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .newsCategoryName{color:var(--ui-ink)}
+.shell.uiTheme .newsCategoryToggle:hover .newsCategoryName{color:var(--ui-accent)}
+.shell.uiTheme .newsCategoryLabel small,.shell.uiTheme .newsListText small,.shell.uiTheme .newsCategoryIntro{color:var(--ui-sub)}
+.shell.uiTheme .newsCategoryIntro strong{color:var(--ui-ink)}
+.shell.uiTheme .newsCategorySymbol,.shell.uiTheme .digestPanel .newsCategorySymbol{background:var(--ui-div2);border:0;color:var(--ui-ink)}
+.shell.uiTheme .newsCategoryChevron,.shell.uiTheme .newsListArrow{color:var(--ui-sub)}
+.shell.uiTheme .newsListButton{border-color:var(--ui-div1);color:var(--ui-ink)}
+.shell.uiTheme .digestPanel .sectionTitle h2{color:var(--ui-ink)}
+.shell.uiTheme .newsDetail{background:#FFFFFF;color:var(--ui-ink)}
+.shell.uiTheme .newsDetailHeadline,.shell.uiTheme .newsDetailBody p{color:var(--ui-ink)}
+.shell.uiTheme .newsDetailSummary{background:var(--ui-div2);border-left:0;border-radius:var(--ui-r-box);color:var(--ui-ink)}
+.shell.uiTheme .newsDetailDate{color:var(--ui-sub)}
+.shell.uiTheme .newsDetailCategory{color:var(--ui-accent)}
+.shell.uiTheme .newsBack,.shell.uiTheme .newsOriginal{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-accent)}
+/* 혜택 */
+.shell.uiTheme .pointOverview .eyebrow{color:var(--ui-sub)}
+.shell.uiTheme .pointProviderHeading{border-color:var(--ui-div1);color:var(--ui-sub)}
+.shell.uiTheme .pointProvider{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .pointAmounts strong{color:var(--ui-ink)}
+.shell.uiTheme .pointIncreaseReason{color:var(--ui-lv-low)!important}
+.shell.uiTheme .pointDecreaseReason{color:var(--ui-lv-high)!important}
+.shell.uiTheme .applicationCounts strong{color:var(--ui-ink)}
+.shell.uiTheme .applicationCounts span{color:var(--ui-sub)}
+.shell.uiTheme .applicationsTable th{color:var(--ui-sub);border-bottom-color:var(--ui-line)}
+.shell.uiTheme .applicationsTable td{color:var(--ui-ink);border-bottom-color:var(--ui-div1)}
+/* 기록: 달력·검색·일정 */
+.shell.uiTheme .calendarHeader h2,.shell.uiTheme .calendarAgendaHeading h2,.shell.uiTheme .calendarMonthNav strong{color:var(--ui-ink)}
+.shell.uiTheme .calendarEyebrow{color:var(--ui-accent)}
+.shell.uiTheme .calendarToday,.shell.uiTheme .calendarArrows button{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-ink)}
+.shell.uiTheme .calendarWeekday{color:var(--ui-sub)}
+.shell.uiTheme .calendarDay{color:var(--ui-ink)}
+.shell.uiTheme .calendarWeekday.sunday,.shell.uiTheme .calendarDay.sunday{color:var(--ui-sun)}
+.shell.uiTheme .calendarDay.today{border-color:var(--ui-accent)}
+.shell.uiTheme .calendarDay.chosen{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme .calendarDay.chosen .calendarDot{filter:none;outline:1px solid #FFFFFF}
+.shell.uiTheme .calendarLegend span{color:var(--ui-sub)}
+.shell.uiTheme .calendarSearchPanel>label{color:var(--ui-ink)}
+.shell.uiTheme .calendarSearchField:focus-within{border-color:var(--ui-accent);box-shadow:none;outline:1px solid var(--ui-accent)}
+.shell.uiTheme .calendarSearchField input::placeholder,.shell.uiTheme .todoAdd input::placeholder{color:var(--ui-mute)}
+.shell.uiTheme .calendarSearchField>span,.shell.uiTheme .calendarSearchField button{color:var(--ui-sub)}
+.shell.uiTheme .calendarFilters button{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-sub)}
+.shell.uiTheme .calendarFilters button.active{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme .calendarAgendaHeading span,.shell.uiTheme .calendarEntryInfo small,.shell.uiTheme .calendarEntryInfo>span{color:var(--ui-sub)}
+.shell.uiTheme .calendarAgendaHeading>strong{background:var(--ui-div2);color:var(--ui-ink)}
+.shell.uiTheme .calendarAgendaEntry{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .calendarEntryInfo strong{color:var(--ui-ink)}
+.shell.uiTheme .calendarNoEntries,.shell.uiTheme .calendarNoEntries>span,.shell.uiTheme .calendarNoEntries p,.shell.uiTheme .calendarDemoNote{color:var(--ui-sub)}
+.shell.uiTheme .calendarSearchResult{color:var(--ui-ink);border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .calendarSearchResultText strong{color:var(--ui-ink)}
+.shell.uiTheme .calendarSearchResultText small,.shell.uiTheme .calendarSearchResultText>span,.shell.uiTheme .calendarResultArrow{color:var(--ui-sub)}
+.shell.uiTheme .calendarEntryIcon,.shell.uiTheme .calendarResultIcon,.shell.uiTheme .calendarAgendaEntry .calendarEntryIcon{background:var(--ui-div2);color:var(--ui-ink)}
+.shell.uiTheme .calendarTaskToggle{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-accent)}
+.shell.uiTheme .calendarTaskToggle.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme .calendarNewsOpen{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-accent)}
+.shell.uiTheme .calendarPointAmount.positive{color:var(--ui-lv-low)}
+.shell.uiTheme .calendarPointAmount.negative{color:var(--ui-lv-high)}
+/* 할 일·배너 */
+.shell.uiTheme .todoRow{border-bottom-color:var(--ui-div1)}
+.shell.uiTheme .todoCheck{border-color:var(--ui-mute);color:#FFFFFF}
+.shell.uiTheme .todoCheck.done{background:var(--ui-accent);border-color:var(--ui-accent)}
+.shell.uiTheme .todoContent small{color:var(--ui-sub)}
+.shell.uiTheme .demoBanner span{color:var(--ui-sub)}
+.shell.uiTheme .demoBanner button{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-ink)}
+.shell.uiTheme button:focus-visible{outline-color:var(--ui-accent)}

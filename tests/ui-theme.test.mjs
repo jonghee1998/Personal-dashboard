@@ -21,6 +21,21 @@ test('ui.css has no gradients or offset shadows',()=>{
  }
 });
 
+test('ui.css re-colors descendants whose old readable colors needed .conceptLight',()=>{
+ // 부모 color 만으론 자식의 명시 글자색이 바뀌지 않으므로 각 자식 선택자에 새 팔레트 색이 있어야 한다
+ const rule=sel=>{
+  const esc=sel.replace(/[.*+?^${}()|[\]\\>]/g,'\\$&');
+  const m=css.match(new RegExp('(?:^|[,}\\n])\\.shell\\.uiTheme '+esc+'(?:,[^{]*)?\\{([^}]*)\\}'));
+  return m?m[1]:null;
+ };
+ for(const sel of ['.calendarDay','.calendarDay.chosen','.calendarSearchPanel>label','.calendarSearchResult','.calendarSearchResultText strong','.calendarSearchResultText small','.newsDetailBody','.newsCategoryName','.dailyTotal strong','.barheading']){
+  const body=rule(sel);
+  assert.ok(body,'missing .shell.uiTheme '+sel);
+  assert.match(body,/(^|;)color:(var\(--ui-|#FFFFFF)/,sel+' has no new-palette color');
+ }
+ assert.match(rule('.pointOverview'),/background-image:none/);
+});
+
 test('layout imports ui.css after globals.css',()=>{
  const src=readFileSync(join(root,'app','layout.tsx'),'utf8');
  assert.ok(src.indexOf('./globals.css')>=0&&src.indexOf('./ui.css')>src.indexOf('./globals.css'));

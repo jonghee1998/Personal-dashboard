@@ -320,6 +320,101 @@ async function checkTabInteractions(browser) {
     if (d < 100) throw new Error(`${selector} 글자·바탕 밝기 차이 ${Math.round(d)} (<100)`);
   };
 
+  // 읽기 쉬움 전수 검사: 지금 보이는 셸(상단·main·하단 탭) 안 글자 요소 전부(SVG 글자는 fill)에 대해 글자·바탕 밝기 차이 ≥ 100,
+  // 그리고 글자 뒤 조상 어디에도 그라데이션 배경이 없어야 한다(옛 어두운 테마 규칙이 새 흰 바탕에 남은 것을 잡는다).
+  const readabilityIssues = page => page.evaluate(() => {
+    const lum = c => { const m = (c.match(/[\d.]+/g) || ['0', '0', '0']).map(Number); return 0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]; };
+    const clear = b => /transparent|rgba\([^)]*,\s*0\)$/.test(b);
+    const out = [];
+    const root = document.querySelector('div.demoShell');
+    if (!root?.querySelector(':scope > main')) return ['main 없음'];
+    for (const el of root.querySelectorAll('*')) {
+      const own = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+      if (!own) continue;
+      const rect = el.getBoundingClientRect();
+      const st = getComputedStyle(el);
+      if (!rect.width || !rect.height || st.visibility === 'hidden' || st.display === 'none') continue;
+      const inSvg = el.closest('svg');
+      const fg = inSvg ? st.fill : st.color;
+      if (!/^rgb/.test(fg)) continue;
+      let node = el, bg = 'rgb(255, 255, 255)', gradient = null;
+      while (node) {
+        const s = getComputedStyle(node);
+        if (/gradient/.test(s.backgroundImage)) gradient = node;
+        if (!(node instanceof SVGElement) && !clear(s.backgroundColor)) { bg = s.backgroundColor; break; }
+        node = node.parentElement;
+      }
+      const name = `${el.tagName.toLowerCase()}.${(el.getAttribute('class') || '').trim().split(/\s+/).join('.')}`;
+      const text = el.textContent.trim().slice(0, 12);
+      if (gradient) out.push(`${name}('${text}') 뒤 그라데이션 배경(${gradient.className})`);
+      const d = Math.abs(lum(fg) - lum(bg));
+      if (d < 100) out.push(`${name}('${text}') 글자 ${fg} / 바탕 ${bg} 밝기 차이 ${Math.round(d)}`);
+    }
+    return [...new Set(out)].slice(0, 12);
+  });
+  const expectAllReadable = async (page, where) => {
+    // 버튼 색 전환(transition) 중간값을 재지 않도록 전환을 끈다(같은 페이지에 여러 번 넣어도 무해)
+    await page.addStyleTag({content: '*,*::before,*::after{transition:none!important;animation:none!important}'});
+    const issues = await readabilityIssues(page);
+    if (issues.length) throw new Error(`${where}: ${issues.join(' | ')}`);
+  };
+
+  await run('읽기 쉬움 전수: 다섯 탭 첫 화면', async page => {
+    for (const [, tabLabel] of TABS) {
+      await clickTab(page, tabLabel);
+      await page.locator('nav.bottom button.active', {hasText: tabLabel}).waitFor();
+      await expectAllReadable(page, tabLabel);
+    }
+  });
+
+  await run('읽기 쉬움 전수: 금융 하위 화면·그날 내역·메모 편집', async page => {
+    await clickTab(page, '금융');
+    const [, m, d] = FIXTURE_DAY.split('-').map(Number);
+    await page.locator(`.dailyHit[aria-label^="${m}월 ${d}일, 지출 "]`).first().click();
+    await expectAllReadable(page, '금융 그날 내역');
+    const segs = page.locator('div.demoShell > main .seg button');
+    for (let i = 0; i < await segs.count(); i++) {
+      await segs.nth(i).click();
+      await expectAllReadable(page, `금융 ${(await segs.nth(i).textContent()).trim()}`);
+    }
+    await page.locator('.financeSeg button', {hasText: '메모'}).click();
+    await page.locator('.memoEntry', {hasText: FIXTURE_TEXT.merchant}).locator('button.memoRead').click();
+    await expectAllReadable(page, '금융 메모 편집');
+  });
+
+  await run('읽기 쉬움 전수: 뉴스 분류 펼침·상세', async page => {
+    await clickTab(page, '뉴스');
+    await category(page).click();
+    await expectAllReadable(page, '뉴스 분류 펼침');
+    await article(page).click();
+    await expectAllReadable(page, '뉴스 상세');
+  });
+
+  await run('읽기 쉬움 전수: 기록 날짜 선택·검색 결과(누르기 전)', async page => {
+    await clickTab(page, '기록');
+    await page.locator('.calendarDay:not(.chosen):not(.today):not(.sunday)').first().waitFor();
+    await expectReadable(page, '.calendarDay:not(.chosen):not(.today):not(.sunday)');
+    await expectReadable(page, '.calendarDay.chosen');
+    await expectReadable(page, '.calendarDay.sunday:not(.chosen)');
+    await expectReadable(page, '.calendarSearchPanel > label');
+    await expectAllReadable(page, '기록 첫 화면');
+    await page.getByRole('searchbox', {name: '통합 기록 검색'}).fill(FIXTURE_TEXT.news);
+    const result = page.locator('.calendarSearchResult', {hasText: FIXTURE_TEXT.news});
+    await expect(result).toBeVisible();
+    await expectReadable(page, '.calendarSearchResult .calendarSearchResultText strong');
+    await expectReadable(page, '.calendarSearchResult .calendarSearchResultText small');
+    await expectAllReadable(page, '기록 검색 결과');
+  });
+
+  await run('혜택 포인트 합계·AI 구독 합계 그라데이션 없음', async page => {
+    await clickTab(page, '혜택');
+    const images = await page.evaluate(() => [...document.querySelectorAll('.pointOverview, .aiSubscriptionTotal, .digestPanel')]
+      .map(el => `${el.className}:${getComputedStyle(el).backgroundImage}`));
+    if (!images.some(s => s.startsWith('pointOverview'))) throw new Error('.pointOverview 없음');
+    const bad = images.filter(s => !s.endsWith(':none'));
+    if (bad.length) throw new Error(`background-image 남음: ${bad.join(', ')}`);
+  });
+
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', async page => {
     await openHomeNews(page);
     await expectReadable(page, '.newsDetailBody');
