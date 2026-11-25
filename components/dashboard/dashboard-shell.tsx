@@ -24,6 +24,7 @@ function NavIcon({id}:{id:string}){return id==='architecture'?<ArchitectureIcon/
 export default function DashboardShell(){
  const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
  const [newsFilter,setNewsFilter]=useState<string>(ALL_NEWS);
+ const [openPointProviders,setOpenPointProviders]=useState<readonly string[]>([]);
  const [financeMonth,setFinanceMonth]=useState<string|null>(null);
  const [memoQuery,setMemoQuery]=useState('');
  const [financeDate,setFinanceDate]=useState<string|null>(null);
@@ -117,7 +118,7 @@ export default function DashboardShell(){
    openNewsCategories={openNewsCategories} setOpenNewsCategories={setOpenNewsCategories}
    expandedNewsCategory={expandedNewsCategory} setExpandedNewsCategory={setExpandedNewsCategory}
    openNews={openNews} closeNews={closeNews}/>}
- {tab==='benefits'&&<BenefitsTab items={items} updateLabel={updateLabel}/>}
+ {tab==='benefits'&&<BenefitsTab items={items} updateLabel={updateLabel} openProviders={openPointProviders} toggleProvider={name=>setOpenPointProviders(list=>list.includes(name)?list.filter(x=>x!==name):[...list,name])}/>}
  {tab==='journal'&&<JournalTab items={items} change={change} openNews={openNews}/>}
  </>}
  <nav className="bottom">{tabs.map(([id,label])=><button key={id} className={tab===id?'active':''} onClick={()=>{setTab(id);setSelectedNewsId(null)}}><span className="navicon"><NavIcon id={id}/></span><span>{label}</span></button>)}</nav></div>

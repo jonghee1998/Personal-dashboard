@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 const root=new URL('..',import.meta.url).pathname;
@@ -26,6 +26,13 @@ test('bottom nav buttons use svg icons and the shell has no symbol glyphs',()=>{
  assert.match(fn,/<ArchitectureIcon\/>/);
  assert.match(fn,/<svg /);
  for(const id of ['home','finance','news','benefits','journal']) assert.match(shell,new RegExp(`\\s${id}:'M`));
+});
+
+test('no symbol glyph icons anywhere in components/dashboard',()=>{
+ const dir=join(root,'components','dashboard');
+ const files=readdirSync(dir,{recursive:true}).filter(f=>/\.(tsx?|css)$/.test(String(f)));
+ assert.ok(files.length>5);
+ for(const f of files) assert.doesNotMatch(readFileSync(join(dir,String(f)),'utf8'),/[⌂▤▣✦◷]/,String(f));
 });
 
 test('shell root keeps existing classes and adds uiTheme; layout imports ui.css after globals.css',()=>{
