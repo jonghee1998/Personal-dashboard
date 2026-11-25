@@ -7,7 +7,7 @@ DB 스키마는 `supabase/migrations/` 의 파일만이 기준이다. 파일 이
 | 1 | `migrations/20261112000000_baseline.sql` | 기준선(예전 `supabase/schema.sql` 과 같은 내용). `dashboard_items`, `set_updated_at` 트리거, RLS 정책 2개 |
 | 2 | `migrations/20261112000100_sync_runs.sql` | `dashboard_sync_runs` 실행 기록 표와 읽기 정책 (예전 `20261112_sync_runs.sql`, 내용 그대로) |
 | 3 | `migrations/20261112000200_atomic_backfill.sql` | 일회성 메타데이터 백필 표·함수 (예전 `20261112_atomic_backfill.sql`, 내용 그대로). `dashboard_items` 행 타입을 쓰므로 1 뒤여야 한다 |
-| 4 | `migrations/20261124000000_ingest_commit.sql` | `dashboard_sync_runs.commit_source` 열(기존 행·`/api/sync-runs` 기록은 `report`) + 수신 커밋 함수 `dashboard_ingest_commit`(service_role 전용). 계획 ③에서 API 가 사용한다. `/api/sync-runs` GET(`select('*')` 응답)은 6단계 ④에서 삭제(405)됐다. 실행 기록 요약은 `/api/dashboard` 응답의 `syncHealth`(대시보드 상태 요약, `app/api/dashboard/route.ts` 47~54행)로 본다 |
+| 4 | `migrations/20261124000000_ingest_commit.sql` | `dashboard_sync_runs.commit_source` 열(기존 행·옛 `/api/sync-runs` 기록은 `report`, 행은 그대로 남는다) + 수신 커밋 함수 `dashboard_ingest_commit`(service_role 전용). `/api/ingest` v2 가 사용한다. `/api/sync-runs`(GET 은 6단계 ④, POST 는 12단계)와 v1 수신은 12단계에서 제거(2026-11-25)됐다. 실행 기록 요약은 `/api/dashboard` 응답의 `syncHealth`(대시보드 상태 요약, `app/api/dashboard/route.ts` 47~54행)로 본다 |
 | 5 | `migrations/20261124000100_ingest_support.sql` | 메모 원자 갱신 `dashboard_item_set_memo`(authenticated·service_role, RLS 그대로, `/api/items` 메모 수정이 사용), 원천 거래ID 정규화 `dashboard_norm_id`(양끝의 JS `trim()` 공백 집합 제거), 키셋 페이지 조회 `dashboard_ingest_existing`·`dashboard_ingest_candidates`(jsonb `{rows, next_after}`, service_role 전용), `dashboard_ingest_commit` 재정의(후보 비교만 `dashboard_norm_id` 규칙으로). 4 뒤여야 한다 |
 
 ## 개발 DB
