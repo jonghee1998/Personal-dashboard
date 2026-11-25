@@ -81,6 +81,40 @@ async function openDashboard(page) {
 const clickTab = (page, label) => page.locator('nav.bottom button', {hasText: label}).click();
 const overflow = page => page.evaluate(() => ({sw: document.documentElement.scrollWidth, iw: window.innerWidth}));
 
+/** 새 디자인 톤의 계산된 스타일(홈 탭이 열린 상태) → 문제 목록 */
+async function checkComputedStyles(page) {
+  const r = await page.evaluate(() => {
+    const cs = el => el && getComputedStyle(el);
+    const card = document.querySelector('div.demoShell > main .panel');
+    const nav = document.querySelector('nav.bottom');
+    const active = document.querySelector('nav.bottom button.active');
+    const c = cs(card), n = cs(nav), a = cs(active);
+    return {
+      body: cs(document.body).backgroundColor,
+      card: c && {shadow: c.boxShadow, image: c.backgroundImage, border: c.borderTopColor},
+      nav: n && {bg: n.backgroundColor, shadow: n.boxShadow},
+      active: a && a.color,
+      svgs: document.querySelectorAll('nav.bottom button svg').length
+    };
+  });
+  const errs = [];
+  if (r.body !== 'rgb(255, 255, 255)') errs.push(`body 배경 ${r.body}`);
+  if (!r.card) errs.push('홈 첫 카드(.panel) 없음');
+  else {
+    if (r.card.shadow !== 'none') errs.push(`카드 box-shadow ${r.card.shadow}`);
+    if (r.card.image !== 'none') errs.push(`카드 background-image ${r.card.image}`);
+    if (r.card.border !== 'rgb(235, 235, 235)') errs.push(`카드 테두리 ${r.card.border}`);
+  }
+  if (!r.nav) errs.push('nav.bottom 없음');
+  else {
+    if (r.nav.bg !== 'rgb(11, 11, 12)') errs.push(`하단 탭 배경 ${r.nav.bg}`);
+    if (r.nav.shadow !== 'none') errs.push(`하단 탭 box-shadow ${r.nav.shadow}`);
+  }
+  if (r.active !== 'rgb(255, 255, 255)') errs.push(`선택 탭 글자 ${r.active}`);
+  if (r.svgs !== 6) errs.push(`하단 탭 svg ${r.svgs}개 (기대 6)`);
+  return errs;
+}
+
 /** 기존 구조 탭 검사 → 문제 목록 */
 async function checkArchitecture(page, label) {
   await clickTab(page, '구조');
@@ -531,6 +565,8 @@ try {
       const open = await openDashboard(page);
       if (open.length) { fail(`합성 세션 / ${label}`, open); continue; }
       console.log(`PASS 합성 세션 / ${label}`);
+      const styleErrs = await checkComputedStyles(page);
+      if (styleErrs.length) fail(`계산된 스타일 ${label}`, styleErrs); else console.log(`PASS 계산된 스타일 ${label}`);
       const arch = await checkArchitecture(page, label);
       if (arch.length) fail(label, arch); else console.log(`PASS ${label}`);
       for (const [id, tabLabel] of TABS) {

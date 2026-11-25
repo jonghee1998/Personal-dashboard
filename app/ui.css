@@ -1,0 +1,70 @@
+@font-face{font-family:'Pretendard';src:url('/fonts/PretendardVariable.woff2') format('woff2-variations');font-weight:45 920;font-style:normal;font-display:swap}
+/* 변수는 --ui- 접두사: globals.css 의 .demoShell 이 --line·--accent 등을 따로 정의하므로 이름이 겹치면 안 된다 */
+:root{--ui-bg:#FFFFFF;--ui-card:#FFFFFF;--ui-line:#EBEBEB;--ui-div1:#F0F0F0;--ui-div2:#F2F2F2;--ui-ink:#0B0B0C;--ui-sub:#6B6B6B;--ui-mute:#8C8C8C;--ui-accent:#2B59C3;--ui-accent-deep:#1F44A0;--ui-lv-low:#4E8B6E;--ui-lv-mid:#C08A2B;--ui-lv-high:#C4513A;--ui-installment:#9A6A1E;--ui-sun:#C4513A;--ui-sat:#3B6EA8;--ui-r-card:16px;--ui-r-box:12px;--ui-r-btn:8px}
+html,body{background:#FFFFFF;color:#0B0B0C;font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.shell.uiTheme{background:var(--ui-bg);background-image:none;color:var(--ui-ink);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.shell.uiTheme button,.shell.uiTheme input{font-family:inherit}
+.shell.uiTheme .top{align-items:flex-start;margin-bottom:20px;gap:12px}
+.shell.uiTheme .brand{display:inline-block;font-size:11px;letter-spacing:.14em;color:var(--ui-accent);font-weight:700}
+.shell.uiTheme .top h1{margin:8px 0 0;font-size:26px;letter-spacing:-.04em;font-weight:700;color:var(--ui-ink)}
+.shell.uiTheme .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-mute);font-size:11px;line-height:1.5}
+.shell.uiTheme .topActions{display:flex;gap:8px}
+.shell.uiTheme .refreshButton,.shell.uiTheme .profile{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-ink);box-shadow:none}
+.shell.uiTheme .refreshNotice{color:var(--ui-sub);font-size:12px}
+.shell.uiTheme .error{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-lv-high);border-radius:var(--ui-r-box)}
+.shell.uiTheme .loading{color:var(--ui-sub)}
+.shell.uiTheme .panel,.shell.uiTheme .metric,.shell.uiTheme .metric.primary,.shell.uiTheme .newsNavCard,.shell.uiTheme .calendarPanel{background:var(--ui-card);background-image:none;border:1px solid var(--ui-line);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-ink)}
+.shell.uiTheme .metric small,.shell.uiTheme .eyebrow,.shell.uiTheme .itembody small,.shell.uiTheme .empty{color:var(--ui-sub)}
+.shell.uiTheme .sectionTitle span{color:var(--ui-accent)}
+.shell.uiTheme .listitem,.shell.uiTheme .newsPreviewItem,.shell.uiTheme .memoEntry{border-bottom:1px solid var(--ui-div1)}
+.shell.uiTheme .listitem:last-child,.shell.uiTheme .newsPreviewItem:last-child,.shell.uiTheme .memoEntry:last-child{border-bottom:0}
+.shell.uiTheme .external,.shell.uiTheme .textbutton,.shell.uiTheme a{color:var(--ui-accent)}
+.shell.uiTheme .seg button,.shell.uiTheme .chip{background:#FFFFFF;border:1px solid var(--ui-line);border-radius:var(--ui-r-btn);color:var(--ui-sub);box-shadow:none}
+.shell.uiTheme .seg button.selected{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme .track{background:var(--ui-div2)}
+.shell.uiTheme .track>div{background:var(--ui-accent)}
+.shell.uiTheme .check{border-color:var(--ui-mute);border-radius:var(--ui-r-btn)}
+.shell.uiTheme .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiTheme nav.bottom{left:50%;bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),596px);padding:8px 6px;background:#0B0B0C;background-image:none;border:0;border-radius:18px;box-shadow:none;backdrop-filter:none}
+.shell.uiTheme nav.bottom button{position:relative;min-width:0;flex:1;gap:4px;padding:6px 2px;color:#8C8C8C;font-size:11px;font-weight:500;background:none}
+.shell.uiTheme nav.bottom button.active{color:#FFFFFF;font-weight:700}
+.shell.uiTheme nav.bottom button.active:before{content:none}
+.shell.uiTheme nav.bottom .navicon{display:inline-flex;font-size:0;line-height:0}
+.shell.uiTheme nav.bottom button svg{width:22px;height:22px}
+/* 구조 탭: 예전엔 .conceptLight 범위에 있던 규칙을 새 팔레트로 옮김(글자 크기가 있어야 SVG 상자 안에 들어간다) */
+.shell.uiTheme .archNavIcon{display:block;width:22px;height:22px}
+.shell.uiTheme .archScreen{min-width:0}
+.shell.uiTheme .archSection{margin:19px 0}
+.shell.uiTheme .archHead{padding:0 2px}
+.shell.uiTheme .archKicker{display:block;color:var(--ui-mute);font-size:11px;font-weight:600;letter-spacing:.04em}
+.shell.uiTheme h2.archTitle{margin:4px 0 0;font-size:17px;line-height:1.35}
+.shell.uiTheme .panel.archBody{margin:10px 0 0;min-width:0;overflow:hidden}
+.shell.uiTheme .archLines p{margin:0;color:var(--ui-ink);font-size:13px;line-height:1.6}
+.shell.uiTheme .archLines p+p{margin-top:6px}
+.shell.uiTheme .archFigure{margin:0}
+.shell.uiTheme .archSvg{display:block;width:100%;height:auto;max-width:100%}
+.shell.uiTheme .archBox rect{fill:#FFFFFF;stroke:#D6D6D6;stroke-width:1}
+.shell.uiTheme .archBox.accent rect{fill:#EAF0FB;stroke:var(--ui-accent)}
+.shell.uiTheme .archBox.deep rect{fill:var(--ui-ink);stroke:var(--ui-ink)}
+.shell.uiTheme .archBox text{fill:var(--ui-ink)}
+.shell.uiTheme .archBox.deep text{fill:#FFFFFF}
+.shell.uiTheme .archBoxMain{font-size:11.5px;font-weight:700}
+.shell.uiTheme .archBoxSub{font-size:10px;opacity:.82}
+.shell.uiTheme .archColLabel{fill:var(--ui-sub);font-size:10px;font-weight:600}
+.shell.uiTheme .archArrow{stroke:var(--ui-mute);stroke-width:1.4}
+.shell.uiTheme .archArrowHead{fill:var(--ui-mute)}
+.shell.uiTheme .archLegend,.shell.uiTheme .archNote,.shell.uiTheme .archMethods{color:var(--ui-sub);font-size:11px;line-height:1.5}
+.shell.uiTheme p.archNote{margin:12px 0 0}
+.shell.uiTheme .archTable{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-size:12px;line-height:1.45}
+.shell.uiTheme .archTable+.archTable{margin-top:16px}
+.shell.uiTheme .archTable thead th{color:var(--ui-sub);font-size:10.5px;font-weight:600;padding:0 6px 7px 0;border-bottom:1px solid var(--ui-line)}
+.shell.uiTheme .archTable tbody th,.shell.uiTheme .archTable td{padding:8px 6px 8px 0;border-bottom:1px solid var(--ui-div1);overflow-wrap:anywhere;vertical-align:top;color:var(--ui-ink)}
+.shell.uiTheme .archTable tbody th{font-weight:700}
+.shell.uiTheme .archTable tbody tr:last-child>*{border-bottom:0}
+.shell.uiTheme .archTable code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700}
+.shell.uiTheme .archMethods{display:block;font-size:10px;font-weight:500}
+.shell.uiTheme .archTag{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:6px;background:#EAF0FB;border:1px solid var(--ui-line);color:var(--ui-accent);font-size:10px;font-weight:600;white-space:nowrap}
+.shell.uiTheme .archFigure+.archTable{margin-top:16px}
+.shell.uiTheme .archTargetTable{font-size:11.5px;word-break:keep-all}
+.shell.uiTheme .archTargetTable th:first-child{width:22%}
+.shell.uiTheme .archTargetTable th:last-child,.shell.uiTheme .archTargetTable td:last-child{width:18%}
