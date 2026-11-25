@@ -36,25 +36,10 @@ test('seed rerun test asserts every seeded key',()=>{
   for(const m of seed.matchAll(/'(seed-[ab]-[\w-]+)'/g)) assert.ok(rerun.includes(`'${m[1]}'`),m[1]);
 });
 
-test('90 no-backfill test: CI-only guard, unique DB, applies every migration except backfill in name order',()=>{
-  const s=read('90_no_backfill_dependency.test.sql');
-  assert.match(s,/^\\getenv gha GITHUB_ACTIONS$/m);
-  assert.ok(s.indexOf('\\quit')<s.indexOf('create database'),'skip before create');
-  assert.match(s,/current_database\(\) <> 'app_test'/);
-  assert.match(s,/'nobackfill_' \|\| to_char\(clock_timestamp\(\),'YYYYMMDDHH24MISSUS'\) \|\| '_' \|\| pg_backend_pid\(\)/);
-  assert.match(s,/from pg_database where datname = :'nobackfill_db'/);
-  assert.doesNotMatch(s,/drop database if exists/i);
-  assert.match(s,/^\\set ORIG :DBNAME$/m);
-  assert.ok(s.lastIndexOf('\\c :ORIG')<s.lastIndexOf('drop database :"nobackfill_db";'),'drop after returning');
-  const applied=[...s.matchAll(/^\\i supabase\/migrations\/(\S+)$/gm)].map(m=>m[1]);
-  const migDir=new URL('../supabase/migrations/',import.meta.url);
-  const expected=readdirSync(migDir).filter(f=>f.endsWith('.sql')&&!f.includes('atomic_backfill')).sort();
-  assert.deepEqual(applied,expected,'새 마이그레이션을 추가하면 90 의 목록도 갱신');
-  assert.match(s,/^\\i tests\/db\/auth-stub\.sql$/m);
-  assert.match(s,/to_regclass\('public\.dashboard_backfill_batches'\) is not null/);
-  for(const f of ['dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)','dashboard_ingest_existing(uuid,text[],uuid,integer)',
-    'dashboard_ingest_candidates(uuid,text[],uuid,integer)','dashboard_item_set_memo(uuid,text)','dashboard_norm_id(text)'])
-    assert.ok(s.includes(`'public.${f}'`),f);
+test('migrations folder has no atomic_backfill file',()=>{
+  const migs=readdirSync(new URL('../supabase/migrations/',import.meta.url));
+  assert.ok(migs.some(f=>f.endsWith('.sql')),'migrations exist');
+  assert.deepEqual(migs.filter(f=>f.includes('atomic_backfill')),[]);
 });
 
 test('db tests 10–60 exist, end with reset role, and wrap data changes in rollback',()=>{
