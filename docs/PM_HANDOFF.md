@@ -63,4 +63,8 @@ _마지막 갱신: 2026-11-25 04시_
 2. 9단계(피클AI 전환): **완료(2026-11-25).** 피클AI가 v2 본문으로 전송(별도 /api/sync-runs 보고 끔), 첫 v2 수신(transactions) 200·idempotent false·upserted = 항목 수·run success 확인. 다른 dataset 은 밤 동기화에서 처음 v2 로 온다. 서버의 v1·/api/sync-runs 는 호환용으로 남아 있다(지우는 건 사용자와 정할 때).
 3. 10단계(옛 저장소 정리): **완료(2026-11-25).** 사용자가 private_dashboard 저장소를 삭제했다.
 → 그래서 자동 모드의 다음 계획은 **쓰지 않는다**(남은 일이 사람 몫뿐). 사람이 8·9단계를 끝냈다고 말하면 PM 이 done PR 을 올리고, 11단계(디자인)는 사용자가 요청할 때 시작한다.
-4. 정리(나중, 자동 계획 안 함 — 사용자와 정할 때): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).
+4. 11단계(디자인) 이어서 할 일 — 자동 모드가 #104 다음에 차례로 계획한다:
+   - (a) #104 가 끝나면 단계 통합 검수: 시안 사양(#104 계획 context)과 6개 탭 화면 대조, 빠진 것 보완.
+   - (b) app/globals.css 정리: 새 화면에서 쓰이지 않는 옛 테마 규칙(conceptLight·demoShell·designPreview·orbit·marine·refined 등)과 .demoBanner 를 지우고, 셸에서 옛 클래스를 뗀다. 화면 검사·기준선으로 바뀐 게 없음을 확인.
+   - (c) 이게 끝나면 11단계를 done 으로 바꾸고, 남은 일이 없으면 다음 계획은 쓰지 않는다.
+   - 하지 않는 것(사용자와 정할 때만): v1 수신·/api/sync-runs 제거, 백필 마이그레이션·dashboard-qa.yml 백필 잡 정리(.github 변경).
