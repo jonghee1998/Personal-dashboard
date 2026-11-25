@@ -63,6 +63,5 @@ _마지막 갱신: 2026-11-25 (Run #119 Step 4, 11단계 완료 표시)_
 2. 9단계(피클AI 전환): **완료(2026-11-25).** 피클AI가 v2 본문으로 전송(별도 /api/sync-runs 보고 끔), 첫 v2 수신(transactions) 200·idempotent false·upserted = 항목 수·run success 확인. 다른 dataset 의 첫 v2 는 2026-11-25 사용자의 전체 갱신으로 확인했다(transactions 외 모든 dataset 200·run success, 이어 transactions 도 200·run success). 서버의 v1·/api/sync-runs 는 12단계에서 제거했다(활성 dataset 모두 v2 확인 후).
 3. 10단계(옛 저장소 정리): **완료(2026-11-25).** 사용자가 private_dashboard 저장소를 삭제했다.
 4. 11단계(디자인): **완료(2026-11-25).** #104 로 화이트·블루 새 디자인을 반영했고, Run #119 에서 사양 대조표(`docs/DESIGN_V2.md`)로 통합 검수·보완, 옛 테마 CSS 정리(셸 className `shell uiV2 uiTheme`, demoBanner·orbit·marine·refined 등 삭제), 커밋별 화면 비교 도구(`npm run screens:ref`·`npm run screens:compare`·`node scripts/screens/verify-same.mjs`)를 만들었다. 옛 CSS 정리 전후 화면 비교 통과.
-→ 1~11단계가 모두 끝나 자동 모드의 다음 계획은 **쓰지 않는다**. 남은 일은 사용자와 정할 때만 한다:
-   - v1 수신·`/api/sync-runs` 제거(피클AI v2 전환이 안정된 뒤).
-   - 백필 마이그레이션·dashboard-qa.yml 백필 잡 정리(.github 변경이라 PM PR).
+5. 12단계(정리): 완료(2026-11-25)
+→ 1~12단계가 모두 끝나 자동 모드의 다음 계획은 **쓰지 않는다**. 남은 일은 사용자와 정할 때만 한다.

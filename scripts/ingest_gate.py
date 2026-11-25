@@ -21,7 +21,6 @@ import urllib.error
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from verify_report_invariants import (
-    verify_backfill_preview_invariants,
     verify_points_ledger_invariants,
     verify_statement_billing_invariants,
     verify_settlement_tracker_invariants,

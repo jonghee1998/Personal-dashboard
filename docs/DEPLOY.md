@@ -73,15 +73,7 @@
 - 모두 있고 ⑥ 의 정의·권한 확인을 통과 → 적용하지 않는다.
 - 그 밖의 모든 섞인 상태(예: 4번 열과 함수 중 하나만 있음, 5번 객체 일부만 있음, 5번 객체는 있는데 `commit_source` 열이 없음, 있는 객체의 정의가 파일과 다름)는 **부분 적용**으로 본다. 어떤 파일도 일괄 재적용하지 않고 배포 보류, 차이를 먼저 확인한다.
 - 5번을 적용한 뒤에는 4번을 다시 적용하지 않는다(5번이 재정의한 `dashboard_ingest_commit` 을 4번의 옛 정의로 덮어쓴다).
-- 백필 `20261112000200_atomic_backfill.sql` 은 적용하지 않아도 된다(`tests/db/90_no_backfill_dependency.test.sql` 근거).
-- 운영 백필 표 결정: `supabase/README.md` 대조 절차 쿼리의 `backfill_table`(`to_regclass('public.dashboard_backfill_batches')`) 결과로 운영 DB 에 백필 표가 있는지 확인하고 결정을 기록한다.
-  - 표가 없음(`backfill_table` 이 null) → 백필 파일은 적용하지 않고 '표 없음' 을 기록한다.
-  - 표가 있음 → 표를 지우거나 바꾸지 않는다. 운영자가 운영 DB 에서 직접 `docs/DIAGNOSIS.md` 107~112행 체크리스트를 확인한다:
-    - `status='staged'` 배치가 0건이거나, 남은 것은 적용하지 않기로 결정함.
-    - `status='applied'` 배치마다 유지 또는 되돌림을 결정함. 백필 API 는 삭제됐으므로 되돌림은 Supabase SQL 편집기에서 `dashboard_backfill_rollback` 함수로 한다(`docs/DIAGNOSIS.md` 103~104행).
-    - 적용된 배치의 `after_rows` 를 운영 DB 밖·저장소 밖(개인 보관소)에 백업함(`docs/DIAGNOSIS.md` 110행).
-  - 표와 함수의 최종 DROP 은 여기서 하지 않고 9단계 뒤 정리로 남긴다(`docs/DIAGNOSIS.md` 114·126행).
-  - 기록에는 항목별 통과 여부와 결정('유지'·'되돌림'·'적용 안 함' 등)만 적고 배치 ID·건수·값은 적지 않는다. AI 는 운영 DB 를 보지 않는다.
+- 백필 마이그레이션·SQL 테스트와 백필 롤백 절차는 12단계에서 제거(운영 미적용).
 - 파일은 하나씩 적용하고, 실패하면 다음 파일로 넘어가지 않는다.
 
 ⑥ 최종 정의·권한 확인 (읽기 전용 쿼리):
@@ -139,8 +131,6 @@ select f.sig, r.role, has_function_privilege(r.role, f.sig, 'execute') as can_ex
 - Vercel 설정 대조 불일치(범위별 기준 위반 포함)
 - 수집기 토큰 불일치
 - `BACKFILL_APPLY_ENABLED` 가 어느 범위에서든 켜져 있거나, 모든 범위를 확인하지 못함
-- 운영 백필 표(`dashboard_backfill_batches`) 존재 여부를 확인하지 못했거나, 표가 있는데 ⑤ 의 체크리스트 결정을 마치지 못했거나, 적용된 배치의 `after_rows` 를 운영 DB 밖·저장소 밖에 백업했는지 확인하지 못했거나(배치별 결정을 모두 기록했어도 백업 확인이 없으면 보류), 결정을 기록하지 않음
-
 ⑧ 그 뒤에만 운영 Vercel 의 Git 연결을 새 저장소로 옮기고 새 코드를 배포한다.
 
 ## (3) 배포 후 확인 (운영자)
