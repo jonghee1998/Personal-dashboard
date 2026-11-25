@@ -2,6 +2,7 @@
 // /api/dashboard 는 브라우저에서 합성 응답(dashboard-fixture.mjs)으로 가로채고, 시계는 FIXTURE_NOW 로 고정한다.
 // 검사: 무세션 / → /login, 구조 탭(섹션·SVG·넘침·짝·겹침·잘림), 다섯 탭 대표 문구·가로 넘침, DOM 뼈대 기준선 비교,
 // 데이터 경계 검사(①~⑦: 조회 실패·401·지연, 상태·할 일·메모 쓰기와 중복 방지), api 인증·로그·수신·항목 검사.
+// 스크린샷(커밋별 비교 대상 목록은 expected.mjs): 탭 진입 화면 tab-<id>-<폭>.png(구조 탭 포함), 상태 화면 state-*-390.png.
 // 하나라도 실패하면 exit 1.
 // 기준선 갱신: npm run screens:baseline (= SCREENS_UPDATE_BASELINE=1, 화면 마크업을 일부러 바꿀 때만)
 import {spawn} from 'node:child_process';
@@ -79,6 +80,11 @@ async function openDashboard(page) {
 }
 
 const clickTab = (page, label) => page.locator('nav.bottom button', {hasText: label}).click();
+/**
+ * 비교용 스크린샷. 같은 코드를 두 번 찍어도 같도록 CSS 애니메이션·전환을 멈추고(animations: 'disabled')
+ * 입력 커서를 숨긴다(caret: 'hide'). 시계는 sessionPage·boundaryPage 의 setFixedTime 으로 고정돼 있다.
+ */
+const shot = (page, filename) => page.screenshot({path: join(SCREENS_DIR, filename), fullPage: true, animations: 'disabled', caret: 'hide'});
 const overflow = page => page.evaluate(() => ({sw: document.documentElement.scrollWidth, iw: window.innerWidth}));
 
 /** 기존 구조 탭 검사 → 문제 목록 */
@@ -248,7 +254,7 @@ async function checkArchitecture(page, label) {
       if (el.scrollWidth > el.clientWidth) out.clipped.push(`${el.className} ${el.scrollWidth}>${el.clientWidth}`);
     return out;
   }, [['02 · 요약', '피클AI 수집기가 카드·뉴스·혜택·일정 데이터를'], ['07 · API', '/api/ingest']]);
-  await page.screenshot({path: join(SCREENS_DIR, `arch-${label}.png`), fullPage: true});
+  await shot(page, `tab-architecture-${page.viewportSize().width}.png`);
   const errs = [];
   if (missing.length) errs.push(`섹션 머리 누락: ${missing.join(',')}`);
   if (svgs < 3) errs.push(`SVG ${svgs}개 (3개 이상 필요)`);
@@ -262,6 +268,30 @@ async function checkArchitecture(page, label) {
 const visible = async (locator, timeout = 5_000) => {
   try { await locator.first().waitFor({state: 'visible', timeout}); return true; } catch { return false; }
 };
+
+/**
+ * clickTab 직후 탭 진입 초기 상태 확인(실패 시 throw): 하단 탭 선택 버튼 활성, networkidle, 탭 대표 요소 보임.
+ * 금융: .dailyChart·.financeCalendar 가 보이고 aria-pressed='true' 날짜 버튼이 하나이며 진입 기본값(FIXTURE_DAY) 그대로.
+ * 뉴스: 분류 펼치기 버튼이 보이고 기사 목록(.newsListButton)이 아직 없음.
+ */
+async function checkTabEntry(page, id, tabLabel) {
+  await expect(page.locator('nav.bottom button.active', {hasText: tabLabel})).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  const main = page.locator('div.demoShell > main');
+  if (id === 'home') await expect(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})).toBeVisible();
+  else if (id === 'finance') {
+    await expect(main.locator('.dailyChart')).toBeVisible();
+    await expect(main.locator('.financeCalendar')).toBeVisible();
+    const pressed = main.locator('.financeCalendar [aria-pressed="true"]');
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toHaveAttribute('data-date', FIXTURE_DAY);
+  } else if (id === 'news') {
+    await expect(main.locator(`.newsCategoryToggle[aria-label="${FIXTURE_NEWS_CATEGORY} 카테고리 펼치기"]`)).toBeVisible();
+    await expect(main.locator('.newsListButton')).toHaveCount(0);
+  } else if (id === 'benefits') await expect(main.locator('.pointRow', {hasText: FIXTURE_TEXT.points})).toBeVisible();
+  else if (id === 'journal') await expect(main.locator('.journalCalendar')).toBeVisible();
+  else throw new Error(`알 수 없는 탭 ${id}`);
+}
 
 /** 탭 하나의 대표 합성 문구 검사 → 문제 목록 */
 async function checkTabContent(page, id) {
@@ -433,7 +463,7 @@ async function boundary(browser, name, routes, fn) {
 async function captureFinanceState(page, filename) {
   // 고정 하단 탭이 펼친 거래를 가리지 않도록 화면 끝에서 전체 페이지를 촬영한다.
   await page.evaluate(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'}));
-  await page.screenshot({path: join(SCREENS_DIR, filename), fullPage: true});
+  await shot(page, filename);
 }
 
 async function checkTabInteractions(browser) {
@@ -484,7 +514,7 @@ async function checkTabInteractions(browser) {
     await expect(undated).toContainText('날짜 없음 · 합성카드A');
     const add = memoButton(undated, FIXTURE_TEXT.undatedMerchant, '추가');
     await expect(add).toBeVisible();
-    await captureFinanceState(page, 'finance-category-open-390.png');
+    await captureFinanceState(page, 'state-finance-category-open-390.png');
     await add.click();
     await expect(undated.getByRole('textbox')).toBeEditable();
   });
@@ -535,6 +565,42 @@ async function checkTabInteractions(browser) {
 
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
 
+  await run('금융 달력 FIXTURE_DAY 선택 → 일별 상세 (state-finance-day)', async page => {
+    await clickTab(page, '금융');
+    const day = financeDay(page, FIXTURE_DAY);
+    await day.click();
+    await expect(day).toHaveAttribute('aria-pressed', 'true');
+    const details = page.locator('.dailyDetails');
+    // 일별 합계는 일시불만(할부 줄은 '일 합계 제외')
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(`${(12000).toLocaleString('ko-KR')}원`); // pii-allow 합성 금액
+    const rows = details.locator('.dailyTransactionWrap');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toBeVisible();
+    await expect(rows.last()).toBeVisible();
+    await captureFinanceState(page, 'state-finance-day-390.png');
+  });
+
+  await run('뉴스 기사 상세 (state-news-detail)', async page => {
+    await clickTab(page, '뉴스');
+    await category(page).click();
+    await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
+    await article(page).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await shot(page, 'state-news-detail-390.png');
+  });
+
+  await run('기록 달력 날짜 선택 (state-journal-day)', async page => {
+    await clickTab(page, '기록');
+    const [y, m] = FIXTURE_DAY.split('-');
+    const day = page.locator(`.journalCalendar [data-date="${y}-${m}-05"]`);
+    await day.click();
+    await expect(day).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.calendarAgendaHeading h2')).toContainText(`${Number(m)}월 5일`);
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await shot(page, 'state-journal-day-390.png');
+  });
+
   await run('혜택 포인트 제공처 줄 펼침 → 증감·사유', async page => {
     await clickTab(page, '혜택');
     const row = page.locator('.pointRow', {hasText: FIXTURE_TEXT.points});
@@ -549,7 +615,7 @@ async function checkTabInteractions(browser) {
     await expect(row.locator('.pointDecreaseReason')).toContainText('합성사용사유A');
     await expect(row.locator('.pointLogDate')).toHaveText(FIXTURE_DAY.replace(/-/g, '.'));
     await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
-    await page.screenshot({path: join(SCREENS_DIR, 'benefits-points-open-390.png'), fullPage: true});
+    await shot(page, 'benefits-points-open-390.png');
     await clickTab(page, '홈');
     await clickTab(page, '혜택');
     await expect(head).toHaveAttribute('aria-expanded', 'true');
@@ -968,10 +1034,12 @@ try {
         const name = `탭 ${id} ${label}`;
         try {
           await clickTab(page, tabLabel);
+          // 탭 진입 초기 상태를 확인하고 먼저 찍은 다음(상호작용 전 화면), 대표 문구 검사(클릭·펼치기 포함)와 가로 넘침 검사를 한다.
+          await checkTabEntry(page, id, tabLabel);
+          await shot(page, `tab-${id}-${w}.png`);
           const errs = await checkTabContent(page, id);
           const {sw, iw} = await overflow(page);
           if (sw > iw) errs.push(`가로 넘침 scrollWidth ${sw} > innerWidth ${iw}`);
-          await page.screenshot({path: join(SCREENS_DIR, `tab-${id}-${w}.png`), fullPage: true});
           if (errs.length) fail(name, errs); else console.log(`PASS ${name} 대표 문구·가로 넘침`);
         } catch (e) { fail(name, [e.message.split('\n')[0]]); }
       }
