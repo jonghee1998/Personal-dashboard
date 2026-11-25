@@ -129,9 +129,11 @@ export function cycleSummary(transactions: readonly FinanceTransaction[], today:
   const prev = billingCycle(addDays(cycle.start, -1));
   const first = historyStart(rows);
   const hasHistory = first !== null && prev.start >= first;
-  const previous = hasHistory ? cycleAmounts(rowsBetween(rows, prev.start, prev.end)) : cycleAmounts([], 'no_history');
+  const prevCovered = coverageDay !== null && coverageDay >= prev.end;
+  const previous = !hasHistory ? cycleAmounts([], 'no_history')
+    : !prevCovered ? cycleAmounts([], 'no_coverage') : cycleAmounts(rowsBetween(rows, prev.start, prev.end));
   let prevSameDayTotal = null;
-  if (hasHistory && countedThrough) {
+  if (hasHistory && prevCovered && countedThrough) {
     const elapsed = dayNumber(countedThrough) - dayNumber(cycle.start);
     const compareEnd = earlier(addDays(prev.start, elapsed), prev.end);
     prevSameDayTotal = cycleAmounts(rowsBetween(rows, prev.start, compareEnd)).total;
@@ -164,9 +166,12 @@ export function cycleGroups<T extends FinanceTransaction>(
   return Array.from({length: n}, (_, index) => {
     const live = index === 0;
     const end = live ? countedEnd(cycle, todayDate, coverageDay) : cycle.end;
-    const items = end ? rowsBetween(rows, cycle.start, end) : [];
+    const unavailable = !end ? 'no_coverage'
+      : live ? undefined
+        : first === null || cycle.start < first ? 'no_history'
+          : coverageDay === null || coverageDay < cycle.end ? 'no_coverage' : undefined;
+    const items = end && unavailable !== 'no_coverage' ? rowsBetween(rows, cycle.start, end) : [];
     items.sort((a, b) => (b.amount ?? -Infinity) - (a.amount ?? -Infinity));
-    const unavailable = !end ? 'no_coverage' : !live && (first === null || cycle.start < first) ? 'no_history' : undefined;
     const {status, total, installmentTotal, missingCount} = cycleAmounts(items, unavailable);
     const group = {
       label: `${cycle.payMonth}월 결제`,

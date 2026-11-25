@@ -249,7 +249,7 @@ async function checkTabContent(page, id) {
     await expect(unconfirmedDay.locator('.financeCalendarAmount')).toHaveCount(0);
     await expect(chart.locator('.dailyPoint')).toHaveCount(0);
     await expect(details.locator('.dailyDetailsTotal')).toHaveText('미확인');
-    await expect(details.getByText('수집 확인 전', {exact: true})).toBeVisible();
+    await expect(details.getByText('수집 확인 전')).toBeVisible();
     await expect(rows).toHaveCount(0);
     await paymentDay.click();
     await expect(hit).toHaveAttribute('aria-pressed', 'true');

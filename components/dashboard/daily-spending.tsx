@@ -124,9 +124,9 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
        <div><h2>{monthNumber}월 {selectedDay}일 거래내역</h2><small>{rows.length}건</small></div>
        <strong className="dailyDetailsTotal">{detail.lumpTotal===null?'미확인':won(detail.lumpTotal)}</strong>
      </div>
-     {detail.status==='no_coverage'&&<p className="empty">수집 확인 전</p>}
-     {detail.status==='amount_missing'&&<p className="empty">금액 미등록</p>}
-     {detail.status==='ok'&&rows.length===0&&<p className="empty">등록 내역 0건</p>}
+     {detail.status==='no_coverage'&&<p className="empty">{monthNumber}.{selectedDay} 은 아직 수집 확인 전입니다</p>}
+     {detail.status==='amount_missing'&&<p className="empty">금액 미등록 거래 {detail.lumpRows.filter(x=>x.amount===null).length}건</p>}
+     {detail.status==='ok'&&rows.length===0&&<p className="empty">이날 등록된 카드 지출은 없어.</p>}
      {rows.map(({item:x,installment})=><div className="dailyTransactionWrap" key={x.id}>
        <div className="dailyTransaction">
          <div>

@@ -78,11 +78,11 @@ export default function FinanceTab({
     <section className="panel financeCycle">
       <h2>이번 결제 주기 사용액</h2>
       <strong className="financeCycleTotal">{won(summary.total)}</strong>
-      <p className="financeCycleSplit">(일시불 {won(summary.lumpTotal)} · 할부 {won(summary.installmentTotal)})</p>
+      {summary.status==='ok'&&<p className="financeCycleSplit">(일시불 {won(summary.lumpTotal)} · 할부 {won(summary.installmentTotal)})</p>}
       <p>{summary.cycle.payMonth}월 21일 결제 예정 · 주기 마감까지 {summary.daysLeft}일</p>
       {coverageDay&&coverageDay<today&&<p>{Number(coverageDay.slice(5,7))}.{Number(coverageDay.slice(8,10))}까지 확인</p>}
-      {summary.status==='no_coverage'&&<p>수집 확인 전</p>}
-      {summary.status==='amount_missing'&&<p>금액 미등록 {summary.missingCount}건</p>}
+      {summary.status==='no_coverage'&&<p>수집 범위 없음</p>}
+      {summary.status==='amount_missing'&&<p>금액 미등록 거래 {summary.missingCount}건</p>}
       <div className="financeCycleComparison">
         {summary.progress===null
           ? <p>지난 주기 비교 없음</p>

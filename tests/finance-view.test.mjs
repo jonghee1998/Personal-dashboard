@@ -47,7 +47,8 @@ test('수집 범위 없음은 이번 주기 합계와 경과일 비교에 전파
     for (const key of ['total', 'lumpTotal', 'installmentTotal', 'countedThrough', 'prevSameDayTotal', 'progress']) {
       assert.equal(summary[key], null, key);
     }
-    assert.equal(summary.prevTotal, 50);
+    assert.equal(summary.prevTotal, coverage === null ? null : 50);
+    assert.equal(summary.prevStatus, coverage === null ? 'no_coverage' : 'ok');
     const [group] = cycleGroups(rows, '2026-11-12', coverage);
     assert.equal(group.status, 'no_coverage');
     assert.equal(group.total, null);
@@ -59,6 +60,15 @@ test('수집 범위 없음은 이번 주기 합계와 경과일 비교에 전파
     assert.equal(totals[day], null);
     assert.equal(dayRows(rows, `2026-11-${String(day).padStart(2, '0')}`, null).status, 'no_coverage');
   }
+});
+
+test('수집이 지난 주기 경계 앞에서 멈추면 지난 주기도 미확인', () => {
+  const rows = [tx('2026-08-01', 10), tx('2026-09-10', 20)];
+  const groups = cycleGroups(rows, '2026-11-25', '2026-09-10', 3);
+  assert.deepEqual(groups.slice(0, 2).map(g => [g.status, g.total]), [['no_coverage', null], ['no_coverage', null]]);
+  const summary = cycleSummary(rows, '2026-11-25', '2026-09-10');
+  assert.equal(summary.prevStatus, 'no_coverage');
+  assert.equal(summary.prevTotal, null);
 });
 
 test('금액 미등록 거래와 비교 범위 밖의 지난 주기 금액 미등록을 구분', () => {
