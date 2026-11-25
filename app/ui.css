@@ -1,0 +1,60 @@
+/* 11단계 새 디자인: 화이트·블루. 셸 루트의 .uiV2 아래에서만 옛 규칙(globals.css)을 덮어쓴다.
+   옛 .demoShell.designPreview.conceptLight 규칙보다 구체성이 높도록 루트 클래스를 모두 나열한다. */
+@font-face{font-family:'Pretendard';src:url('/fonts/PretendardVariable.woff2') format('woff2-variations');font-weight:45 920;font-style:normal;font-display:swap}
+:root{--ui-bg:#FFFFFF;--ui-card:#FFFFFF;--ui-border:#EBEBEB;--ui-line:#F0F0F0;--ui-line2:#F2F2F2;--ui-text:#0B0B0C;--ui-sub:#6B6B6B;--ui-faint:#8C8C8C;--ui-accent:#2B59C3;--ui-accent-dark:#1F44A0;--ui-low:#4E8B6E;--ui-mid:#C08A2B;--ui-high:#C4513A;--ui-installment:#9A6A1E;--ui-sun:#C4513A;--ui-sat:#3B6EA8;--ui-r-card:16px;--ui-r-box:12px;--ui-r-btn:8px}
+html,body{background:#FFFFFF;color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight{background:var(--ui-bg);color:var(--ui-text);font-family:'Pretendard',system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.shell.uiV2.demoShell.designPreview.conceptLight button,.shell.uiV2.demoShell.designPreview.conceptLight input,.shell.uiV2.demoShell.designPreview.conceptLight textarea{font-family:inherit}
+.shell.uiV2.demoShell.designPreview.conceptLight h1,.shell.uiV2.demoShell.designPreview.conceptLight h2{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight a{color:var(--ui-accent)}
+
+/* 카드 */
+.shell.uiV2.demoShell.designPreview.conceptLight .panel,.shell.uiV2.demoShell.designPreview.conceptLight .metric,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary,.shell.uiV2.demoShell.designPreview.conceptLight .newsNavCard,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail{background:var(--ui-card);background-image:none;border:1px solid var(--ui-border);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .metric .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary .eyebrow,.shell.uiV2.demoShell.designPreview.conceptLight .metric small,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary small{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .metric strong,.shell.uiV2.demoShell.designPreview.conceptLight .metric.primary strong{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .listitem,.shell.uiV2.demoShell.designPreview.conceptLight .memoEntry,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading,.shell.uiV2.demoShell.designPreview.conceptLight .newsPreviewItem,.shell.uiV2.demoShell.designPreview.conceptLight .newsListButton,.shell.uiV2.demoShell.designPreview.conceptLight .todoRow{border-bottom-color:var(--ui-line)}
+.shell.uiV2.demoShell.designPreview.conceptLight .itembody small,.shell.uiV2.demoShell.designPreview.conceptLight .empty{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .sectionTitle span{color:var(--ui-accent)}
+
+/* 버튼·칩 */
+.shell.uiV2.demoShell.designPreview.conceptLight .seg{background:#F5F5F5;border-radius:var(--ui-r-box);padding:4px;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .seg button{background:transparent;color:var(--ui-sub);border-radius:var(--ui-r-btn);box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .seg button.selected{background:var(--ui-accent);color:#FFFFFF;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .textbutton,.shell.uiV2.demoShell.designPreview.conceptLight .external{color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .check.checked{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2.demoShell.designPreview.conceptLight .track{background:var(--ui-line2)}
+.shell.uiV2.demoShell.designPreview.conceptLight .track>div{background:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .error{background:#FDF1EE;color:#8A2F1D;border-radius:var(--ui-r-box)}
+
+/* 상단 */
+.shell.uiV2.demoShell.designPreview.conceptLight .top{align-items:flex-start;margin-bottom:20px}
+.shell.uiV2.demoShell.designPreview.conceptLight .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .brandMark{display:inline-flex;color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .top h1{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ui-text);margin:6px 0 0}
+.shell.uiV2.demoShell.designPreview.conceptLight .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-faint);font-size:11px;line-height:1.5}
+.shell.uiV2.demoShell.designPreview.conceptLight .refreshButton,.shell.uiV2.demoShell.designPreview.conceptLight .profile{background:#FFFFFF;background-image:none;border:1px solid var(--ui-border);color:var(--ui-text);border-radius:var(--ui-r-btn);box-shadow:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
+.shell.uiV2.demoShell.designPreview.conceptLight .topActions{display:flex;gap:8px}
+
+/* 하단 탭 */
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom{background:#0B0B0C;background-image:none;box-shadow:none;backdrop-filter:none;border:0;border-radius:18px;bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),596px);padding:8px 6px;gap:2px;justify-content:space-between}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{flex:1;min-width:0;color:#A0A0A6;background:none;border:0;border-radius:12px;padding:6px 2px;gap:3px;font-size:11px;font-weight:600;box-shadow:none}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button.active{color:#FFFFFF;background:none}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom .navicon{display:inline-flex;font-size:0;line-height:0}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 옛 탭: 흰 바탕에서 읽히는 글자색 */
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail *{color:#2A2A2C}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailHeadline{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailDate,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsDetailCategory{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsBack,.shell.uiV2.demoShell.designPreview.conceptLight .newsDetail .newsOriginal{color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider,.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider *{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .pointProvider small,.shell.uiV2.demoShell.designPreview.conceptLight .pointProviderHeading{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel button,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel strong,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel b{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel small,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel span{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen,.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.chosen span{background:var(--ui-accent);border-color:var(--ui-accent);color:#FFFFFF}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay:not(.chosen) span{color:var(--ui-text)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarPanel .calendarDay.sunday:not(.chosen) span{color:var(--ui-sun)}
+.shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{transition:none}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday{color:var(--ui-sub)}
+.shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday.sunday{color:var(--ui-sun)}

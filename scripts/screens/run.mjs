@@ -82,6 +82,59 @@ const clickTab = (page, label) => page.locator('nav.bottom button', {hasText: la
 const overflow = page => page.evaluate(() => ({sw: document.documentElement.scrollWidth, iw: window.innerWidth}));
 
 /** 기존 구조 탭 검사 → 문제 목록 */
+/** 계산된 스타일 검사(새 디자인 바탕): body·카드·하단 탭·선택 탭·SVG 아이콘, 옛 탭 글자 대비 */
+async function checkComputedStyles(page) {
+  await clickTab(page, '홈');
+  const r = await page.evaluate(() => {
+    const cs = el => getComputedStyle(el);
+    const card = document.querySelector('.shell.uiV2 .panel') || document.querySelector('.shell.uiV2 .metric');
+    const nav = document.querySelector('nav.bottom');
+    const active = nav && nav.querySelector('button.active');
+    return {
+      body: cs(document.body).backgroundColor,
+      card: card ? {shadow: cs(card).boxShadow, image: cs(card).backgroundImage, border: cs(card).borderTopColor} : null,
+      nav: nav ? {bg: cs(nav).backgroundColor, shadow: cs(nav).boxShadow} : null,
+      activeColor: active ? cs(active).color : null,
+      svgs: nav ? nav.querySelectorAll('button svg').length : 0,
+    };
+  });
+  const errs = [];
+  if (r.body !== 'rgb(255, 255, 255)') errs.push(`body 배경 ${r.body}`);
+  if (!r.card) errs.push('홈 카드 없음');
+  else {
+    if (r.card.shadow !== 'none') errs.push(`카드 box-shadow ${r.card.shadow}`);
+    if (r.card.image !== 'none') errs.push(`카드 background-image ${r.card.image}`);
+    if (r.card.border !== 'rgb(235, 235, 235)') errs.push(`카드 테두리 ${r.card.border}`);
+  }
+  if (!r.nav) errs.push('nav.bottom 없음');
+  else {
+    if (r.nav.bg !== 'rgb(11, 11, 12)') errs.push(`하단 탭 배경 ${r.nav.bg}`);
+    if (r.nav.shadow !== 'none') errs.push(`하단 탭 box-shadow ${r.nav.shadow}`);
+  }
+  if (r.activeColor !== 'rgb(255, 255, 255)') errs.push(`선택 탭 글자 ${r.activeColor}`);
+  if (r.svgs !== 6) errs.push(`하단 탭 svg ${r.svgs}개 (기대 6)`);
+  // 옛 탭 글자 대비(뉴스 상세·기록 달력·혜택 포인트 줄): 4.5:1 이상
+  for (const [id, label] of [['news', '뉴스'], ['benefits', '혜택'], ['journal', '기록']]) {
+    await clickTab(page, label);
+    const low = await page.evaluate(() => {
+      const parse = c => { const m = c.match(/[\d.]+/g).map(Number); return {c: m.slice(0, 3), a: m.length > 3 ? m[3] : 1}; };
+      const lum = ([r, g, b]) => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+      const bgOf = el => { for (let e = el; e; e = e.parentElement) { const p = parse(getComputedStyle(e).backgroundColor); if (p.a > 0.5) return p.c; } return [255, 255, 255]; };
+      const out = [];
+      for (const el of document.querySelectorAll('.newsDetail *, .calendarPanel *, .pointProvider, .pointProvider *')) {
+        if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+        const box = el.getBoundingClientRect(); if (!box.width || !box.height) continue;
+        const [hi, lo] = [lum(parse(getComputedStyle(el).color).c), lum(bgOf(el))].sort((x, y) => y - x);
+        const ratio = (hi + 0.05) / (lo + 0.05);
+        if (ratio < 4.5) out.push(`${el.className || el.tagName} ${ratio.toFixed(2)}`);
+      }
+      return out.slice(0, 5);
+    });
+    if (low.length) errs.push(`${id} 탭 글자 대비 4.5 미만: ${low.join(', ')}`);
+  }
+  return errs;
+}
+
 async function checkArchitecture(page, label) {
   await clickTab(page, '구조');
   await page.locator('section.archSection').first().waitFor();
@@ -544,6 +597,10 @@ try {
           if (errs.length) fail(name, errs); else console.log(`PASS ${name} 대표 문구·가로 넘침`);
         } catch (e) { fail(name, [e.message.split('\n')[0]]); }
       }
+      try {
+        const errs = await checkComputedStyles(page);
+        if (errs.length) fail(`계산된 스타일 ${label}`, errs); else console.log(`PASS 계산된 스타일 ${label}`);
+      } catch (e) { fail(`계산된 스타일 ${label}`, [e.message.split('\n')[0]]); }
     } catch (e) {
       fail(label, [e.message.split('\n')[0]]);
     } finally { await context.close(); }

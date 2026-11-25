@@ -1,7 +1,7 @@
 {
  "home": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight",
+  "className": "shell demoShell designPreview conceptLight uiV2",
   "children": [
    {
     "tag": "header",
@@ -16,14 +16,15 @@
         "className": "brand",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "brandMark",
-          "children": []
-         },
-         {
-          "tag": "span",
-          "className": "brandEdition",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
@@ -54,16 +55,34 @@
         "className": "refreshButton",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
        {
         "tag": "button",
         "className": "profile",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      }
@@ -216,7 +235,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -232,7 +263,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -248,7 +291,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -264,7 +319,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -280,7 +347,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -338,7 +417,7 @@
  },
  "finance": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight",
+  "className": "shell demoShell designPreview conceptLight uiV2",
   "children": [
    {
     "tag": "header",
@@ -353,14 +432,15 @@
         "className": "brand",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "brandMark",
-          "children": []
-         },
-         {
-          "tag": "span",
-          "className": "brandEdition",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
@@ -391,16 +471,34 @@
         "className": "refreshButton",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
        {
         "tag": "button",
         "className": "profile",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      }
@@ -1168,7 +1266,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1184,7 +1294,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1200,7 +1322,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1216,7 +1350,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1232,7 +1378,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1290,7 +1448,7 @@
  },
  "news": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight",
+  "className": "shell demoShell designPreview conceptLight uiV2",
   "children": [
    {
     "tag": "header",
@@ -1305,14 +1463,15 @@
         "className": "brand",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "brandMark",
-          "children": []
-         },
-         {
-          "tag": "span",
-          "className": "brandEdition",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
@@ -1343,16 +1502,34 @@
         "className": "refreshButton",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
        {
         "tag": "button",
         "className": "profile",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      }
@@ -1425,7 +1602,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1441,7 +1630,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1457,7 +1658,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1473,7 +1686,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1489,7 +1714,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1547,7 +1784,7 @@
  },
  "benefits": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight",
+  "className": "shell demoShell designPreview conceptLight uiV2",
   "children": [
    {
     "tag": "header",
@@ -1562,14 +1799,15 @@
         "className": "brand",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "brandMark",
-          "children": []
-         },
-         {
-          "tag": "span",
-          "className": "brandEdition",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
@@ -1600,16 +1838,34 @@
         "className": "refreshButton",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
        {
         "tag": "button",
         "className": "profile",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      }
@@ -1908,7 +2164,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1924,7 +2192,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1940,7 +2220,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1956,7 +2248,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -1972,7 +2276,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -2030,7 +2346,7 @@
  },
  "journal": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight",
+  "className": "shell demoShell designPreview conceptLight uiV2",
   "children": [
    {
     "tag": "header",
@@ -2045,14 +2361,15 @@
         "className": "brand",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "brandMark",
-          "children": []
-         },
-         {
-          "tag": "span",
-          "className": "brandEdition",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
@@ -2083,16 +2400,34 @@
         "className": "refreshButton",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
        },
        {
         "tag": "button",
         "className": "profile",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      }
@@ -2996,7 +3331,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -3012,7 +3359,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -3028,7 +3387,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -3044,7 +3415,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
@@ -3060,7 +3443,19 @@
        {
         "tag": "span",
         "className": "navicon",
-        "children": []
+        "children": [
+         {
+          "tag": "svg",
+          "className": "",
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "span",
