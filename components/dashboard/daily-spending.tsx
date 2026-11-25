@@ -1,19 +1,11 @@
 'use client';
 import {useMemo,useState} from 'react';
 import {paymentTime} from '@/lib/transaction-time';
+import {installmentInfo} from '@/lib/finance-view';
 
 type Transaction={id:string;title:string;description:string|null;amount:number|null;category:string|null;event_date:string|null;source:string|null;metadata:Record<string,unknown>};
 const money=(value:number)=>'₩'+Math.round(value).toLocaleString('ko-KR');
 const pad=(value:number)=>String(value).padStart(2,'0');
-const isInstallment=(row:Transaction)=>{
- const m=row.metadata??{};
- const flags=[m.is_installment,m.installment];
- if(flags.some(v=>v===true||v===1||typeof v==='string'&&/^(true|yes|y|1)$/i.test(v.trim())))return true;
- const months=[m.installment_months,m.installment_total_months,m.installment_count,m.total_installments];
- if(months.some(v=>Number.isFinite(Number(v))&&Number(v)>1))return true;
- const fields=[row.category,row.title,row.description,m.payment_type,m.payment_method,m.payment_plan,m.installment_type,m.installment,m.installment_info];
- return fields.some(v=>typeof v==='string'&&!/^(일시불|single|lump.sum|false|no|0)$/i.test(v.trim())&&(/할부|installment/i.test(v)||/\b\d+\s*\/\s*\d+\s*회차\b/.test(v)));
-};
 const seoulToday=()=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const num=(name:string)=>Number(parts.find(p=>p.type===name)?.value??0);return {year:num('year'),index:num('month')-1,day:num('day')}};
 const CHART_HEIGHT=186,TOP=25,BOTTOM=149,LEFT=20;
 export default function DailySpending({transactions,coverageDay,onSaveMemo}:{transactions:Transaction[];coverageDay?:string|null;onSaveMemo:(id:string,memo:string)=>Promise<void>}){
@@ -36,11 +28,11 @@ export default function DailySpending({transactions,coverageDay,onSaveMemo}:{tra
  const chartRight=chartWidth-20;
  const prefix=`${month.year}-${pad(month.index+1)}-`;
  const monthRows=useMemo(()=>transactions.filter(x=>x.event_date?.slice(0,7)===prefix.slice(0,7)&&Number(x.amount??0)>0&&(!currentMonth||x.event_date.slice(0,10)<=`${prefix}${pad(days)}`)),[transactions,prefix,currentMonth,days]);
- const installmentTotal=monthRows.filter(isInstallment).reduce((sum,x)=>sum+Number(x.amount??0),0);
+ const installmentTotal=monthRows.filter(x=>installmentInfo(x).installment).reduce((sum,x)=>sum+Number(x.amount??0),0);
  const monthTotal=monthRows.reduce((sum,x)=>sum+Number(x.amount??0),0);
  const daily=useMemo(()=>Array.from({length:days},(_,i)=>{
    const day=i+1,date=`${prefix}${pad(day)}`;
-   const rows=transactions.filter(x=>x.event_date?.slice(0,10)===date&&Number(x.amount??0)>0&&!isInstallment(x)).sort((a,b)=>(paymentTime(b)??'').localeCompare(paymentTime(a)??''));
+   const rows=transactions.filter(x=>x.event_date?.slice(0,10)===date&&Number(x.amount??0)>0&&!installmentInfo(x).installment).sort((a,b)=>(paymentTime(b)??'').localeCompare(paymentTime(a)??''));
    return {day,date,rows,total:rows.reduce((sum,x)=>sum+Number(x.amount??0),0)};
  }),[days,prefix,transactions]);
  const max=Math.max(1,...daily.map(x=>x.total));

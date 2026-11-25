@@ -5,6 +5,7 @@ import DailySpending from './daily-spending';
 import {paymentDateLabel,paymentTime} from '@/lib/transaction-time';
 import {subscriptionDisplay} from '@/lib/dashboard-display';
 import {registeredCoverageDay} from '@/lib/dashboard-freshness';
+import {detailRows,isAggregateWithoutDetail} from '@/lib/finance-view';
 
 type Props={
  items:Item[];
@@ -50,17 +51,6 @@ export default function FinanceTab({
    groups[category].rows.push(x);
    return groups;
  },{})).sort((a,b)=>b[1].total-a[1].total||a[0].localeCompare(b[0],'ko'));
- const detailRowsFor=(item:Item)=>{
-   const candidates=[item.metadata.line_items,item.metadata.transactions,item.metadata.items,item.metadata.details];
-   const raw=candidates.find(Array.isArray);
-   if(!Array.isArray(raw))return [] as Array<{title:string;amount:number|null;date:string|null;time:string|null}>;
-   return raw.filter((value):value is Record<string,unknown>=>typeof value==='object'&&value!==null&&!Array.isArray(value)).map(value=>({
-     title:String(value.title??value.merchant??value.name??value.description??'거래 항목'),
-     amount:typeof value.amount==='number'?value.amount:typeof value.amount==='string'&&value.amount.trim()!==''&&Number.isFinite(Number(value.amount))?Number(value.amount):null,
-     date:typeof value.event_date==='string'?value.event_date:typeof value.date==='string'?value.date:null,
-     time:paymentTime({event_date:typeof value.event_date==='string'?value.event_date:typeof value.date==='string'?value.date:null,metadata:value})
-   }));
- };
  const barData=categoryGroups.slice(0,7);
  const maxBar=Math.max(1,...barData.map(([,group])=>group.total));
  const orderedTransactions=categoryGroups.flatMap(([,group])=>[...group.rows].sort((a,b)=>Number(b.amount??0)-Number(a.amount??0)||(b.event_date??'').localeCompare(a.event_date??'')));
@@ -97,7 +87,7 @@ export default function FinanceTab({
         const categoryOpen=openExpenseCategories.includes(category);
         const sorted=[...group.rows].sort((a,b)=>(b.event_date??'').localeCompare(a.event_date??'')||Number(b.amount??0)-Number(a.amount??0));
         const visible=expanded?sorted:sorted.slice(0,5);
-        const detailedCount=group.rows.reduce((sum,x)=>sum+(detailRowsFor(x).length||1),0);
+        const detailedCount=group.rows.reduce((sum,x)=>sum+(detailRows(x).length||1),0);
         return <div className="categorySection" key={category}>
           <button type="button" className="categoryHeading expenseCategoryToggle" aria-expanded={categoryOpen} aria-label={category+' 거래내역 '+(categoryOpen?'접기':'펼치기')} onClick={()=>setOpenExpenseCategories(old=>old.includes(category)?old.filter(name=>name!==category):[...old,category])}>
             <b>{category}</b><span className="expenseCategoryMeta">{money(group.total)} · {detailedCount}건 <span className={'expenseCategoryChevron '+(!categoryOpen?'collapsed':'')} aria-hidden="true">⌄</span></span>
@@ -110,8 +100,8 @@ export default function FinanceTab({
               <strong>{money(Number(x.amount??0))}</strong>
               <button className="memoInlineButton" onClick={()=>startMemo(x)} aria-label={x.title+' 메모 '+(getMemo(x)?'수정':'추가')}>{getMemo(x)?'수정':'메모 +'}</button>
             </article>
-            {detailRowsFor(x).length>0&&<div className="expenseSubItems">{detailRowsFor(x).map((line,i)=><div className="expenseSubItem" key={i}><span>{line.title}{(line.date||line.time)&&<small> · {[line.date?.slice(0,10),line.time].filter(Boolean).join(' · ')}</small>}</span><strong>{line.amount===null?'금액 미등록':money(line.amount)}</strong></div>)}</div>}
-            {detailRowsFor(x).length===0&&(/합산|\d+\s*건/.test(x.title)||Number(x.metadata.transaction_count??0)>1)&&<p className="expenseAggregateNote">합산 거래 · 상세 내역 없음</p>}
+            {detailRows(x).length>0&&<div className="expenseSubItems">{detailRows(x).map((line,i)=><div className="expenseSubItem" key={i}><span>{line.title}{(line.date||line.time)&&<small> · {[line.date?.slice(0,10),line.time].filter(Boolean).join(' · ')}</small>}</span><strong>{line.amount===null?'금액 미등록':money(line.amount)}</strong></div>)}</div>}
+            {isAggregateWithoutDetail(x)&&<p className="expenseAggregateNote">합산 거래 · 상세 내역 없음</p>}
           </div>)}
           {categoryOpen&&sorted.length>5&&<button className="expenseCategoryMore" type="button" onClick={()=>setExpandedExpenseCategories(old=>expanded?old.filter(name=>name!==category):[...old,category])}>{expanded?'접기 ↑':`나머지 ${sorted.length-5}건 모두 보기 ↓`}</button>}
         </div>;
