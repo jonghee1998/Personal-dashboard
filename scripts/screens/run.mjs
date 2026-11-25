@@ -3,7 +3,7 @@
 // 검사: 무세션 / → /login, 구조 탭(섹션·SVG·넘침·짝·겹침·잘림), 다섯 탭 대표 문구·가로 넘침, DOM 뼈대 기준선 비교,
 // 데이터 경계 검사(①~⑦: 조회 실패·401·지연, 상태·할 일·메모 쓰기와 중복 방지), api 인증·로그·수신·항목 검사.
 // 하나라도 실패하면 exit 1.
-// 기준선 갱신: SCREENS_UPDATE_BASELINE=1 npm run screens (화면 마크업을 일부러 바꿀 때만)
+// 기준선 갱신: npm run screens:baseline (= SCREENS_UPDATE_BASELINE=1, 화면 마크업을 일부러 바꿀 때만)
 import {spawn} from 'node:child_process';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
@@ -566,7 +566,7 @@ try {
         writeFileSync(BASELINE_PATH, JSON.stringify(current, null, 1) + '\n');
         console.log(`기준선 기록 ${BASELINE_PATH}`);
       } else if (!existsSync(BASELINE_PATH)) {
-        fail('DOM 뼈대 비교', [`${BASELINE_PATH} 없음 (SCREENS_UPDATE_BASELINE=1 로 먼저 기록)`]);
+        fail('DOM 뼈대 비교', [`${BASELINE_PATH} 없음 (npm run screens:baseline 으로 먼저 기록)`]);
       } else {
         const diff = firstDomDifference(JSON.parse(readFileSync(BASELINE_PATH, 'utf8')), current, TABS.map(([id]) => id));
         if (diff) fail('DOM 뼈대 비교', [diff]); else console.log('PASS DOM 뼈대 비교');
