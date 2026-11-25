@@ -35,11 +35,11 @@ export type TargetRow={area:string;now:string;target:string;phase:string};
 export const targetRows:readonly TargetRow[]=[
  {area:'저장소',now:'공개 저장소 하나',target:'코드만 · 데이터 없음',phase:'완료'},
  {area:'AI 팀',now:'PM·구현·검수·CI',target:'운영계·운영 DB 접근 없음',phase:'완료'},
- {area:'수신 API',now:'수신 2개 + 화면 2개',target:'수신 1개 + 조회',phase:'9단계'},
+ {area:'수신 API',now:'v2 수신 사용 중 (v1·실행 보고는 호환용으로 남김)',target:'수신 1개 + 조회',phase:'완료'},
  {area:'DB',now:'운영 1개(수신 함수 적용) + 개발 확인은 CI Postgres',target:'개발 / 운영 분리',phase:'완료'},
  {area:'배포',now:'새 저장소 main → 운영',target:'개발계 / 운영계',phase:'완료'},
  {area:'테스트',now:'단위 + 화면 + CI DB',target:'개발 DB 연동 추가',phase:'완료'},
- {area:'피클AI',now:'Issue + API',target:'API v2 만',phase:'9단계'},
+ {area:'피클AI',now:'API v2 로 전송',target:'API v2 만',phase:'완료'},
  {area:'화면',now:'다섯 탭 · 셸·훅 분리',target:'다섯 탭 정리',phase:'완료'}
 ];
 
