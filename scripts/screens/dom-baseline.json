@@ -1,7 +1,7 @@
 {
  "home": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -485,7 +485,7 @@
  },
  "finance": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -2688,7 +2688,7 @@
  },
  "news": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -3085,7 +3085,7 @@
  },
  "benefits": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -3556,7 +3556,7 @@
  },
  "journal": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
+  "className": "shell uiV2 uiTheme",
   "children": [
    {
     "tag": "header",

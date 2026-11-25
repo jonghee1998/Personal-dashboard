@@ -277,7 +277,7 @@ const visible = async (locator, timeout = 5_000) => {
 async function checkTabEntry(page, id, tabLabel) {
   await expect(page.locator('nav.bottom button.active', {hasText: tabLabel})).toBeVisible();
   await page.waitForLoadState('networkidle');
-  const main = page.locator('div.demoShell > main');
+  const main = page.locator('div.shell.uiV2 > main');
   if (id === 'home') await expect(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})).toBeVisible();
   else if (id === 'finance') {
     await expect(main.locator('.dailyChart')).toBeVisible();
@@ -295,7 +295,7 @@ async function checkTabEntry(page, id, tabLabel) {
 
 /** 탭 하나의 대표 합성 문구 검사 → 문제 목록 */
 async function checkTabContent(page, id) {
-  const main = page.locator('div.demoShell > main');
+  const main = page.locator('div.shell.uiV2 > main');
   if (id === 'home') return await visible(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})) ? [] : [`'${FIXTURE_TEXT.task}' 없음`];
   if (id === 'finance') {
     const chart = main.locator('.dailyChart');
@@ -385,10 +385,10 @@ async function checkTabContent(page, id) {
   return [`알 수 없는 탭 ${id}`];
 }
 
-/** .demoShell(없으면 body) 아래 요소 트리 {tag, className, children}. 글자·style·좌표·path d 는 넣지 않는다. */
+/** .shell.uiV2(없으면 body) 아래 요소 트리 {tag, className, children}. 글자·style·좌표·path d 는 넣지 않는다. */
 const domSkeleton = page => page.evaluate(() => {
   const walk = el => ({tag: el.tagName.toLowerCase(), className: el.getAttribute('class') ?? '', children: [...el.children].map(walk)});
-  return walk(document.querySelector('.demoShell') ?? document.body);
+  return walk(document.querySelector('.shell.uiV2') ?? document.body);
 });
 
 // ── 데이터 경계 검사(390 폭). 각 검사는 새 페이지에서 /api/dashboard·/api/items 를 가로채 합성 응답만 쓴다. ──
