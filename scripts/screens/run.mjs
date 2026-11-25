@@ -121,7 +121,7 @@ async function checkComputedStyles(page) {
       const lum = ([r, g, b]) => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
       const bgOf = el => { for (let e = el; e; e = e.parentElement) { const p = parse(getComputedStyle(e).backgroundColor); if (p.a > 0.5) return p.c; } return [255, 255, 255]; };
       const out = [];
-      for (const el of document.querySelectorAll('.newsDetail *, .calendarPanel *, .pointProvider, .pointProvider *')) {
+      for (const el of document.querySelectorAll('.newsDetail *, .journalCalendar *, .pointRow, .pointRow *, .pointSummary *, .calendarAgendaEntry *, .applicationItem *')) {
         if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
         const box = el.getBoundingClientRect(); if (!box.width || !box.height) continue;
         const [hi, lo] = [lum(parse(getComputedStyle(el).color).c), lum(bgOf(el))].sort((x, y) => y - x);
@@ -268,8 +268,22 @@ async function checkTabContent(page, id) {
     if (!await visible(article)) errs.push(`.newsListButton 에 '${FIXTURE_TEXT.news}' 없음`);
     return errs;
   }
-  if (id === 'benefits') return await visible(main.locator('.pointProvider', {hasText: FIXTURE_TEXT.points})) ? [] : [`'${FIXTURE_TEXT.points}' 포인트 항목 없음`];
-  if (id === 'journal') return await visible(page.locator('.calendarAgendaEntry', {hasText: FIXTURE_TEXT.event})) ? [] : [`기록 일정 '${FIXTURE_TEXT.event}' 없음`];
+  if (id === 'benefits') {
+    const errs = [];
+    if (!await visible(main.locator('.pointRow', {hasText: FIXTURE_TEXT.points}))) errs.push(`'${FIXTURE_TEXT.points}' 포인트 항목 없음`);
+    const delta = (await main.locator('.pointSummaryDelta').textContent().catch(() => '')) ?? '';
+    if (!delta.includes('어제보다 +500P')) errs.push(`'(어제보다 +500P)' 없음: ${delta}`); // pii-allow
+    for (const label of ['대기', '합격', '불합격']) if (!await visible(main.locator('.applicationCounts span', {hasText: new RegExp(`^${label}$`)}))) errs.push(`신청 숫자 칸 '${label}' 없음`);
+    return errs;
+  }
+  if (id === 'journal') {
+    const errs = [];
+    if (!await visible(page.locator('.calendarAgendaEntry', {hasText: FIXTURE_TEXT.event}))) errs.push(`기록 일정 '${FIXTURE_TEXT.event}' 없음`);
+    const dots = await page.locator(`.journalCalendar [data-date="${FIXTURE_DAY}"] .journalDot`).evaluateAll(list => list.map(x => x.getAttribute('data-kind')));
+    for (const kind of ['event', 'task', 'news', 'point']) if (!dots.includes(kind)) errs.push(`${FIXTURE_DAY} 종류 점 '${kind}' 없음 (${dots.join(',')})`);
+    if (!await visible(page.locator('.journalLegend'))) errs.push('기록 달력 범례 없음');
+    return errs;
+  }
   return [`알 수 없는 탭 ${id}`];
 }
 
@@ -452,6 +466,51 @@ async function checkTabInteractions(browser) {
   });
 
   await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
+
+  await run('혜택 포인트 제공처 줄 펼침 → 증감·사유', async page => {
+    await clickTab(page, '혜택');
+    const row = page.locator('.pointRow', {hasText: FIXTURE_TEXT.points});
+    const head = row.locator('button.pointRowHead');
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+    await expect(row.locator('.pointDetail')).toHaveCount(0);
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await expect(row.locator('.pointIncreaseReason')).toContainText('+700P');
+    await expect(row.locator('.pointIncreaseReason')).toContainText('합성적립사유A');
+    await expect(row.locator('.pointDecreaseReason')).toContainText('−200P');
+    await expect(row.locator('.pointDecreaseReason')).toContainText('합성사용사유A');
+    await expect(row.locator('.pointLogDate')).toHaveText(FIXTURE_DAY.replace(/-/g, '.'));
+    await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
+    await page.screenshot({path: join(SCREENS_DIR, 'benefits-points-open-390.png'), fullPage: true});
+    await clickTab(page, '홈');
+    await clickTab(page, '혜택');
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  const pointB = {...fixtureItem(FIXTURE_TEXT.points), id: '00000000-0000-4000-8000-000000000920', title: '합성포인트B', source: '합성포인트B', amount: 100, metadata: {provider: '합성포인트B'}};
+  await boundary(browser, '혜택 전일 잔액 없는 포인트 → 어제 잔액 데이터 없음 · 증감 없는 줄은 펼침 버튼 없음', {dashboard: okDashboard([pointB])}, async page => {
+    const errs = await openDashboard(page);
+    if (errs.length) return errs;
+    await clickTab(page, '혜택');
+    await expect(page.locator('.pointSummaryDelta')).toHaveText('(어제 잔액 데이터 없음)');
+    await expect(page.locator('.pointSummaryDelta')).not.toContainText('어제보다');
+    const plain = page.locator('.pointRow', {hasText: '합성포인트B'});
+    await expect(plain).toBeVisible();
+    await expect(plain.locator('button')).toHaveCount(0);
+    await expect(plain.locator('small').first()).toHaveText('전일 데이터 없음');
+    await expect(page.locator('.pointRow', {hasText: FIXTURE_TEXT.points}).locator('button.pointRowHead')).toHaveCount(1);
+    return [];
+  });
+
+  await run('기록 달력 FIXTURE_DAY 종류 점 4가지', async page => {
+    await clickTab(page, '기록');
+    const dots = page.locator(`.journalCalendar [data-date="${FIXTURE_DAY}"] .journalDot`);
+    await expect(dots).toHaveCount(4);
+    for (const kind of ['event', 'task', 'news', 'point']) await expect(dots.and(page.locator(`[data-kind="${kind}"]`))).toHaveCount(1);
+    await expect(page.locator('.journalLegend span')).toHaveText(['일정', '할 일', '뉴스', '포인트']);
+  });
 
   await run('기록 뉴스 검색 결과 → 바로 상세', async page => {
     await clickTab(page, '기록');
