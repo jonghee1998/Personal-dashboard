@@ -301,7 +301,35 @@ async function checkTabInteractions(browser) {
     await expect(draft).toHaveValue('합성메모초안A');
   });
 
-  await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', openHomeNews);
+  // 글자색과 (조상까지 올라가 찾은) 바탕색의 밝기 차이가 충분해야 읽힌다
+  const contrastOf = (page, selector) => page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const lum = c => { const m = c.match(/[\d.]+/g).map(Number); return 0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]; };
+    let node = el, bg = 'rgb(255, 255, 255)';
+    while (node) {
+      const b = getComputedStyle(node).backgroundColor;
+      if (!/, 0\)$|transparent/.test(b)) { bg = b; break; }
+      node = node.parentElement;
+    }
+    return Math.abs(lum(getComputedStyle(el).color) - lum(bg));
+  }, selector);
+  const expectReadable = async (page, selector) => {
+    const d = await contrastOf(page, selector);
+    if (d === null) throw new Error(`${selector} 없음`);
+    if (d < 100) throw new Error(`${selector} 글자·바탕 밝기 차이 ${Math.round(d)} (<100)`);
+  };
+
+  await run('홈 뉴스 카드 → 목록 → 분류 펼침 → 상세', async page => {
+    await openHomeNews(page);
+    await expectReadable(page, '.newsDetailBody');
+  });
+
+  await run('혜택 탭 포인트 합계 글자 대비', async page => {
+    await clickTab(page, '혜택');
+    await expectReadable(page, '.pointOverview > strong');
+    await expectReadable(page, '.pointOverview > small');
+  });
 
   await run('기록 뉴스 검색 결과 → 바로 상세', async page => {
     await clickTab(page, '기록');

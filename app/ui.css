@@ -68,3 +68,18 @@ html,body{background:#FFFFFF;color:#0B0B0C;font-family:'Pretendard',system-ui,-a
 .shell.uiTheme .archTargetTable{font-size:11.5px;word-break:keep-all}
 .shell.uiTheme .archTargetTable th:first-child{width:22%}
 .shell.uiTheme .archTargetTable th:last-child,.shell.uiTheme .archTargetTable td:last-child{width:18%}
+/* 예전 어두운/.conceptLight 팔레트에서 밝은 글자·어두운 바탕을 쓰던 컴포넌트를 새 흰 바탕 팔레트로 옮김 */
+.shell.uiTheme .newsDetailBody{color:var(--ui-ink)}
+.shell.uiTheme .pointOverview,.shell.uiTheme .aiSubscriptionTotal,.shell.uiTheme .digestPanel,.shell.uiTheme .calendarAgenda,.shell.uiTheme .calendarSearchPanel{background:var(--ui-card);background-image:none;border:1px solid var(--ui-line);border-radius:var(--ui-r-card);box-shadow:none;color:var(--ui-ink)}
+.shell.uiTheme .pointOverview>strong,.shell.uiTheme .aiSubscriptionTotal strong{color:var(--ui-ink)}
+.shell.uiTheme .pointOverview>small,.shell.uiTheme .aiSubscriptionTotal small{color:var(--ui-sub)}
+.shell.uiTheme .memoRead,.shell.uiTheme .calendarSearchField{background:#FFFFFF;background-image:none;border:1px solid var(--ui-line);border-radius:var(--ui-r-box);color:var(--ui-ink);box-shadow:none}
+.shell.uiTheme .applicationCounts>div{background:var(--ui-div2);border-radius:var(--ui-r-box);color:var(--ui-ink)}
+.shell.uiTheme .todoAdd input,.shell.uiTheme .calendarSearchField input{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-ink)}
+.shell.uiTheme .demoBanner{background:#FFFFFF;border:1px solid var(--ui-line);color:var(--ui-ink)}
+.shell.uiTheme .statusPending{background:#FBF3E2;color:var(--ui-installment)}
+.shell.uiTheme .statusAccepted{background:#E8F3EC;color:var(--ui-lv-low)}
+.shell.uiTheme .statusRejected{background:#FBEAE6;color:var(--ui-lv-high)}
+.shell.uiTheme .deltaUp{color:var(--ui-lv-low)!important}
+.shell.uiTheme .deltaDown{color:var(--ui-lv-high)!important}
+.shell.uiTheme .deltaFlat{color:var(--ui-sub)!important}
