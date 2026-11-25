@@ -5,8 +5,8 @@
 do $$
 declare t text; p record;
 begin
- -- 테이블 3개 + RLS 켜짐
- foreach t in array array['dashboard_items','dashboard_sync_runs','dashboard_backfill_batches'] loop
+ -- 테이블 2개 + RLS 켜짐
+ foreach t in array array['dashboard_items','dashboard_sync_runs'] loop
   if to_regclass('public.'||t) is null then raise exception 'missing table public.%', t; end if;
   if not (select relrowsecurity from pg_class where oid=to_regclass('public.'||t)) then raise exception 'RLS disabled on public.%', t; end if;
  end loop;
@@ -30,11 +30,11 @@ begin
   ) then raise exception 'missing policy "%" on public.%', p.pol, p.tbl; end if;
  end loop;
 
- -- 백필 함수 3개
- if to_regprocedure('public.dashboard_backfill_inventory(uuid)') is null
-  or to_regprocedure('public.dashboard_backfill_apply(uuid,uuid,text,integer)') is null
-  or to_regprocedure('public.dashboard_backfill_rollback(uuid,uuid,text)') is null
- then raise exception 'missing backfill function'; end if;
+ -- 백필 표와 함수 3개가 없다 (백필 마이그레이션 삭제됨)
+ if to_regclass('public.dashboard_backfill_batches') is not null then raise exception 'backfill table should not exist'; end if;
+ if to_regprocedure('public.dashboard_backfill_inventory(uuid)') is not null then raise exception 'backfill inventory function should not exist'; end if;
+ if to_regprocedure('public.dashboard_backfill_apply(uuid,uuid,text,integer)') is not null then raise exception 'backfill apply function should not exist'; end if;
+ if to_regprocedure('public.dashboard_backfill_rollback(uuid,uuid,text)') is not null then raise exception 'backfill rollback function should not exist'; end if;
 
  -- 수신 커밋 함수 + 실행 기록 commit_source 열
  if to_regprocedure('public.dashboard_ingest_commit(uuid,jsonb,jsonb,text[],jsonb,jsonb)') is null then raise exception 'missing ingest commit function'; end if;
@@ -63,14 +63,6 @@ begin
  if has_table_privilege('authenticated','public.dashboard_sync_runs','insert')
   or has_table_privilege('anon','public.dashboard_sync_runs','update')
  then raise exception 'client can write sync runs'; end if;
- if has_table_privilege('authenticated','public.dashboard_backfill_batches','select')
-  or has_table_privilege('anon','public.dashboard_backfill_batches','select')
- then raise exception 'client can read backfill batches'; end if;
- if not has_table_privilege('service_role','public.dashboard_backfill_batches','insert') then raise exception 'service_role cannot stage backfill'; end if;
- if has_function_privilege('authenticated','public.dashboard_backfill_apply(uuid,uuid,text,integer)','execute')
-  or has_function_privilege('anon','public.dashboard_backfill_rollback(uuid,uuid,text)','execute')
- then raise exception 'client can run backfill'; end if;
- if not has_function_privilege('service_role','public.dashboard_backfill_apply(uuid,uuid,text,integer)','execute') then raise exception 'service_role cannot apply'; end if;
 
  -- auth.uid() 흉내: 설정 없으면 null, sub 가 있으면 그 uuid
  if auth.uid() is not null then raise exception 'auth.uid() should be null without claim'; end if;
