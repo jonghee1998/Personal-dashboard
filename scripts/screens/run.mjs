@@ -13,7 +13,7 @@ import {checkApiAuth, fakeAppEnv, startFakeSupabase, validSessionCookie} from '.
 import {checkApiLogs} from './api-log.mjs';
 import {checkApiIngest} from './api-ingest.mjs';
 import {checkApiItems} from './api-items.mjs';
-import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from './dashboard-fixture.mjs';
+import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from './dashboard-fixture.mjs';
 import {firstDomDifference} from './dom-skeleton.mjs';
 
 const PORT = process.env.PORT || '3100';
@@ -365,7 +365,7 @@ async function checkTabInteractions(browser) {
   const category = page => page.locator('.newsCategoryToggle', {hasText: FIXTURE_NEWS_CATEGORY});
   const article = page => page.locator('.newsListButton', {hasText: FIXTURE_TEXT.news});
   const openHomeNews = async page => {
-    await page.locator('button.newsNavCard').click();
+    await page.locator('.homeNewsPanel button.homeNewsAll').click();
     await expect(category(page)).toBeVisible();
     await expect(detail(page)).toHaveCount(0);
     await expect(category(page)).toHaveAttribute('aria-expanded', 'false');
@@ -467,6 +467,40 @@ async function checkTabInteractions(browser) {
     await expect(detail(page)).toHaveCount(0);
     await expect(category(page)).toHaveAttribute('aria-expanded', 'true');
     await expect(article(page)).toBeVisible();
+  });
+
+  await run('홈 뉴스 항목 → 바로 상세', async page => {
+    const items = page.locator('.homeNewsPanel button.homeNewsItem');
+    await expect(items).toHaveCount(2);
+    await items.filter({hasText: FIXTURE_TEXT.news}).click();
+    await expect(detail(page).getByRole('heading', {name: FIXTURE_TEXT.news, exact: true})).toBeVisible();
+  });
+
+  await run('뉴스 칩 전환 → 그 분류만 · 전체로 돌아옴', async page => {
+    await clickTab(page, '뉴스');
+    const chips = page.locator('.newsChips button.newsChip');
+    const panels = page.locator('.newsCategoryPanel');
+    const chip = name => chips.filter({hasText: new RegExp(`^${name}$`)});
+    await expect(chips).toHaveText(['전체', FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panels).toHaveCount(2);
+    await chip(FIXTURE_NEWS_CATEGORY_B).click();
+    await expect(chip(FIXTURE_NEWS_CATEGORY_B)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'false');
+    await expect(panels).toHaveCount(1);
+    await expect(panels.locator('.newsCategoryName')).toHaveText(FIXTURE_NEWS_CATEGORY_B);
+    await chip('전체').click();
+    await expect(chip('전체')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panels.locator('.newsCategoryName')).toHaveText([FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+  });
+
+  await run('홈 결제 주기 카드 금액 = 금융 탭 카드 금액', async page => {
+    const home = page.locator('button.homeCycleCard .homeCycleTotal');
+    await expect(home).toHaveText(`${(57000).toLocaleString('ko-KR')}원`);
+    const amount = await home.textContent();
+    await page.locator('button.homeCycleCard').click();
+    await expect(page.locator('nav.bottom button.active')).toHaveText('금융');
+    await expect(page.locator('.financeCycle .financeCycleTotal')).toHaveText(amount);
   });
 
   await run('기록 탭 옛 안내 문구 없음', async page => {
@@ -602,6 +636,20 @@ async function checkDataBoundaries(browser) {
     const errs = [];
     try { await taskPanel(page).locator('.listitem', {hasText: FIXTURE_TEXT.task}).waitFor({state: 'detached', timeout: 5_000}); }
     catch { errs.push(`'${FIXTURE_TEXT.task}' 가 남음`); }
+    const del = log.filter(x => x.method === 'DELETE');
+    if (del.length !== 1 || !same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del.map(x => x.body))}`);
+    return errs;
+  });
+  await boundary(browser, '홈 할 일 삭제 버튼 aria-label·선 SVG ✕ → DELETE 본문', {dashboard: okDashboard(), items: (route, e) => route.fulfill(e.method === 'DELETE' ? json(200, {deleted: true}) : json(500, {}))}, async (page, log) => {
+    const open = await openDashboard(page);
+    if (open.length) return open;
+    const errs = [];
+    const button = page.getByRole('button', {name: `${FIXTURE_TEXT.task} 삭제`, exact: true});
+    if (!await visible(button)) return [`aria-label '${FIXTURE_TEXT.task} 삭제' 버튼 없음`];
+    const shape = await button.evaluate(el => ({text: el.textContent.trim(), svg: el.querySelectorAll('svg path').length, fill: el.querySelector('svg')?.getAttribute('fill')}));
+    if (shape.text !== '' || shape.svg !== 1 || shape.fill !== 'none') errs.push(`삭제 버튼 모양 ${JSON.stringify(shape)}`);
+    await button.click();
+    try { await button.waitFor({state: 'detached', timeout: 5_000}); } catch { errs.push(`'${FIXTURE_TEXT.task}' 가 남음`); }
     const del = log.filter(x => x.method === 'DELETE');
     if (del.length !== 1 || !same(del[0].body, {id: taskA.id})) errs.push(`DELETE 본문 ${JSON.stringify(del.map(x => x.body))}`);
     return errs;

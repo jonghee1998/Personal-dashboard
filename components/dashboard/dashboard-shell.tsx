@@ -8,7 +8,7 @@ import {useDashboardData} from '@/components/dashboard/use-dashboard-data';
 import type {Item} from './use-dashboard-data';
 import HomeTab from './home-tab';
 import FinanceTab,{type MemoEditorProps,type MemoPlace} from './finance-tab';
-import NewsTab from './news-tab';
+import NewsTab,{ALL_NEWS} from './news-tab';
 import BenefitsTab from './benefits-tab';
 import JournalTab from './journal-tab';
 
@@ -23,6 +23,7 @@ const navPaths:Record<string,string>={
 function NavIcon({id}:{id:string}){return id==='architecture'?<ArchitectureIcon/>:<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d={navPaths[id]}/></svg>}
 export default function DashboardShell(){
  const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
+ const [newsFilter,setNewsFilter]=useState<string>(ALL_NEWS);
  const [financeMonth,setFinanceMonth]=useState<string|null>(null);
  const [memoQuery,setMemoQuery]=useState('');
  const [financeDate,setFinanceDate]=useState<string|null>(null);
@@ -100,10 +101,10 @@ export default function DashboardShell(){
  const closeNews=()=>{setSelectedNewsId(null);window.scrollTo({top:0,behavior:'smooth'});};
  return <div className="shell demoShell designPreview conceptLight uiV2 uiTheme"><header className="top"><div className="topIdentity"><span className="brand"><svg className="brandMark" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 21 12 12 21 3 12z"/></svg> PERSONAL OS</span><h1>{tab==='home'?'대시보드':tabs.find(x=>x[0]===tab)?.[1]}</h1>{tab!=='architecture'&&<small className="pageUpdateTime" title="DB에 마지막 저장된 시각 · 한국 시간">DB 저장 · {updateLabel(tab)}<br/>원본 기준 · {sourceLabel(tab)}</small>}</div><div className="topActions">{tab!=='architecture'&&<button type="button" className={"refreshButton"+(refreshing?" refreshing":"")} onClick={()=>void manualRefresh()} disabled={refreshing||loading} aria-label={refreshing?"새로고침 중":"새로고침"} title="새로고침"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg></button>}<button className="profile" onClick={signOut} aria-label="로그아웃" title={userEmail+' 로그아웃'}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/></svg></button></div></header>{refreshNotice&&<p className="refreshNotice" role="status">{refreshNotice}</p>}{error&&<aside className="error">{error}{hasSnapshot?' · 마지막 조회값 유지 중':''}</aside>}{!error&&sourceAlerts.length>0&&<aside className="error" role="status">{sourceAlerts.map(spec=><div key={spec.key}>{spec.label} · {healthText(spec.key)}{syncHealth[spec.key]?.last_source_at?' ('+dashboardTimestamp(syncHealth[spec.key].last_source_at)+')':''}</div>)}</aside>}
  {tab==='architecture'?<ArchitectureScreen/>:loading?<div className="loading">데이터 불러오는 중…</div>:!hasSnapshot?<div className="loading">정상 데이터를 불러오지 못했습니다. 새로고침하면 다시 확인할 수 있습니다.</div>:<>
- {tab==='home'&&<HomeTab items={items} transactions={transactions} statusBusy={statusBusy}
+ {tab==='home'&&<HomeTab items={items} transactions={transactions} today={today} coverageDay={coverageDay} statusBusy={statusBusy}
    taskBusy={taskBusy} taskRemoving={taskRemoving} taskFormOpen={taskFormOpen} taskDraft={taskDraft}
    setTaskFormOpen={setTaskFormOpen} setTaskDraft={setTaskDraft} addTask={addTask} change={change}
-   removeTask={removeTask} openFinance={openFinance} openNewsList={openNewsList}/>}
+   removeTask={removeTask} openFinance={openFinance} openNewsList={openNewsList} openNews={openNews}/>}
  {tab==='finance'&&<FinanceTab items={items} transactions={transactions}
    today={today} coverageDay={coverageDay} updateLabel={updateLabel}
    statusBusy={statusBusy} change={change} memoEditor={memoEditor}
@@ -112,7 +113,7 @@ export default function DashboardShell(){
    month={financeMonth??currentMonth} selectedDate={financeMonth===null?initialDate:financeDate} setMonth={changeFinanceMonth} selectDay={setFinanceDate}
    openExpenseCategories={openExpenseCategories} setOpenExpenseCategories={setOpenExpenseCategories}
    expandedExpenseCategories={expandedExpenseCategories} setExpandedExpenseCategories={setExpandedExpenseCategories}/>}
- {tab==='news'&&<NewsTab items={items} selectedNewsId={selectedNewsId}
+ {tab==='news'&&<NewsTab items={items} selectedNewsId={selectedNewsId} newsFilter={newsFilter} setNewsFilter={setNewsFilter}
    openNewsCategories={openNewsCategories} setOpenNewsCategories={setOpenNewsCategories}
    expandedNewsCategory={expandedNewsCategory} setExpandedNewsCategory={setExpandedNewsCategory}
    openNews={openNews} closeNews={closeNews}/>}

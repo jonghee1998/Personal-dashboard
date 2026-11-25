@@ -8,6 +8,8 @@ export const FIXTURE_NOW = '2026-11-12T03:00:00.000Z';
 export const FIXTURE_DAY = '2026-11-12';
 export const FIXTURE_PREVIOUS_DAY = '2026-10-20';
 export const FIXTURE_NEWS_CATEGORY = '합성분류A';
+/** 뉴스 분류 칩 전환 검사용 두 번째 분류 */
+export const FIXTURE_NEWS_CATEGORY_B = '합성분류B';
 /** 탭별 대표 합성 문구 (run.mjs 탭 검사) */
 export const FIXTURE_TEXT = {
   task: '합성할일A',
@@ -17,6 +19,7 @@ export const FIXTURE_TEXT = {
   aggregateMerchant: '합성가맹점E',
   undatedMerchant: '합성가맹점F',
   news: '합성뉴스A',
+  newsB: '합성뉴스B',
   points: '합성포인트A',
   event: '합성일정A',
 };
@@ -51,6 +54,7 @@ export function dashboardSnapshot() {
       {title: '합성하위항목B', amount: 9000, date: '2026-11-11', time: '09:20'},
     ]}}),
     item(12, {kind: 'transaction', title: FIXTURE_TEXT.undatedMerchant, amount: 3000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A'}),
+    item(13, {kind: 'news', title: FIXTURE_TEXT.newsB, description: '합성 요약문B', status: 'unread', category: FIXTURE_NEWS_CATEGORY_B, source: '합성언론B', event_date: FIXTURE_DAY, url: 'https://example.invalid/news-b', metadata: {full_body: '합성 본문B'}}),
   ];
   const stamp = at('10:00');
   const tabs = ['home', 'finance', 'news', 'benefits', 'journal', 'subscriptions', 'points', 'applications'];

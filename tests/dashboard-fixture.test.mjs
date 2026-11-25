@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync, readdirSync, readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {isDashboardSnapshot, monitoredSources, registeredCoverageDay, seoulDay} from '../lib/dashboard-freshness.ts';
-import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from '../scripts/screens/dashboard-fixture.mjs';
+import {dashboardSnapshot, FIXTURE_DAY, FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B, FIXTURE_NOW, FIXTURE_PREVIOUS_DAY, FIXTURE_TEXT} from '../scripts/screens/dashboard-fixture.mjs';
 import {firstDomDifference} from '../scripts/screens/dom-skeleton.mjs';
 
 const TABS = ['home', 'finance', 'news', 'benefits', 'journal'];
@@ -21,6 +21,23 @@ test('필요한 kind 가 모두 있고 benefit 은 points·ai_subscription 을 �
   assert.ok(items.some(x => x.kind === 'task' && x.title === '합성할일A'));
   assert.ok(items.some(x => x.kind === 'news' && x.title === '합성뉴스A' && x.category === '합성분류A'));
   assert.equal(FIXTURE_NEWS_CATEGORY, '합성분류A');
+});
+
+test('뉴스 칩 전환 검사용으로 서로 다른 뉴스 분류가 두 개 있다', () => {
+  const news = dashboardSnapshot().items.filter(x => x.kind === 'news');
+  assert.deepEqual([...new Set(news.map(x => x.category))].sort(), [FIXTURE_NEWS_CATEGORY, FIXTURE_NEWS_CATEGORY_B]);
+  assert.ok(news.some(x => x.title === FIXTURE_TEXT.newsB && x.category === FIXTURE_NEWS_CATEGORY_B));
+});
+
+test('홈·뉴스 탭은 분류 이모지·글자 아이콘을 쓰지 않고 할 일 삭제는 aria-label 을 갖는다', () => {
+  for (const f of ['home-tab.tsx', 'news-tab.tsx']) {
+    const src = readFileSync(`components/dashboard/${f}`, 'utf8');
+    assert.ok(!/[⌂▤▣✦◷⌘↗◎›⌄×]/.test(src), f);
+    assert.ok(!src.includes('newsCategoryEmoji'), f);
+  }
+  const home = readFileSync('components/dashboard/home-tab.tsx', 'utf8');
+  assert.ok(home.includes("aria-label={x.title+' 삭제'}"));
+  assert.ok(home.includes('cycleSummary(transactions,today,coverageDay)'));
 });
 
 test('FIXTURE_DAY 는 FIXTURE_NOW 의 한국 날짜이고 지난달 합성 거래가 한 건 있다', () => {

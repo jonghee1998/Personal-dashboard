@@ -94,28 +94,44 @@
     "children": [
      {
       "tag": "button",
-      "className": "navCard",
+      "className": "panel homeCycleCard",
       "children": [
        {
-        "tag": "section",
-        "className": "metric primary",
+        "tag": "span",
+        "className": "homeCycleHeading",
         "children": [
          {
-          "tag": "div",
-          "className": "eyebrow",
-          "children": []
-         },
-         {
-          "tag": "strong",
+          "tag": "span",
           "className": "",
           "children": []
          },
          {
-          "tag": "small",
+          "tag": "svg",
           "className": "",
-          "children": []
+          "children": [
+           {
+            "tag": "path",
+            "className": "",
+            "children": []
+           }
+          ]
          }
         ]
+       },
+       {
+        "tag": "strong",
+        "className": "homeCycleTotal",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "homeCycleSplit",
+        "children": []
+       },
+       {
+        "tag": "small",
+        "className": "homeCycleMeta",
+        "children": []
        }
       ]
      },
@@ -144,7 +160,19 @@
            {
             "tag": "button",
             "className": "taskOpenButton",
-            "children": []
+            "children": [
+             {
+              "tag": "svg",
+              "className": "",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
            }
           ]
          }
@@ -178,19 +206,31 @@
          {
           "tag": "button",
           "className": "taskDeleteButton",
-          "children": []
+          "children": [
+           {
+            "tag": "svg",
+            "className": "",
+            "children": [
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
          }
         ]
        }
       ]
      },
      {
-      "tag": "button",
-      "className": "newsNavCard",
+      "tag": "section",
+      "className": "panel homeNewsPanel",
       "children": [
        {
         "tag": "div",
-        "className": "sectionTitle",
+        "className": "sectionTitle homeNewsHeader",
         "children": [
          {
           "tag": "h2",
@@ -198,23 +238,51 @@
           "children": []
          },
          {
-          "tag": "span",
-          "className": "linkHint",
+          "tag": "button",
+          "className": "homeNewsAll",
+          "children": [
+           {
+            "tag": "svg",
+            "className": "",
+            "children": [
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "button",
+        "className": "homeNewsItem",
+        "children": [
+         {
+          "tag": "small",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "b",
+          "className": "",
           "children": []
          }
         ]
        },
        {
-        "tag": "div",
-        "className": "newsPreviewItem",
+        "tag": "button",
+        "className": "homeNewsItem",
         "children": [
          {
-          "tag": "b",
+          "tag": "small",
           "className": "",
           "children": []
          },
          {
-          "tag": "small",
+          "tag": "b",
           "className": "",
           "children": []
          }
@@ -2707,48 +2775,109 @@
     "className": "",
     "children": [
      {
-      "tag": "section",
-      "className": "panel newsCategoryPanel ",
+      "tag": "div",
+      "className": "newsChips",
       "children": [
        {
-        "tag": "div",
-        "className": "newsCategoryHeading",
+        "tag": "button",
+        "className": "newsChip selected",
+        "children": []
+       },
+       {
+        "tag": "button",
+        "className": "newsChip",
+        "children": []
+       },
+       {
+        "tag": "button",
+        "className": "newsChip",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel newsCategoryPanel",
+      "children": [
+       {
+        "tag": "button",
+        "className": "newsCategoryToggle",
         "children": [
          {
-          "tag": "button",
-          "className": "newsCategoryToggle",
+          "tag": "span",
+          "className": "newsCategoryLabel",
           "children": [
            {
-            "tag": "span",
-            "className": "newsCategoryLabel",
-            "children": [
-             {
-              "tag": "span",
-              "className": "newsCategorySymbol",
-              "children": []
-             },
-             {
-              "tag": "span",
-              "className": "",
-              "children": [
-               {
-                "tag": "strong",
-                "className": "newsCategoryName",
-                "children": []
-               },
-               {
-                "tag": "small",
-                "className": "",
-                "children": []
-               }
-              ]
-             }
-            ]
+            "tag": "strong",
+            "className": "newsCategoryName",
+            "children": []
            },
            {
-            "tag": "span",
-            "className": "newsCategoryChevron collapsed",
+            "tag": "small",
+            "className": "",
             "children": []
+           }
+          ]
+         },
+         {
+          "tag": "span",
+          "className": "newsCategoryChevron",
+          "children": [
+           {
+            "tag": "svg",
+            "className": "",
+            "children": [
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel newsCategoryPanel",
+      "children": [
+       {
+        "tag": "button",
+        "className": "newsCategoryToggle",
+        "children": [
+         {
+          "tag": "span",
+          "className": "newsCategoryLabel",
+          "children": [
+           {
+            "tag": "strong",
+            "className": "newsCategoryName",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "span",
+          "className": "newsCategoryChevron",
+          "children": [
+           {
+            "tag": "svg",
+            "className": "",
+            "children": [
+             {
+              "tag": "path",
+              "className": "",
+              "children": []
+             }
+            ]
            }
           ]
          }
@@ -4438,6 +4567,43 @@
             "children": []
            }
           ]
+         }
+        ]
+       },
+       {
+        "tag": "article",
+        "className": "calendarAgendaEntry news",
+        "children": [
+         {
+          "tag": "div",
+          "className": "calendarEntryIcon",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "calendarEntryInfo",
+          "children": [
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "strong",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "calendarNewsOpen",
+          "children": []
          }
         ]
        },
