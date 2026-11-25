@@ -224,8 +224,8 @@
     {
       "id": "10",
       "title": "옛 저장소 정리",
-      "status": "todo",
-      "note": "나: private_dashboard 삭제 · 선행: 8단계 운영 배포 후 확인"
+      "status": "done",
+      "note": "11/25 private_dashboard 저장소 삭제 완료"
     },
     {
       "id": "11",
