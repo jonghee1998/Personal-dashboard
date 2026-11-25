@@ -585,7 +585,12 @@ try {
   if (logCheck.problems.length) fail('api 로그 검사', [`${logCheck.problems.length}건`]);
   else console.log(`PASS api 로그 검사 ${logCheck.results.length}건`);
   const ingestCheck = await checkApiIngest(BASE, fake);
-  if (ingestCheck.problems.length) fail('api 수신 검사', [`${ingestCheck.problems.length}건`]);
+  const kResults = ingestCheck.results.filter(result => result.id === 'k');
+  const ingestErrors = [];
+  if (ingestCheck.problems.length) ingestErrors.push(`판정 오류 ${ingestCheck.problems.length}건`);
+  if (kResults.length !== 1) ingestErrors.push(`k 결과 ${kResults.length}건 (기대 1)`);
+  else if (kResults[0].errs.length) ingestErrors.push(`k 판정 오류 ${kResults[0].errs.length}건`);
+  if (ingestErrors.length) fail('api 수신 검사', ingestErrors);
   else console.log(`PASS api 수신 검사 ${ingestCheck.results.length}건`);
   const itemsCheck = await checkApiItems(BASE, fake);
   if (itemsCheck.problems.length) fail('api 항목 검사', [`${itemsCheck.problems.length}건`]);

@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {apiIngestCases} from '../scripts/screens/api-ingest.mjs';
 
 const doc = readFileSync(new URL('../docs/INGEST_V2.md', import.meta.url), 'utf8');
 
@@ -47,8 +48,24 @@ test('ⓖ 판정 줄: 새 키 발급 전 원본 재전송 확인과 두 곳 동�
 test('ⓓ 판정 줄: 배포 점검 전 본문 최상위 version 타입 확인', () => {
   const lines = itemLines('ⓓ');
   assert.equal(lines.length, 1, `ⓓ 로 시작하는 줄이 ${lines.length}개`);
-  for (const word of ['Invalid payload', 'version', '숫자'])
+  for (const word of ['Invalid payload', 'version', '숫자', 'api-ingest.mjs', '경우 k'])
     assert.ok(lines[0].includes(word), `ⓓ 줄에 '${word}' 가 없음`);
+});
+
+test('ⓓ 판정 줄이 문자열 version 검사와 실제 소스 줄을 가리킨다', () => {
+  const stringVersionCase = apiIngestCases().find(({id}) => id === 'k');
+  assert.ok(stringVersionCase, '빌드된 앱 수신 검사에 경우 k가 없음');
+  assert.equal(stringVersionCase.body.version, '2');
+
+  const [line] = itemLines('ⓓ');
+  const citation = line?.match(/(\d+)행 `isIngestV2Body`, (\d+)행/);
+  assert.ok(citation?.[1] && citation?.[2], 'ⓓ 줄에 소스 인용 번호 두 개가 필요함');
+  const sourceLines = readFileSync(new URL('../lib/ingest-service.ts', import.meta.url), 'utf8').split('\n');
+  const versionLine = sourceLines[Number(citation[1]) - 1];
+  const invalidPayloadLine = sourceLines[Number(citation[2]) - 1];
+  assert.match(versionLine ?? '', /isIngestV2Body/);
+  assert.match(versionLine ?? '', /version===2/);
+  assert.match(invalidPayloadLine ?? '', /Invalid payload/);
 });
 
 test('ⓐ~ⓚ 판정 항목이 하나씩 있고 ⓖ 바로 다음 항목이 ⓗ 다', () => {
