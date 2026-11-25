@@ -15,7 +15,7 @@ _마지막 갱신: 2026-11-25 (Run #119 Step 4, 11단계 완료 표시)_
 
 ## 운영 상태 (중요)
 - 운영 배포는 새 저장소 main 에 연결된 Vercel 에서 된다(2026-11-25 8단계 완료). **main 반영이 곧 운영 배포**이고, 6단계 이후 변경도 운영에 들어갔다. 되돌리기는 Vercel Deployments → Instant Rollback(사람).
-- 피클AI 는 2026-11-25 부터 v2 본문으로 `/api/ingest` 에 보낸다(9단계, 첫 v2 수신 200 확인, `/api/sync-runs` 보고 끔). 서버는 v1 수신과 `/api/sync-runs` 를 호환용으로 남겨 두었다(지우는 건 사용자와 정할 때). 수집기 토큰은 2026-11-24 에 교체했다.
+- 피클AI 는 2026-11-25 부터 v2 본문으로 `/api/ingest` 에 보낸다(9단계, 첫 v2 수신 200 확인, `/api/sync-runs` 보고 끔). 다른 dataset 의 첫 v2 도 2026-11-25 전체 갱신으로 확인했다(모두 200·run success). 서버의 v1 수신과 `/api/sync-runs` 는 12단계에서 제거했다(활성 dataset 모두 v2 확인 후, 2026-11-25). 수집기 토큰은 2026-11-24 에 교체했다.
 - 운영 Supabase는 무료 플랜이라 일주일 쓰지 않으면 일시정지된다. 계정 전체에서 활성 프로젝트는 2개까지다(ai-orchestrator, 운영). 개발용 프로젝트는 일시정지 상태다.
 - 2026-11-24 확인: 운영 DB에 `dashboard_backfill_batches` 표가 없었다. `BACKFILL_APPLY_ENABLED`는 없다. 피클AI는 일회성 4개 경로를 부르지 않는다.
 
@@ -60,7 +60,7 @@ _마지막 갱신: 2026-11-25 (Run #119 Step 4, 11단계 완료 표시)_
 
 ## 다음 할 일
 1. 8단계(배포 분리): **완료(2026-11-25).** 운영 DB에 마이그레이션 4→5 적용·정의/권한 확인 통과, 백필 표 없음, BACKFILL_APPLY_ENABLED 없음, 운영 Vercel(private-dashboard 프로젝트)을 새 저장소 main 에 연결해 배포. 배포 후 확인 통과: 무로그인 / → 로그인, 탭 6개(구조 포함), 메모 저장, 피클AI v1 수집 200·upserted ≥ 1. check-env --compare 는 개발 Vercel 프로젝트가 없어 생략. 이제 main 반영이 곧 운영 배포다.
-2. 9단계(피클AI 전환): **완료(2026-11-25).** 피클AI가 v2 본문으로 전송(별도 /api/sync-runs 보고 끔), 첫 v2 수신(transactions) 200·idempotent false·upserted = 항목 수·run success 확인. 다른 dataset 은 밤 동기화에서 처음 v2 로 온다. 서버의 v1·/api/sync-runs 는 호환용으로 남아 있다(지우는 건 사용자와 정할 때).
+2. 9단계(피클AI 전환): **완료(2026-11-25).** 피클AI가 v2 본문으로 전송(별도 /api/sync-runs 보고 끔), 첫 v2 수신(transactions) 200·idempotent false·upserted = 항목 수·run success 확인. 다른 dataset 의 첫 v2 는 2026-11-25 사용자의 전체 갱신으로 확인했다(transactions 외 모든 dataset 200·run success, 이어 transactions 도 200·run success). 서버의 v1·/api/sync-runs 는 12단계에서 제거했다(활성 dataset 모두 v2 확인 후).
 3. 10단계(옛 저장소 정리): **완료(2026-11-25).** 사용자가 private_dashboard 저장소를 삭제했다.
 4. 11단계(디자인): **완료(2026-11-25).** #104 로 화이트·블루 새 디자인을 반영했고, Run #119 에서 사양 대조표(`docs/DESIGN_V2.md`)로 통합 검수·보완, 옛 테마 CSS 정리(셸 className `shell uiV2 uiTheme`, demoBanner·orbit·marine·refined 등 삭제), 커밋별 화면 비교 도구(`npm run screens:ref`·`npm run screens:compare`·`node scripts/screens/verify-same.mjs`)를 만들었다. 옛 CSS 정리 전후 화면 비교 통과.
 → 1~11단계가 모두 끝나 자동 모드의 다음 계획은 **쓰지 않는다**. 남은 일은 사용자와 정할 때만 한다:

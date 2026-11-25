@@ -44,11 +44,16 @@ export function checkAiCollabDoc(text) {
   need(api, 'Integration API', /DEPLOY\.md[^\n]*\(3\) 배포 후 확인이 끝난 뒤[^\n]*INGEST_V2\.md[^\n]*⑪/,
     'DEPLOY.md (3) 배포 후 확인이 끝난 뒤 INGEST_V2.md ⑪ 로 전환한다는 줄이 없음');
   forbid(api, 'Integration API', /배포 후 확인[^\n]*(전에|끝나기 전|없이)/, '배포 후 확인 전에 전환해도 된다는 줄이 있음');
-  need(api, 'Integration API', /v2 로 보내는 실행은 `\/api\/sync-runs` 로 따로 보고하지 않는다/,
-    'v2 실행을 /api/sync-runs 로 따로 보고하지 않는다는 줄이 없음');
-  forbid(api, 'Integration API', /sync-runs[^\n]*(보고한다|보고해도|보고를 켠다)/, 'v2 실행을 sync-runs 로 보고하라는 줄이 있음');
-  need(api, 'Integration API', /같은 실행 키[^\n]*`\/api\/sync-runs`[^\n]*먼저[^\n]*`409 RUN_ID_CONFLICT` 가 된다/,
-    '같은 실행 키가 먼저 보고되면 409 RUN_ID_CONFLICT 가 된다는 줄이 없음');
+  need(api, 'Integration API', /수신은 v2 전용이다[^\n]*12단계에서 v1 제거/, '수신은 v2 전용이고 v1 은 12단계에서 제거됐다는 줄이 없음');
+  forbid(api, 'Integration API', /v1 은 지금 사용한다|pickle-payload-v1/, '옛 v1 사용 안내가 남아 있음');
+  need(api, 'Integration API', /Request body:[^\n]*`410 v1 ingest removed`/, 'v1 본문은 410 v1 ingest removed 라는 Request body 줄이 없음');
+  need(api, 'Integration API', /별도 실행 보고 경로 `\/api\/sync-runs` 는 12단계에서 제거됐다/,
+    '/api/sync-runs 가 12단계에서 제거됐다는 줄이 없음');
+  need(api, 'Integration API', /실행 기록은 v2 본문의 `run` 으로 항목과 함께 저장되므로 따로 보고하지 않는다/,
+    '실행 기록은 v2 본문과 함께 저장돼 따로 보고하지 않는다는 줄이 없음');
+  forbid(api, 'Integration API', /sync-runs[^\n]*(보고한다|보고해도|보고를 켠다|호환용)/, 'sync-runs 로 보고하라거나 호환용으로 남았다는 줄이 있음');
+  need(api, 'Integration API', /같은 실행 키[^\n]*옛 `\/api\/sync-runs`[^\n]*먼저[^\n]*'report'[^\n]*`409 RUN_ID_CONFLICT` 가 된다/,
+    "같은 실행 키가 옛 'report' 기록과 겹치면 409 RUN_ID_CONFLICT 가 된다는 줄이 없음");
   forbid(api, 'Integration API', /RUN_ID_CONFLICT[^\n]*(되지 않는다|안 된다|않는다)/, 'RUN_ID_CONFLICT 뒤에 부정형이 붙은 줄이 있음');
   if (api !== null) {
     for (const s of ['운영 반영 뒤', '8단계']) {
@@ -88,13 +93,16 @@ test('실제 docs/AI_COLLABORATION.md 는 어긋난 점이 없다', () => {
   assert.deepEqual(checkAiCollabDoc(doc), []);
 });
 
-const aLine = '- v1 은 지금 사용한다. v2 로 바꾸는 것은 [DEPLOY.md](DEPLOY.md) (3) 배포 후 확인이 끝난 뒤에만 [INGEST_V2.md](INGEST_V2.md) ⑪ 전환 확인 절차를 따라 한다.';
-const aReversed = '- v1 은 지금 사용한다. v2 로 바꾸는 것은 [INGEST_V2.md](INGEST_V2.md) ⑪ 전환 확인 절차를 따라 하고 [DEPLOY.md](DEPLOY.md) (3) 배포 후 확인이 끝난 뒤에만 한다.';
+const aLine = '새 수집기·새 dataset 의 첫 수신은 [DEPLOY.md](DEPLOY.md) (3) 배포 후 확인이 끝난 뒤에만 [INGEST_V2.md](INGEST_V2.md) ⑪ (3) 판정으로 확인한다.';
+const aReversed = '새 수집기·새 dataset 의 첫 수신은 [INGEST_V2.md](INGEST_V2.md) ⑪ (3) 판정으로 확인하고 [DEPLOY.md](DEPLOY.md) (3) 배포 후 확인이 끝난 뒤에만 한다.';
 
 const mutations = [
   ['확인이 끝난 뒤에만', '확인이 끝나기 전에'],
+  ['수신은 v2 전용이다', '수신은 v1 도 받는다'],
+  ['`410 v1 ingest removed` 로 거부된다', '그대로 받는다'],
+  ['`/api/sync-runs` 는 12단계에서 제거됐다', '`/api/sync-runs` 는 호환용으로 남아 있다'],
   ['따로 보고하지 않는다', '따로 보고한다'],
-  ['먼저 보고되면 v2 는 `409 RUN_ID_CONFLICT`', '먼저 보고되어도 v2 는 `200`'],
+  ["먼저 기록돼 있으면(기존 `commit_source` 'report' 행) v2 는 `409 RUN_ID_CONFLICT`", '먼저 기록돼 있어도 v2 는 `200`'],
   ['`409 RUN_ID_CONFLICT` 가 된다', '`409 RUN_ID_CONFLICT` 가 되지 않는다'],
   ['never use production credentials', 'always use production credentials'],
   ['Never point Pickle AI at preview', 'Always point Pickle AI at preview'],

@@ -1,34 +1,38 @@
-# Phase 1 — Sync run reporting contract
-Status: implementation committed; Supabase migration and live integration must be verified.
+# Sync run records (실행 기록) contract
+> The separate run-report endpoint `/api/sync-runs` 는 12단계에서 제거(2026-11-25). 실행 기록은 이제 v2 수신(`POST /api/ingest`, [INGEST_V2.md](INGEST_V2.md))이 항목과 함께 저장한다.
+
+Status: in production. Every active collector dataset sends v2 bodies to `POST /api/ingest` (confirmed 2026-11-25); no collector uses the removed separate report.
 
 ## Migration
-The table is defined in `supabase/migrations/20261112000100_sync_runs.sql`. Empty development DB: apply every file in `supabase/migrations/` in name order. Existing production DB: applied state is unconfirmed — the operator decides with the check procedure in `supabase/README.md` and applies only what is needed. It adds an audit table only, with RLS; it does not change existing business records. Until then POST /api/sync-runs returns 503 (GET 은 6단계 ④에서 삭제, 405). Ordinary dashboard reads/ingest are independent of this table.
+The run record table `dashboard_sync_runs` is defined in `supabase/migrations/20261112000100_sync_runs.sql` (`commit_source` column added by `20261124000000_ingest_commit.sql`). Empty development DB: apply every file in `supabase/migrations/` in name order. Existing production DB: check applied state with the procedure in `supabase/README.md`. The table has RLS; collectors never write it directly. `/api/ingest` v2 depends on this table: the commit function `dashboard_ingest_commit` writes the item rows and the run record in the same transaction, so ingest is unavailable (503) if the table or function is missing.
 
 ## Collector flow
-1. Assign a UUID run_id for each collection execution. Keep a dataset/source pair consistent across all chunks. Include run_id, source_system, as_of, verified_at and the required provenance in all ingest rows. Use validate_only before production writes.
-2. After all chunks are finished, POST /api/sync-runs with the existing ingest Bearer token. Send the report immediately, before a later run overwrites those same items. Do not send credentials in the body or GitHub.
-3. For a collection failure, send status=failed, received_count=0, rejected_count=0, an error_code, expected_count=null if unknown, source_as_of/collected_at=null when unknown. Do not create any fake item. For partial, report actual expected/received/rejected counts, nullable expected if unknown, and error_code. A quarantined run has not been released as verified data; current API does not implement a staging store, so do not submit it to ingest.
-4. For success, source_as_of and collected_at required, expected_count=received_count, rejected_count=0. The server compares the number of persisted records matching run_id/dataset/source with expected_count. This counts stored records including tombstones; it is not independent verification of the source. The report does not overwrite business records.
-5. Final run records are immutable, exact retries return the stored record, changed reports require a new run ID. This is final reporting, not streaming progress. Do not claim source verification based solely on a successful report.
-6. GET 은 6단계 ④에서 삭제(405). 실행 기록 요약은 /api/dashboard 응답의 syncHealth(대시보드 상태 요약, app/api/dashboard/route.ts 47~54행)로 본다. No collector credentials in browser.
+1. Assign a UUID run_id for each collection execution. The run key is `(run_id, dataset, source_system)`. Put the same `run_id` and `source_system` in `run` and in every `items[].metadata`, together with as_of, verified_at and the required provenance.
+2. Send one v2 body — `{version:2, run, items, manifest}` — to `POST /api/ingest` with the ingest Bearer token. Items and the run record are stored together in one transaction (all or nothing). Do not send credentials in the body or GitHub.
+3. For success (`run.status` "success"): send 1+ items and `manifest.item_count` equal to the item count. Check the response: HTTP 200, `run.status` "success", `upserted` equal to `manifest.item_count` (1 or more). A 200 alone is not proof of storage.
+4. For a collection failure: send `run.status` "failed" with an `error_code`, `items` with 0 entries and `manifest.item_count` 0 (`source_as_of` null when unknown). Do not create any fake item. The response is 200 with `upserted` 0; it records the failed run only.
+5. Resending the exact same body (e.g. after a lost response) is idempotent: 200 `idempotent:true`, `upserted` 0, nothing rewritten. A different body is a different run — use a new `run_id` (and update every `items[].metadata.run_id`). Reusing a key with a different body returns `409 RUN_ID_CONFLICT`.
+6. Older run records written by the removed `/api/sync-runs` have `commit_source = 'report'`. If a v2 body uses the same run key as such a 'report' record, v2 returns `409 RUN_ID_CONFLICT` even if the digest matches — send it under a new `run_id`.
+7. 실행 기록 요약은 /api/dashboard 응답의 syncHealth(대시보드 상태 요약)와 기록 탭의 수집 기록으로 본다. No collector credentials in browser. Do not claim source verification based solely on a successful run.
 
-Example (fictional schema example, not production data):
+Example (fictional schema example, not production data — failed run, no items):
 ```json
 {
- "run_id":"b4df4f59-3c11-4abf-814c-45ec4eb41234",
- "dataset":"transactions",
- "source_system":"samsungcard",
- "source_as_of":"2026-11-12T06:00:00+09:00",
- "collected_at":"2026-11-12T06:05:00+09:00",
- "status":"failed",
- "expected_count":null,
- "received_count":0,
- "rejected_count":0,
- "error_code":"SOURCE_AUTH_EXPIRED",
- "payload_digest":null
+ "version":2,
+ "run":{
+  "run_id":"00000000-0000-4000-8000-000000000002",
+  "dataset":"transactions",
+  "source_system":"samsungcard",
+  "source_as_of":null,
+  "collected_at":"2026-01-01T09:10:00+09:00",
+  "status":"failed",
+  "error_code":"SOURCE_TIMEOUT"
+ },
+ "items":[],
+ "manifest":{"item_count":0,"amount_total":null}
 }
 ```
-The digest is a collector-provided reference only; it is not independent proof.
+The server stores a `payload_digest` of the received items; it identifies the bytes sent, not independent proof of the source.
 
 ## Freshness
 GET /api/dashboard returns updates (DB write time) and sourceUpdates (latest valid metadata.as_of from visible records per section). The UI labels these separately. Older legacy records lacking provenance show source time as unconfirmed. The latest timestamp is not evidence every provider was updated or reconciled. Per-source run histories are required for complete freshness.

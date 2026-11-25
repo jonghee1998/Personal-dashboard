@@ -46,9 +46,23 @@ test('배포 후 확인 절은 200 만이 아니라 저장 건수·화면으로 
   const rest = doc.slice(start + 3);
   const next = rest.search(/^## /m);
   const section = next >= 0 ? rest.slice(0, next) : rest;
-  for (const s of ['v1', '200', 'validate_only', 'upserted', '새로고침', '/api/sync-runs']) {
+  for (const s of ['v2', '200', 'run.status', 'upserted', '수집 기록', '새로고침']) {
     assert.ok(section.includes(s), `배포 후 확인 절에 '${s}' 가 없음`);
   }
+  assert.ok(!section.includes('validate_only'), "배포 후 확인 절에 제거된 'validate_only' 절차가 남아 있음");
+  const lines = section.split(/\r?\n/);
+  assert.ok(
+    lines.some((l) => l.includes('수집 확인') && l.includes('run.status') && l.includes('success') && l.includes('upserted') && l.includes('1 이상')),
+    "배포 후 확인 절에 'run.status success·upserted 1 이상' 수집 확인 줄이 없음",
+  );
+  assert.ok(
+    lines.some((l) => l.includes('/api/sync-runs') && l.includes('12단계에서 제거')),
+    "배포 후 확인 절에 '/api/sync-runs' 가 12단계에서 제거됐다는 줄이 없음",
+  );
+  assert.ok(
+    !lines.some((l) => l.includes('/api/sync-runs') && !l.includes('제거')),
+    "배포 후 확인 절에 '/api/sync-runs' 를 확인 절차로 쓰는 줄이 남아 있음",
+  );
   assert.ok(
     section.split(/\r?\n/).some((l) => l.includes('개발 토큰') && l.includes('401')),
     "배포 후 확인 절에 '개발 토큰' 과 '401' 이 함께 있는 줄이 없음",
