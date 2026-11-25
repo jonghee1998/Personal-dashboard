@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {ChevronDown,Search} from 'lucide-react';
-import {cycleGroups,detailRows,installmentInfo,installmentLabel,isAggregateWithoutDetail,koreanDate,memoSearch} from '@/lib/finance-view';
+import {cycleAmountLabel,cycleGroups,detailRows,installmentInfo,installmentLabel,isAggregateWithoutDetail,koreanDate,memoSearch} from '@/lib/finance-view';
 import {paymentTime} from '@/lib/transaction-time';
 import type {MemoEditorProps,MemoPlace} from './finance-tab';
 import type {Item} from './use-dashboard-data';
@@ -142,8 +142,7 @@ export default function FinanceActivity({transactions,cycles,editor,query,setQue
      {cycles.map(group=>{
        const key=group.label;
        const empty=group.total===0&&group.items.length===0;
-       const amount=group.status==='no_history'?'등록 내역 없음':group.status==='amount_missing'
-         ?`미확인 · 금액 미등록 ${group.missingCount}건`:won(group.total);
+       const amount=cycleAmountLabel(group);
        const open=group.live!==toggledCycles.includes(key);
        return <ExpenseGroup key={key} title={group.label} subtitle={group.range} amount={amount}
          amountNote={empty&&!group.live?'(등록 내역 0건)':group.installmentTotal===null?undefined:`(할부 ${won(group.installmentTotal)})`}

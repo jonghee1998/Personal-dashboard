@@ -381,7 +381,7 @@ async function checkTabInteractions(browser) {
     const toggles = section.locator('.financeGroupToggle');
     await expect(toggles).toHaveCount(6);
     await expect(toggles.first()).toHaveAttribute('aria-expanded', 'true');
-    await expect(toggles.first()).toContainText('(할부 30,000원)');
+    await expect(toggles.first()).toContainText('(할부 30,000원)'); // pii-allow 합성 금액
     await expect(monthlyRow(page, FIXTURE_TEXT.installment).locator('.financeInstallment')).toHaveText('(할부 3개월)');
     await expect(monthlyRow(page, FIXTURE_TEXT.undatedMerchant)).toHaveCount(0);
     await captureFinanceState(page, 'finance-monthly-open-390.png');
@@ -393,7 +393,7 @@ async function checkTabInteractions(browser) {
     const toggle = section.getByRole('button', {name: /합성지출분류A/});
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(toggle).toContainText('5건');
-    await expect(toggle).toContainText('60,000원');
+    await expect(toggle).toContainText('60,000원'); // pii-allow 합성 금액
     await toggle.click();
     const aggregate = section.locator('.financeTransaction', {hasText: FIXTURE_TEXT.aggregateMerchant});
     const subItems = aggregate.locator('.financeSubItems li');
