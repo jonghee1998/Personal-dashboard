@@ -1,7 +1,11 @@
 // 빌드된 앱(next start)의 서버 로그 검사. run.mjs 가 next start 의 stdout·stderr 를 줄 단위로 logs 배열에 모으고,
 // checkApiAuth 뒤에 checkApiLogs 를 부른다. 수집기 API 실패가 값 없이 한 줄(JSON)로 남는지, 정상·검증 실패 응답에는
 // 실패 로그가 남지 않는지, 응답 본문·상태·Cache-Control 이 그대로인지 확인한다. 값은 모두 가짜다.
-import {FAKE_EXISTING_RUN_ID, FAKE_PGRST_DETAILS, FAKE_PGRST_MESSAGE, FAKE_TOKEN} from './api-auth.mjs';
+// b~d 는 /api/ingest 에 숫자 version:2 본문을 보낸다: b 커밋 RPC 503(run f4, api-ingest 경우 c 와 같은 본문 모양),
+// c manifest 가 틀린 본문(422), d 가짜 서버가 처음부터 ingest_v2 기록을 가진 run f9 의 멱등 재전송(200 idempotent).
+// d 는 api-ingest 경우 f·g 가 쓰는 f6 상태를 만들지 않는다(run.mjs 에서 checkApiLogs 가 checkApiIngest 보다 먼저 돈다).
+import {FAKE_PGRST_DETAILS, FAKE_PGRST_MESSAGE, FAKE_TOKEN, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_OK, LOG_REPLAY_RUN} from './api-auth.mjs';
+import {v2Body} from './api-ingest.mjs';
 
 export const QUIET_MS = 1500;
 export const QUIET_MAX_MS = 15_000;
@@ -9,11 +13,11 @@ export const WINDOW_MS = 3000;
 export const FORBIDDEN = [FAKE_PGRST_MESSAGE, FAKE_PGRST_DETAILS, FAKE_TOKEN];
 export const FAILURE_EVENTS = ['api_failure', 'collector_auth_failed'];
 
-function syncReport(runId) {
-  return {
-    run_id: runId, dataset: 'transactions', source_system: 'fake-source', source_as_of: null, collected_at: null,
-    status: 'failed', expected_count: null, received_count: 0, rejected_count: 0, error_code: 'FAKE_CHECK', payload_digest: null,
-  };
+/** manifest.item_count 가 항목 수와 다른 v2 본문(형식은 맞고 규칙 검사에서 422 ITEM_COUNT_MISMATCH, DB 호출 전) */
+export function badManifestBody(runId = INGEST_RUN_OK) {
+  const body = v2Body(runId);
+  body.manifest = {...body.manifest, item_count: body.items.length + 1};
+  return body;
 }
 
 /** 검사 목록. expect.events: event 별 정확한 개수, expect.match: 그 event 줄(1개)이 가져야 할 필드 */
@@ -24,18 +28,18 @@ export function apiLogCases() {
     {id: 'a', name: 'POST /api/ingest 토큰 없음', path: '/api/ingest', headers: json, body: '{}',
       expect: {status: 401, body: {error: 'Unauthorized'}, events: {collector_auth_failed: 1, api_failure: 0},
         match: {event: 'collector_auth_failed', route: '/api/ingest', reason: 'no_bearer'}}},
-    {id: 'b', name: 'POST /api/sync-runs 데이터 읽기 실패', path: '/api/sync-runs', headers: auth,
-      body: JSON.stringify(syncReport('00000000-0000-4000-8000-0000000000f1')),
-      expect: {status: 503, body: {error: 'Sync audit unavailable; migration required or database unavailable'}, cacheControl: 'no-store',
+    {id: 'b', name: `POST /api/ingest v2 run ${INGEST_RUN_COMMIT_FAIL.slice(-2)} 커밋 RPC 503`, path: '/api/ingest', headers: auth,
+      body: JSON.stringify(v2Body(INGEST_RUN_COMMIT_FAIL)),
+      expect: {status: 503, body: {error: 'Ingest unavailable'}, cacheControl: 'no-store',
         events: {api_failure: 1, collector_auth_failed: 0},
-        match: {event: 'api_failure', route: '/api/sync-runs', stage: 'read', code: 'PGRST301'}}},
-    {id: 'c', name: 'POST /api/sync-runs 형식 오류', path: '/api/sync-runs', headers: auth, body: '{}',
-      expect: {status: 422, events: {api_failure: 0, collector_auth_failed: 0}}},
-    {id: 'd', name: 'POST /api/sync-runs 기존 실행(idempotent)', path: '/api/sync-runs', headers: auth,
-      body: JSON.stringify(syncReport(FAKE_EXISTING_RUN_ID)),
+        match: {event: 'api_failure', route: '/api/ingest', stage: 'write', code: 'PGRST002'}}},
+    {id: 'c', name: 'POST /api/ingest v2 manifest 오류', path: '/api/ingest', headers: auth, body: JSON.stringify(badManifestBody()),
+      expect: {status: 422, cacheControl: 'no-store', events: {api_failure: 0, collector_auth_failed: 0}}},
+    {id: 'd', name: `POST /api/ingest v2 run ${LOG_REPLAY_RUN.slice(-2)} 멱등 재전송`, path: '/api/ingest', headers: auth,
+      body: JSON.stringify(v2Body(LOG_REPLAY_RUN)),
       expect: {status: 200, cacheControl: 'no-store', events: {api_failure: 0, collector_auth_failed: 0},
-        bodyFields: {recorded: true, idempotent: true, run_id: FAKE_EXISTING_RUN_ID},
-        fakeQuery: `run_id=eq.${FAKE_EXISTING_RUN_ID}`}},
+        bodyFields: {version: 2, idempotent: true, upserted: 0, run_id: LOG_REPLAY_RUN},
+        fakeQuery: `run_id=eq.${LOG_REPLAY_RUN}`}},
   ];
 }
 
@@ -70,7 +74,8 @@ export function judgeLogCase(c, observed) {
   if (e.body && !sameJson(body, e.body)) errs.push('응답 본문이 기대와 다름');
   if (e.bodyFields) {
     const f = e.bodyFields;
-    if (!body || body.recorded !== f.recorded || body.idempotent !== f.idempotent || body.run?.run_id !== f.run_id) errs.push('응답 본문 recorded·idempotent·run.run_id 불일치');
+    if (!body || body.version !== f.version || body.idempotent !== f.idempotent || body.upserted !== f.upserted
+      || !Array.isArray(body.items) || body.items.length !== 0 || body.run?.run_id !== f.run_id) errs.push('응답 본문 version·idempotent·upserted·items·run.run_id 불일치');
   }
   if (e.cacheControl !== undefined && observed.cacheControl !== e.cacheControl) errs.push(`Cache-Control ${observed.cacheControl} (기대 ${e.cacheControl})`);
   const lines = observed.lines || [];

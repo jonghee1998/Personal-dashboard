@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {checkCollectorToken,collectorAuthFailureLog} from '../lib/collector-auth.ts';
 
@@ -52,7 +52,7 @@ test('failure log is one JSON line with only event, route, reason',()=>{
  assert.ok(!line.includes(secret));
  assert.ok(!line.includes(header));
  for(const reason of ['server_secret_missing','server_secret_short','no_bearer','mismatch'])
-  assert.equal(JSON.parse(collectorAuthFailureLog('/api/backfill/stage',reason)).reason,reason);
+  assert.equal(JSON.parse(collectorAuthFailureLog('/api/ingest',reason)).reason,reason);
 });
 
 test('failure log replaces odd route or reason with invalid',()=>{
@@ -64,7 +64,11 @@ test('failure log replaces odd route or reason with invalid',()=>{
 });
 
 const root=new URL('..',import.meta.url).pathname;
-const routes=['app/api/ingest/route.ts','app/api/sync-runs/route.ts'];
+const routes=['app/api/ingest/route.ts'];
+
+test('removed /api/sync-runs route file is absent',()=>{
+ assert.equal(existsSync(join(root,'app/api/sync-runs')),false);
+});
 const call=/checkCollectorToken\(\s*req\.headers\.get\('authorization'\)\s*,\s*process\.env\.PICKLE_INGEST_TOKEN\s*\)/g;
 
 test('collector routes use only the shared token check',()=>{

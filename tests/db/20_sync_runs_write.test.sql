@@ -1,12 +1,10 @@
--- 클라이언트(authenticated)는 dashboard_sync_runs 에 쓸 수 없고, dashboard_backfill_batches 는 읽기·쓰기 모두 못 한다.
+-- 클라이언트(authenticated)는 dashboard_sync_runs 에 쓸 수 없다.
 \set ON_ERROR_STOP on
 
 -- 권한 회수가 실제로 효과를 냈는지 먼저 확인
 do $$
 begin
  if has_table_privilege('authenticated','public.dashboard_sync_runs','INSERT') then raise exception 'authenticated still has INSERT on dashboard_sync_runs'; end if;
- if has_table_privilege('authenticated','public.dashboard_backfill_batches','SELECT') then raise exception 'authenticated has SELECT on dashboard_backfill_batches'; end if;
- if has_table_privilege('authenticated','public.dashboard_backfill_batches','INSERT') then raise exception 'authenticated has INSERT on dashboard_backfill_batches'; end if;
 end $$;
 
 begin;

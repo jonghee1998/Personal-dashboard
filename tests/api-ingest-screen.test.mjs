@@ -1,18 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {apiIngestCases, judgeIngestCase, pagedBody, v1Body, v2Body, v2ConflictBody, failedExample, PAGED_ITEMS} from '../scripts/screens/api-ingest.mjs';
+import {apiIngestCases, judgeIngestCase, pagedBody, noVersionBody, truncatedJsonBody, v2Body, v2ConflictBody, failedExample, PAGED_ITEMS, V1_REMOVED_BODY} from '../scripts/screens/api-ingest.mjs';
 import {
   FAKE_TOKEN, FAKE_USER_ID, INGEST_RUN_OK, INGEST_RUN_COMMIT_FAIL, INGEST_RUN_PAGED, INGEST_RUN_REPLAY, INGEST_RUN_REPORT, INGEST_RUN_FAILED, PAGED_UPDATED_AT, FAKE_PAGE_ROWS,
   fakeCommitResponse, fakeReportRun, fakeExistingPage, fakeSupabaseResponse, startFakeSupabase,
 } from '../scripts/screens/api-auth.mjs';
 import {parseIngestV2} from '../lib/ingest-v2.ts';
-import {handleIngest, readAllPages, payload} from '../lib/ingest-service.ts';
+import {handleIngest, readAllPages} from '../lib/ingest-service.ts';
 
 const NOW = Date.parse('2026-01-02T00:00:00+09:00');
 const cases = Object.fromEntries(apiIngestCases().map(c => [c.id, c]));
 
-test('검사 목록 a~k, run_id f3·f4·f5·f6·f7·f8', () => {
-  assert.deepEqual(apiIngestCases().map(c => c.id), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']);
+test('검사 목록 b~m(v1 경우 a 없음), run_id f3·f4·f5·f6·f7·f8', () => {
+  assert.deepEqual(apiIngestCases().map(c => c.id), ['b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']);
+  // l: version 키 없는 옛 v1 모양, m: 인증된 깨진 JSON 문자열 원본
+  assert.equal(cases.l.headers.authorization, `Bearer ${FAKE_TOKEN}`);
+  assert.ok(!Object.hasOwn(cases.l.body, 'version'));
+  assert.deepEqual(cases.l.body, noVersionBody());
+  assert.equal(cases.m.headers.authorization, `Bearer ${FAKE_TOKEN}`);
+  assert.equal(cases.m.body, undefined);
+  assert.equal(typeof cases.m.rawBody, 'string');
+  assert.equal(cases.m.rawBody, truncatedJsonBody());
+  assert.throws(() => JSON.parse(cases.m.rawBody), SyntaxError);
   assert.equal(cases.k.headers.authorization, `Bearer ${FAKE_TOKEN}`);
   assert.equal(typeof cases.k.body.version, 'string');
   assert.equal(cases.k.body.version, '2');
@@ -45,7 +54,7 @@ test('검사 목록 a~k, run_id f3·f4·f5·f6·f7·f8', () => {
   assert.deepEqual({...cases.h.body.items[0], title: '합성가맹점A'}, cases.g.body.items[0]);
 });
 
-test('v2 본문은 parseIngestV2 를 통과(1항목·500항목), v1 본문은 v1 스키마 통과', () => {
+test('v2 본문은 parseIngestV2 를 통과(1항목·500항목)', () => {
   for (const body of [v2Body(INGEST_RUN_OK), v2Body(INGEST_RUN_COMMIT_FAIL), pagedBody(), v2Body(INGEST_RUN_REPLAY), v2ConflictBody(), cases.i.body, cases.j.body]) {
     const r = parseIngestV2(structuredClone(body), NOW);
     assert.equal(r.ok, true, JSON.stringify(r.violations));
@@ -57,7 +66,6 @@ test('v2 본문은 parseIngestV2 를 통과(1항목·500항목), v1 본문은 v1
   assert.equal(new Set(pagedBody().items.map(x => x.metadata.source_record_id)).size, PAGED_ITEMS);
   assert.equal(v2Body(INGEST_RUN_OK).items.length, 1);
   assert.equal(parseIngestV2(structuredClone(cases.j.body), NOW).items.length, 0);
-  assert.equal(payload.safeParse(v1Body()).success, true);
 });
 
 test('가짜 existing RPC: 500건을 200개씩 next_after 로 이어 3페이지', () => {
@@ -125,12 +133,12 @@ async function simulate(c, runs, mapRow = row => row) {
   // route 와 같은 변환(결정 D)
   let status, body, cacheControl = null;
   if (out.kind === 'v2failure') { status = 503; body = {error: 'Ingest unavailable'}; cacheControl = 'no-store'; }
-  else { status = out.status; body = out.body; if (out.version === 2 || out.status === 200) cacheControl = 'no-store'; }
+  else { status = out.status; body = out.body; cacheControl = 'no-store'; }
   return {status, bodyText: JSON.stringify(body), cacheControl, calls};
 }
 
-test('a·b·c·e: lib 처리 결과를 판정하면 통과(ⓔ existing 3회·p_expected 500개 고정 updated_at)', async () => {
-  for (const id of ['a', 'b', 'c', 'e']) {
+test('b·c·e: lib 처리 결과를 판정하면 통과(ⓔ existing 3회·p_expected 500개 고정 updated_at)', async () => {
+  for (const id of ['b', 'c', 'e']) {
     const observed = await simulate(cases[id]);
     assert.deepEqual(judgeIngestCase(cases[id], observed), [], id);
   }
@@ -139,10 +147,9 @@ test('a·b·c·e: lib 처리 결과를 판정하면 통과(ⓔ existing 3회·p_
 });
 
 test('판정: 어긋난 관찰은 실패', async () => {
-  const a = await simulate(cases.a);
-  assert.ok(judgeIngestCase(cases.a, {...a, cacheControl: null}).length);
-  assert.ok(judgeIngestCase(cases.a, {...a, calls: []}).length);
   const b = await simulate(cases.b);
+  assert.ok(judgeIngestCase(cases.b, {...b, cacheControl: null}).length);
+  assert.ok(judgeIngestCase(cases.b, {...b, calls: []}).length);
   assert.ok(judgeIngestCase(cases.b, {...b, calls: b.calls.filter(x => x.method !== 'GET')}).length);
   assert.ok(judgeIngestCase(cases.b, {...b, bodyText: JSON.stringify({version: 2, idempotent: true})}).length);
   const c = await simulate(cases.c);
@@ -283,38 +290,67 @@ test('j 판정: 어긋난 관찰은 실패', async () => {
   assert.match(errs[0], /뒤|commit 보다/);
 });
 
-test('k: 문자열 version은 400 Invalid payload, 숫자 version은 200', async () => {
-  const k = await simulate(cases.k);
-  assert.equal(k.status, 400);
-  assert.equal(JSON.parse(k.bodyText).error, 'Invalid payload');
-  assert.equal(k.cacheControl, null);
-  assert.equal(k.calls.length, 0);
-  assert.deepEqual(judgeIngestCase(cases.k, k), []);
+test('k·l: 문자열 version·version 없음은 410 v1 ingest removed(no-store, DB 호출 0), 숫자 version은 200', async () => {
+  for (const id of ['k', 'l']) {
+    const o = await simulate(cases[id]);
+    assert.equal(o.status, 410, id);
+    assert.deepEqual(JSON.parse(o.bodyText), V1_REMOVED_BODY, id);
+    assert.deepEqual(V1_REMOVED_BODY, {error: 'v1 ingest removed', hint: 'send version 2'});
+    assert.equal(o.cacheControl, 'no-store', id);
+    assert.equal(o.calls.length, 0, id);
+    assert.deepEqual(judgeIngestCase(cases[id], o), [], id);
+  }
 
   const ctl = await simulate({...cases.k, body: {...cases.k.body, version: 2}});
   assert.equal(ctl.status, 200);
   assert.equal(JSON.parse(ctl.bodyText).version, 2);
 });
 
-test('k 판정: 어긋난 관찰은 실패', async () => {
-  const k = await simulate(cases.k);
-  const body = JSON.parse(k.bodyText);
-  const bad = {
-    '상태 200': {...k, status: 200},
-    '상태 422': {...k, status: 422},
-    'Invalid JSON 오류': {...k, bodyText: JSON.stringify({error: 'Invalid JSON'})},
-    '본문 version 키': {...k, bodyText: JSON.stringify({...body, version: 2})},
-    'details 누락': {...k, bodyText: JSON.stringify({...body, details: undefined})},
-    'details 배열': {...k, bodyText: JSON.stringify({...body, details: []})},
-    'Cache-Control no-store': {...k, cacheControl: 'no-store'},
-    'commit POST 1건': {...k, calls: [{method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_commit'}]},
-    '실행 조회 GET 1건': {...k, calls: [{method: 'GET', path: '/rest/v1/dashboard_sync_runs'}]},
-    '빈 본문': {...k, bodyText: ''},
-    'JSON이 아닌 본문': {...k, bodyText: 'Invalid payload'},
-  };
-  for (const [name, observed] of Object.entries(bad)) {
-    assert.ok(judgeIngestCase(cases.k, observed).length, name);
+test('k·l 판정: 어긋난 관찰은 실패', async () => {
+  for (const id of ['k', 'l']) {
+    const k = await simulate(cases[id]);
+    const body = JSON.parse(k.bodyText);
+    const bad = {
+      '상태 200': {...k, status: 200},
+      '상태 400': {...k, status: 400},
+      '상태 422': {...k, status: 422},
+      'Invalid JSON 오류': {...k, bodyText: JSON.stringify({error: 'Invalid JSON'})},
+      'Invalid payload 오류': {...k, bodyText: JSON.stringify({error: 'Invalid payload', details: {}})},
+      '본문 version 키': {...k, bodyText: JSON.stringify({...body, version: 2})},
+      'hint 누락': {...k, bodyText: JSON.stringify({error: body.error})},
+      'hint 다름': {...k, bodyText: JSON.stringify({...body, hint: 'send version 1'})},
+      'Cache-Control 없음': {...k, cacheControl: null},
+      'commit POST 1건': {...k, calls: [{method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_commit'}]},
+      '실행 조회 GET 1건': {...k, calls: [{method: 'GET', path: '/rest/v1/dashboard_sync_runs'}]},
+      '빈 본문': {...k, bodyText: ''},
+      'JSON이 아닌 본문': {...k, bodyText: 'v1 ingest removed'},
+    };
+    for (const [name, observed] of Object.entries(bad)) {
+      assert.ok(judgeIngestCase(cases[id], observed).length, `${id} ${name}`);
+    }
   }
+});
+
+// m 은 route 의 JSON 파싱 단계라 lib 로 흉내 낼 수 없다: 지금 route 그대로의 관찰(400·Invalid JSON·Cache-Control 없음·호출 0)
+const mOk = {status: 400, bodyText: JSON.stringify({error: 'Invalid JSON'}), cacheControl: null, calls: []};
+
+test('m: 인증된 깨진 JSON 정상 관찰은 통과(Cache-Control 은 요구하지 않음)', () => {
+  assert.deepEqual(judgeIngestCase(cases.m, mOk), []);
+  assert.deepEqual(judgeIngestCase(cases.m, {...mOk, cacheControl: 'no-store'}), []);
+});
+
+test('m 판정: 어긋난 관찰은 실패', () => {
+  const bad = {
+    '상태 410': {...mOk, status: 410},
+    '상태 422': {...mOk, status: 422},
+    '상태 200': {...mOk, status: 200},
+    '본문 Invalid payload': {...mOk, bodyText: JSON.stringify({error: 'Invalid payload'})},
+    '본문 v1 ingest removed': {...mOk, bodyText: JSON.stringify(V1_REMOVED_BODY)},
+    '본문 필드 추가': {...mOk, bodyText: JSON.stringify({error: 'Invalid JSON', details: {}})},
+    'DB 호출 1건(RPC)': {...mOk, calls: [{method: 'POST', path: '/rest/v1/rpc/dashboard_ingest_commit'}]},
+    'DB 호출 1건(REST)': {...mOk, calls: [{method: 'GET', path: '/rest/v1/dashboard_sync_runs'}]},
+  };
+  for (const [name, observed] of Object.entries(bad)) assert.ok(judgeIngestCase(cases.m, observed).length, name);
 });
 
 // f6: 가짜 commit 이 받은 p_run 을 실행 기록으로 기억하고, 네 필터(user_id·run_id·dataset·source_system)로 조회한다.

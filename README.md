@@ -25,7 +25,7 @@
    - `DASHBOARD_USER_ID`: 위 로그인 사용자 UUID
    - `PICKLE_INGEST_TOKEN`: 랜덤 32자 이상의 비밀 문자열
 5. Deploy → 생성된 https://...vercel.app 주소에서 로그인
-6. 피클AI에 URL + 전용 ingest token + 수신 규격 전달 (비밀키는 공개 Issue에 올리지 않기): 지금(8단계 전)은 v1 — `examples/pickle-payload-v1.json`, v2 는 운영 반영 뒤 — `examples/pickle-payload.json`([docs/INGEST_V2.md](docs/INGEST_V2.md))
+6. 피클AI에 URL + 전용 ingest token + 수신 규격 전달 (비밀키는 공개 Issue에 올리지 않기): v2 본문 — `examples/pickle-payload.json`([docs/INGEST_V2.md](docs/INGEST_V2.md))
 
 ## 피클AI API
 
@@ -35,10 +35,10 @@ Authorization: Bearer <PICKLE_INGEST_TOKEN>
 Content-Type: application/json
 ```
 
-Body: 지금(8단계 전)은 v1 — `examples/pickle-payload-v1.json`, v2 는 운영 반영 뒤 — `examples/pickle-payload.json`([docs/INGEST_V2.md](docs/INGEST_V2.md), v2 루트 구조는 이 문서 참고).
+Body: v2 본문 — `examples/pickle-payload.json`(루트 구조 `{version:2, run, items, manifest}` 는 [docs/INGEST_V2.md](docs/INGEST_V2.md) 참고). `version` 이 숫자 2 가 아닌 본문(옛 v1 형식)은 `410 v1 ingest removed` 로 거부한다(v1 수신은 12단계에서 제거, 2026-11-25).
 예시는 형식 확인용 합성 값이며, 운영 전송 본문은 수집기가 실제로 검증한 원천 레코드로 만든다([examples/README.md](examples/README.md)).
 
-v1: `items`는 1~100개 배열. `kind`는 transaction / settlement / news / benefit / task / event / journal. `external_id`는 **종류별로 일관된 고유 ID**. 동일 ID 재전송 시 upsert. 모든 데이터는 설정된 `DASHBOARD_USER_ID`로 귀속.
+`items`는 0~500개 배열(성공 실행은 1개 이상, 실패 보고는 0개). `kind`는 transaction / settlement / news / benefit / task / event / journal. `external_id`는 **종류별로 일관된 고유 ID**. 동일 ID 재전송 시 upsert. 항목과 실행 기록(`run`)은 한 트랜잭션으로 함께 저장된다. 모든 데이터는 설정된 `DASHBOARD_USER_ID`로 귀속.
 
 포인트는 `kind:"benefit", category:"points"`, 지출은 `kind:"transaction", amount:양수`, 정산은 `kind:"settlement", amount:받을 금액`으로 표준화.
 

@@ -1,10 +1,11 @@
 // 빌드된 앱(next start)의 수신(/api/ingest) 검사. run.mjs 가 checkApiLogs 뒤에 checkApiIngest 를 부른다.
-// 가짜 Supabase 서버(api-auth.mjs)의 RPC·실행 조회 경로를 써서 v1·v2 응답과 DB 함수 호출 본문을 확인한다.
-// ⓐ v1 → 200 ⓑ v2 → 200 ⓒ v2 커밋 RPC 503 → 503 Ingest unavailable ⓓ 토큰 없는 v2 → 401 ⓔ 500건·키셋 페이지 3회
+// 가짜 Supabase 서버(api-auth.mjs)의 RPC·실행 조회 경로를 써서 v2 응답과 DB 함수 호출 본문을 확인한다.
+// (12단계에서 v1 수신을 지웠다: 옛 경우 a(v1 → 200)는 없다.) ⓑ v2 → 200 ⓒ v2 커밋 RPC 503 → 503 Ingest unavailable ⓓ 토큰 없는 v2 → 401 ⓔ 500건·키셋 페이지 3회
 // ⓕ v2 run f6 최초 → 200 ⓖ f6 동일 재전송 → 200 idempotent ⓗ f6 같은 run_id 다른 본문 → 409 RUN_ID_CONFLICT
 // ⓘ v2 run f7 별도 보고(commit_source 'report')가 먼저 기록 → 409 RUN_ID_CONFLICT
 // ⓙ v2 run f8 실패 보고(run.status 'failed'·items []) → 200 upserted 0.
-// ⓚ v2 모양·version "2"(문자열) → 400 Invalid payload·details 객체·version과 Cache-Control 없음·Supabase 호출 0건.
+// ⓚ v2 모양·version "2"(문자열) → 410 {error:'v1 ingest removed', hint:'send version 2'}·Cache-Control no-store·Supabase 데이터 호출 0건.
+// ⓛ version 없는 옛 v1 본문({items}) → ⓚ 와 같은 기대. ⓜ 인증된 깨진 JSON(끝이 잘린 문자열 원본) → 400 {error:'Invalid JSON'}·데이터 호출 0건.
 // 값은 모두 가짜다. 이 파일은 lib/*.ts 를 import 하지 않는다(node 로 바로 실행). 본문이 v2 규칙을 통과하는지는
 // tests/api-ingest-screen.test.mjs 가 parseIngestV2 로 확인한다.
 import {readFileSync} from 'node:fs';
@@ -75,10 +76,19 @@ export function v2ConflictBody(runId = INGEST_RUN_REPLAY) {
   return withItems(runId, [{...successExample().items[0], title: '합성가맹점B'}]);
 }
 
-/** 같은 항목(metadata.run_id 그대로)으로 만든 v1 본문 */
-export function v1Body(runId = INGEST_RUN_OK) {
+/** version 키가 없는 옛 v1 모양 본문({items}). 12단계부터 410 으로 거부된다. */
+export function noVersionBody(runId = INGEST_RUN_OK) {
   return {items: v2Body(runId).items};
 }
+
+/** 끝이 잘린 JSON 문자열(JSON.parse 실패). 경우 m 은 이 문자열을 그대로 보낸다. */
+export function truncatedJsonBody(runId = INGEST_RUN_OK) {
+  const text = JSON.stringify(v2Body(runId));
+  return text.slice(0, Math.floor(text.length / 2));
+}
+
+/** 410 거부 본문(lib/ingest-service.ts handleIngest) */
+export const V1_REMOVED_BODY = {error: 'v1 ingest removed', hint: 'send version 2'};
 
 /** 최대 배치: external_id·source_record_id 를 번호로 다르게 만든 가짜 거래 500건 */
 export function pagedBody(runId = INGEST_RUN_PAGED, n = PAGED_ITEMS) {
@@ -95,7 +105,6 @@ export function apiIngestCases() {
   const json = {'content-type': 'application/json'};
   const auth = {...json, authorization: `Bearer ${FAKE_TOKEN}`};
   return [
-    {id: 'a', name: 'v1 → 200', headers: auth, body: v1Body()},
     {id: 'b', name: `v2 run ${INGEST_RUN_OK.slice(-2)} → 200`, headers: auth, body: v2Body(INGEST_RUN_OK)},
     {id: 'c', name: `v2 run ${INGEST_RUN_COMMIT_FAIL.slice(-2)} 커밋 RPC 503 → 503`, headers: auth, body: v2Body(INGEST_RUN_COMMIT_FAIL)},
     {id: 'd', name: '토큰 없는 v2 → 401', headers: json, body: v2Body(INGEST_RUN_OK)},
@@ -109,7 +118,10 @@ export function apiIngestCases() {
     {id: 'i', name: 'v2 run f7 별도 보고가 먼저 기록 → 409 RUN_ID_CONFLICT', headers: auth, body: v2Body(INGEST_RUN_REPORT)},
     // j 는 문서 failed 예시(items []) 그대로, run_id 만 f8
     {id: 'j', name: 'v2 run f8 실패 보고 → 200 upserted 0', headers: auth, body: failedBody()},
-    {id: 'k', name: 'v2 모양·version "2"(문자열) → 400 Invalid payload', headers: auth, body: stringVersionBody()},
+    {id: 'k', name: 'v2 모양·version "2"(문자열) → 410 v1 ingest removed', headers: auth, body: stringVersionBody()},
+    {id: 'l', name: 'version 없는 옛 v1 본문 → 410 v1 ingest removed', headers: auth, body: noVersionBody()},
+    // m 은 body 대신 rawBody(문자열 원본)를 그대로 보낸다(checkApiIngest 송신부)
+    {id: 'm', name: '인증된 깨진 JSON → 400 Invalid JSON', headers: auth, rawBody: truncatedJsonBody()},
   ];
 }
 
@@ -148,19 +160,11 @@ export function judgeIngestCase(c, observed) {
   };
   const noCommit = () => { if (commits.length) errs.push(`commit RPC ${commits.length}건 (기대 0)`); };
   const expectedRun = {run_id: INGEST_RUN_REPLAY, dataset: runKey.dataset, source_system: runKey.source_system, status: 'success', accepted_count: 1};
+  const noData = () => {
+    const data = calls.filter(x => x.path.startsWith('/rest/v1')).length;
+    if (data) errs.push(`데이터 요청 rest/v1 ${data}건 (기대 0)`);
+  };
   switch (c.id) {
-  case 'a': {
-    status(200); noStore();
-    if (!isObj(body) || JSON.stringify(Object.keys(body).sort()) !== JSON.stringify(['items', 'upserted', 'verification'])
-      || body.upserted !== 1 || !Array.isArray(body.items) || body.verification !== 'structural_provenance_only') errs.push('v1 응답 본문이 {upserted:1, items, verification} 이 아님');
-    const args = oneCommit();
-    if (args) {
-      if (args.p_user !== FAKE_USER_ID) errs.push('commit p_user 가 FAKE_USER_ID 가 아님');
-      if (args.p_run !== null) errs.push('v1 commit p_run 이 null 이 아님');
-      if (!Array.isArray(args.p_rows) || args.p_rows.length !== 1) errs.push('v1 commit p_rows 가 1개가 아님');
-    }
-    break;
-  }
   case 'b': {
     status(200); noStore();
     if (!isObj(body) || body.version !== 2 || body.idempotent !== false) errs.push('v2 응답 본문 version 2·idempotent false 가 아님');
@@ -182,16 +186,25 @@ export function judgeIngestCase(c, observed) {
     else if (mine[0].status !== 503) errs.push(`commit RPC 응답 ${mine[0].status} (기대 503)`);
     break;
   }
-  case 'd':
-  case 'k': {
-    status(c.id === 'k' ? 400 : 401);
-    if (c.id === 'k' && (!isObj(body) || body.error !== 'Invalid payload'
-      || !isObj(body.details) || Object.hasOwn(body, 'version'))) {
-      errs.push('응답 본문이 version 없는 {error:"Invalid payload", details: 객체} 가 아님');
-    }
+  case 'd': {
+    status(401);
     if (observed.cacheControl !== null && observed.cacheControl !== undefined) errs.push(`Cache-Control ${observed.cacheControl} (기대 없음)`);
-    const data = calls.filter(x => x.path.startsWith('/rest/v1')).length;
-    if (data) errs.push(`데이터 요청 rest/v1 ${data}건 (기대 0)`);
+    noData();
+    break;
+  }
+  case 'k':
+  case 'l': {
+    // v1 수신 제거(12단계): 숫자 2 가 아닌 version·version 없음 → 410, DB 를 부르지 않는다
+    status(410); noStore();
+    if (JSON.stringify(body) !== JSON.stringify(V1_REMOVED_BODY)) errs.push(`응답 본문이 ${JSON.stringify(V1_REMOVED_BODY)} 가 아님`);
+    noData();
+    break;
+  }
+  case 'm': {
+    // route 의 JSON 파싱 실패: 지금 route 그대로라 Cache-Control 은 요구하지 않는다
+    status(400);
+    if (JSON.stringify(body) !== JSON.stringify({error: 'Invalid JSON'})) errs.push('응답 본문이 정확히 {error:"Invalid JSON"} 가 아님');
+    noData();
     break;
   }
   case 'e': {
@@ -293,7 +306,8 @@ export async function checkApiIngest(base, fake) {
     const start = fake.calls.length;
     const observed = {status: undefined, bodyText: '', cacheControl: null};
     try {
-      const res = await fetch(base + '/api/ingest', {method: 'POST', headers: c.headers, body: JSON.stringify(c.body), redirect: 'manual'});
+      const payload = typeof c.rawBody === 'string' ? c.rawBody : JSON.stringify(c.body);
+      const res = await fetch(base + '/api/ingest', {method: 'POST', headers: c.headers, body: payload, redirect: 'manual'});
       observed.status = res.status;
       observed.cacheControl = res.headers.get('cache-control');
       observed.bodyText = await res.text();
