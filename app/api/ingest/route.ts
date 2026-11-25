@@ -34,14 +34,9 @@ export async function POST(req:NextRequest){
  let json:unknown;try{json=await req.json()}catch{return NextResponse.json({error:'Invalid JSON'},{status:400})}
  try{
  const out=await handleIngest(json,userId,Date.now(),ingestDeps());
- // v2 응답은 상태와 상관없이 no-store, v1 은 지금처럼 200 에만(결정 D).
- if(out.kind==='response')return out.version===2?NextResponse.json(out.body,{status:out.status,headers:{'Cache-Control':'no-store'}}):out.status===200?NextResponse.json(out.body,{headers:{'Cache-Control':'no-store'}}):NextResponse.json(out.body,{status:out.status});
+ // 응답은 상태와 상관없이 no-store(결정 D). v1 본문의 410 도 같다.
+ if(out.kind==='response')return NextResponse.json(out.body,{status:out.status,headers:{'Cache-Control':'no-store'}});
  // v2 의 DB 실패는 단계와 상관없이 503 Ingest unavailable(결정 D).
- if(out.kind==='v2failure'){logApiFailure('/api/ingest',out.stage,out.err);return NextResponse.json({error:'Ingest unavailable'},{status:503,headers:{'Cache-Control':'no-store'}});}
- const {stage,err}=out;
- if(stage==='status_lookup'){logApiFailure('/api/ingest',stage,err);return NextResponse.json({error:'Status lookup failed'},{status:500});}
- if(stage==='duplicate_lookup'){logApiFailure('/api/ingest',stage,err);return NextResponse.json({error:'Duplicate lookup failed'},{status:503});}
- if(stage==='run_lookup'){logApiFailure('/api/ingest',stage,err);return NextResponse.json({error:'Run lookup failed'},{status:503});}
- logApiFailure('/api/ingest','write',err);return NextResponse.json({error:'Write failed'},{status:500});
+ logApiFailure('/api/ingest',out.stage,out.err);return NextResponse.json({error:'Ingest unavailable'},{status:503,headers:{'Cache-Control':'no-store'}});
  }catch(e){logApiFailure('/api/ingest','unexpected',e);return NextResponse.json({error:'Server configuration error'},{status:503})}
 }

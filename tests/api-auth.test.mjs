@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {FAKE_TOKEN, FAKE_USER_ID, apiAuthCases, appOrigin, fakeAppEnv, judge, sessionCookie, startFakeSupabase} from '../scripts/screens/api-auth.mjs';
+import {FAKE_TOKEN, FAKE_USER_ID, REMOVED_SYNC_RUNS, apiAuthCases, appOrigin, fakeAppEnv, judge, sessionCookie, startFakeSupabase} from '../scripts/screens/api-auth.mjs';
 
 test('fake env uses only synthetic values and the fake server URL', () => {
   const env = fakeAppEnv('http://127.0.0.1:4555');
@@ -27,13 +27,20 @@ test('app origin is localhost on the same port (next start without -H)', () => {
 test('case list covers token, session and removed routes', () => {
   const cases = apiAuthCases('http://localhost:3100', 'c=1');
   const keys = new Set(cases.map(c => `${c.method} ${c.path}`));
-  for (const k of ['POST /api/ingest', 'POST /api/sync-runs', 'GET /api/dashboard', 'PATCH /api/items', 'POST /api/items',
+  for (const k of ['POST /api/ingest', 'GET /api/dashboard', 'PATCH /api/items', 'POST /api/items',
     'DELETE /api/items']) assert.ok(keys.has(k), k);
-  const removed = cases.filter(c => c.method === 'GET' && c.path === '/api/sync-runs');
-  assert.equal(removed.length, 2);
-  assert.equal(removed.filter(c => c.headers.cookie === 'c=1').length, 1);
-  assert.equal(removed.filter(c => !c.headers.cookie).length, 1);
-  for (const c of removed) assert.deepEqual([c.expect, c.authUser], [405, 'zero']);
+  // 12단계에서 지운 /api/sync-runs: 토큰 경로 목록(401 기대)에는 없고, 부재 검사(404 또는 405)로만 남는다
+  assert.equal(REMOVED_SYNC_RUNS, '/api/sync-runs');
+  const removed = cases.filter(c => c.path === '/api/sync-runs');
+  assert.ok(removed.every(c => c.name.startsWith('없어진 경로')));
+  assert.equal(removed.filter(c => c.method === 'GET').length, 3);
+  assert.equal(removed.filter(c => c.method === 'POST').length, 2);
+  assert.ok(removed.some(c => c.method === 'GET' && c.headers.cookie === 'c=1'));
+  assert.ok(removed.some(c => c.method === 'GET' && c.headers.authorization === `Bearer ${FAKE_TOKEN}`));
+  assert.ok(removed.some(c => c.method === 'GET' && !c.headers.cookie && !c.headers.authorization));
+  assert.ok(removed.some(c => c.method === 'POST' && c.headers.authorization === `Bearer ${FAKE_TOKEN}` && !c.headers.cookie));
+  assert.ok(removed.some(c => c.method === 'POST' && c.headers.authorization === `Bearer ${FAKE_TOKEN}` && c.headers.cookie === 'c=1'));
+  for (const c of removed) assert.deepEqual([c.expect, c.authUser, c.noFakeCalls], [[404, 405], 'zero', true], c.name);
   // 6단계 ⑤에서 지운 일회성 API 4개: 경우 5개가 정확히 하나씩, 올바른 인증을 보내도 404·세션 확인 0건
   const gone = [
     ['POST', '/api/reconcile/transactions', 'token'], ['POST', '/api/backfill/preview', 'token'], ['POST', '/api/backfill/stage', 'token'],
@@ -64,6 +71,16 @@ test('judge flags wrong status, data requests and auth-user call counts', () => 
   assert.equal(judge({expect: 403, authUser: 'zero'}, 403, [{path: '/auth/v1/user'}]).length, 1);
   assert.match(judge({expect: 401, authUser: 'some'}, 401, [])[0], /가짜 Supabase 서버를 쓰지 않음/);
   assert.deepEqual(judge({expect: 401, authUser: 'some'}, 401, [{path: '/auth/v1/user'}]), []);
+});
+
+test('judge for removed /api/sync-runs: 404 or 405 pass, other status or any fake call fails', () => {
+  const [c] = apiAuthCases('http://localhost:3100', 'c=1').filter(x => x.path === '/api/sync-runs' && x.method === 'POST');
+  assert.deepEqual(judge(c, 404, []), []);
+  assert.deepEqual(judge(c, 405, []), []);
+  for (const status of [200, 401, 410, 503]) assert.equal(judge(c, status, []).length, 1, String(status));
+  assert.ok(judge(c, 404, [{path: '/rest/v1/dashboard_sync_runs'}]).length);
+  assert.ok(judge(c, 404, [{path: '/auth/v1/user'}]).length);
+  assert.ok(judge(c, 405, [{path: '/rest/v1/rpc/dashboard_ingest_commit'}]).length);
 });
 
 test('fake Supabase server records every request and rejects with 401', async () => {

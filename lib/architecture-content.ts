@@ -35,7 +35,7 @@ export type TargetRow={area:string;now:string;target:string;phase:string};
 export const targetRows:readonly TargetRow[]=[
  {area:'저장소',now:'공개 저장소 하나',target:'코드만 · 데이터 없음',phase:'완료'},
  {area:'AI 팀',now:'PM·구현·검수·CI',target:'운영계·운영 DB 접근 없음',phase:'완료'},
- {area:'수신 API',now:'v2 수신 사용 중 (v1·실행 보고는 호환용으로 남김)',target:'수신 1개 + 조회',phase:'완료'},
+ {area:'수신 API',now:'v2 수신 전용 (v1·실행 보고는 12단계에서 제거)',target:'수신 1개 + 조회',phase:'완료'},
  {area:'DB',now:'운영 1개(수신 함수 적용) + 개발 확인은 CI Postgres',target:'개발 / 운영 분리',phase:'완료'},
  {area:'배포',now:'새 저장소 main → 운영',target:'개발계 / 운영계',phase:'완료'},
  {area:'테스트',now:'단위 + 화면 + CI DB',target:'개발 DB 연동 추가',phase:'완료'},
@@ -88,7 +88,6 @@ export type ApiRow={path:string;methods:string;caller:string;auth:string};
 /** Every app/api/**\/route.ts. tests/architecture-content.test.mjs compares this with the filesystem. */
 export const apiRows:readonly ApiRow[]=[
  {path:'/api/ingest',methods:'POST',caller:'피클AI 수집기',auth:'Bearer 토큰'},
- {path:'/api/sync-runs',methods:'POST',caller:'POST 수집기(실행 보고, 9단계까지 호환)',auth:'Bearer 토큰'},
  {path:'/api/dashboard',methods:'GET',caller:'대시보드 화면',auth:'로그인 세션'},
  {path:'/api/items',methods:'PATCH · POST · DELETE',caller:'대시보드 화면 (상태·메모·할 일)',auth:'로그인 세션'}
 ];
@@ -96,7 +95,7 @@ export const apiRows:readonly ApiRow[]=[
 export const safeguardRows=[
  {name:'RLS',desc:'dashboard_items·sync_runs 는 본인 행만 조회, 화면 쓰기는 items 수정만. 백필 배치 테이블은 service_role 전용.'},
  {name:'service role 키',desc:'lib/supabase-server.ts 의 adminDb 에서만 사용. 브라우저(lib/supabase.ts)는 anon 키만.'},
- {name:'ingest 토큰',desc:'수집기 API 2개(/api/ingest, /api/sync-runs)가 lib/collector-auth.ts 한 곳에서 검사: 32자 미만 거부, timingSafeEqual 비교. 틀리면 401.'},
+ {name:'ingest 토큰',desc:'수집기 API(/api/ingest)가 lib/collector-auth.ts 한 곳에서 검사: 32자 미만 거부, timingSafeEqual 비교. 틀리면 401.'},
  {name:'공개 저장소',desc:'코드·테스트·문서에 실데이터 금지. CI 가 추가된 줄을 개인정보 검사.'},
  {name:'AI 개발',desc:'운영 DB 접근 금지. 테스트는 가짜 데이터·모의 객체로만.'}
 ] as const;

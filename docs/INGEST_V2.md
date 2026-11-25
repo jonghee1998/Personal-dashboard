@@ -237,7 +237,7 @@
 - ⓐ 성공 실행(`run.status` 'success'): 200·`idempotent:false`·`upserted` = `manifest.item_count`(1 이상)·`run.status` 'success' → 전환 통과.
 - ⓑ 실패 보고(`run.status` 'failed'): 200·`upserted` 0 → 실패 실행 기록이 저장됐다는 뜻일 뿐 항목 저장은 확인하지 못했으므로 전환 완료가 아니다. 다음 성공 실행의 ⓐ 를 확인한 뒤 완료한다.
 - ⓒ 응답 유실로 같은 본문을 다시 보냄: 200·`idempotent:true`·`upserted:0`·`items []` → 정상(⑤). 저장 확인은 처음 응답 대신 이것으로 하지 않는다.
-- ⓓ 400 `Invalid JSON` → 본문 JSON 형식을 고친다. 400 `Invalid payload` → 서버는 본문 최상위의 `version` 이 숫자 2 일 때만 v2 로 처리하고 그 밖(`version` 없음, `"2"` 같은 문자열 등)은 v1 검사로 보내 이 400 을 낸다(`lib/ingest-service.ts` 89행 `isIngestV2Body`, 100행). 그러므로 먼저 실제로 보낸 본문의 최상위 `version` 이 따옴표 없는 숫자 2 인지 확인해 고치고, 그것이 맞는데도 이 400 이 나면 대상 배포에 v2 가 반영됐는지(⑧ (가)) 확인한다. 빌드된 앱 수신 검사(`scripts/screens/api-ingest.mjs` 경우 k)가 문자열 `"2"` 본문의 이 400 을 확인한다.
+- ⓓ 400 `Invalid JSON` → 본문 JSON 형식을 고친다. 410 `v1 ingest removed` → 서버는 본문 최상위의 `version` 이 숫자 2 일 때만 v2 로 처리하고 그 밖(`version` 없음, `"2"` 같은 문자열 등)은 v1 본문으로 보고 DB 를 부르지 않고 이 410 을 낸다(12단계에서 v1 수신 제거, `lib/ingest-service.ts` 56행 `isIngestV2Body`, 57행). 그러므로 실제로 보낸 본문의 최상위 `version` 이 따옴표 없는 숫자 2 인지 확인해 고친다. 빌드된 앱 수신 검사(`scripts/screens/api-ingest.mjs` 경우 k)가 문자열 `"2"` 본문의 이 410 을 확인한다.
 - ⓔ 401 → 토큰을 확인한다(DEPLOY.md).
 - ⓕ 422 → `violations` 의 `code`·`field` 만 보고 본문을 고친다.
 - ⓖ 409 `RUN_ID_CONFLICT` → 같은 실행 키에 이미 다른 기록이 있다는 뜻이다. 바로 새 `run_id` 로 바꾸지 말고 먼저 확인한다: (i) 앞서 같은 실행을 보냈다가 응답을 잃고 본문을 다시 만들어 보낸 경우라면(⑤ 재전송 계약) 원래 보냈던 본문을 바이트 그대로 다시 보낸다 — 이미 저장된 실행이면 200 idempotent 가 나온다; (ii) `/api/sync-runs` 로 같은 키가 먼저 보고된 경우라면 (2)의 별도 보고가 꺼졌는지 확인한다; (iii) 정말 별개의 실행을 보내야 할 때만 새 `run_id` 를 발급하고, `run.run_id` 와 모든 `items[].metadata.run_id` 를 함께 바꾼다(한쪽만 바꾸면 422 `RUN_ID_MISMATCH`, ⑥).

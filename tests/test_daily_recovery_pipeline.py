@@ -142,6 +142,14 @@ class TestDailyRecoveryPipeline(unittest.TestCase):
         fake_response = MagicMock()
         fake_response.read.return_value = json.dumps({"status": "success", "accepted": 1}).encode("utf-8")
         mock_opener.open.return_value.__enter__.return_value = fake_response
+        # Synthetic v2 run (fake uuid matching items metadata.run_id)
+        recovered_run = {
+            "run_id": "00000000-0000-0000-0000-000000000003",
+            "dataset": "points",
+            "source_system": "samsungcard",
+            "source_as_of": "2026-11-12T16:15:00+09:00",
+            "collected_at": "2026-11-12T16:16:00+09:00",
+        }
 
         res = transmit_gated_ingest(
             "https://dashboard.example.invalid/api/ingest",
@@ -149,12 +157,22 @@ class TestDailyRecoveryPipeline(unittest.TestCase):
             "points",
             recovered_manifest,
             recovered_items,
-            opener=mock_opener
+            opener=mock_opener,
+            run=recovered_run
         )
 
         self.assertEqual(res["status"], "success")
         self.assertEqual(mock_opener.open.call_count, 1)
         self.assertEqual(res["_gate_audit"]["item_amount_sum"], 1334)
+        # 보낸 본문은 /api/ingest v2(숫자 version 2·run·items·manifest), validate_only 없음
+        (req,), _ = mock_opener.open.call_args
+        body = json.loads(req.data.decode("utf-8"))
+        self.assertEqual(set(body), {"version", "run", "items", "manifest"})
+        self.assertIs(type(body["version"]), int)
+        self.assertEqual(body["version"], 2)
+        self.assertEqual(body["run"], recovered_run)
+        self.assertEqual(body["items"], recovered_items)
+        self.assertEqual(body["manifest"], {"item_count": 1, "amount_total": 1334})  # pii-allow
 
 if __name__ == "__main__":
     unittest.main()
