@@ -201,17 +201,61 @@ async function checkTabContent(page, id) {
   const main = page.locator('div.demoShell > main');
   if (id === 'home') return await visible(main.locator('.taskPanel', {hasText: FIXTURE_TEXT.task})) ? [] : [`'${FIXTURE_TEXT.task}' 없음`];
   if (id === 'finance') {
-    const panel = page.locator('section.dailySpendingPanel');
-    if (!await visible(panel)) return ['일별 지출 패널 없음'];
-    const errs = [];
-    if (!await panel.locator('svg path').count()) errs.push('일별 지출 패널에 차트 svg path 없음');
-    if (await panel.getByText('선택 월의 확인된 지출 내역이 없습니다').count()) errs.push('일별 지출 패널이 빈 안내를 표시');
+    const chart = main.locator('.dailyChart');
+    const cycle = main.locator('.financeCycle');
+    const details = main.locator('.dailyDetails');
+    const calendar = main.locator('.financeCalendar');
     const [, m, d] = FIXTURE_DAY.split('-').map(Number);
-    const hit = panel.locator(`.dailyHit[aria-label^="${m}월 ${d}일, 지출 "]`);
-    if (!await hit.count()) return [...errs, `${m}월 ${d}일 점 버튼 없음`];
-    await hit.first().click();
-    if (!await visible(panel.locator('.dailyDetails', {hasText: FIXTURE_TEXT.merchant}))) errs.push(`.dailyDetails 에 '${FIXTURE_TEXT.merchant}' 없음`);
-    return errs;
+    const nextDay = new Date(Date.parse(FIXTURE_DAY) + 86_400_000).toISOString().slice(0, 10);
+    const paymentDay = calendar.locator(`[data-date="${FIXTURE_DAY}"]`);
+    const unconfirmedDay = calendar.locator(`[data-date="${nextDay}"]`);
+    const formatWon = amount => `${amount.toLocaleString('ko-KR')}원`;
+    const lumpAmount = formatWon(12000);
+
+    await expect(chart).toBeVisible();
+    expect(await chart.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const paths = await chart.locator('path.dailyLine').evaluateAll(lines => lines.map(line => line.getAttribute('d')));
+    expect(paths.length).toBeGreaterThan(0);
+    for (const path of paths) {
+      const coordinates = [...path.matchAll(/(?:M|C) ([^MC]+)/g)]
+        .flatMap(([, values]) => values.trim().split(/\s+/).map(Number).filter((_, i) => i % 2 === 0));
+      expect(coordinates.length).toBeGreaterThan(1);
+      expect(coordinates.every((x, i) => Number.isFinite(x) && (i === 0 || x > coordinates[i - 1]))).toBe(true);
+    }
+    await expect(cycle).toContainText('결제 예정');
+    await expect(cycle.locator('.financeCycleTotal')).toHaveText(formatWon(42000));
+    await expect(cycle.locator('.financeCycleSplit')).toContainText(`할부 ${formatWon(30000)}`);
+    await expect(cycle.getByText('지난 주기 등록 내역 없음', {exact: true})).toBeVisible();
+    await expect(cycle.getByText('지난 주기 비교 없음', {exact: true})).toBeVisible();
+    await expect(cycle.locator('progress')).toHaveCount(0);
+
+    const hit = chart.getByRole('button', {name: `${m}월 ${d}일, 지출 ${lumpAmount}`, exact: true});
+    await chart.getByRole('button', {name: `${m}월 1일, 지출 0원`, exact: true}).click();
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText('0원');
+    await hit.click();
+    await expect(chart.locator('.dailyMarker')).toHaveCount(1);
+    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만원`);
+    await expect(hit).toHaveAttribute('aria-pressed', 'true');
+    await expect(paymentDay).toHaveAttribute('aria-pressed', 'true');
+    await expect(paymentDay.locator('.financeCalendarAmount')).toHaveText('1.2만');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
+    const rows = details.locator('.dailyTransactionWrap');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toContainText(FIXTURE_TEXT.merchant);
+    await expect(rows.last()).toContainText(FIXTURE_TEXT.installment);
+    await expect(rows.last().locator('.dailyInstallment')).toHaveText('(할부 3개월) · 일 합계 제외');
+
+    await unconfirmedDay.click();
+    await expect(unconfirmedDay).toHaveAttribute('aria-pressed', 'true');
+    await expect(unconfirmedDay.locator('.financeCalendarAmount')).toHaveCount(0);
+    await expect(chart.locator('.dailyPoint')).toHaveCount(0);
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText('미확인');
+    await expect(details.getByText('수집 확인 전', {exact: true})).toBeVisible();
+    await expect(rows).toHaveCount(0);
+    await paymentDay.click();
+    await expect(hit).toHaveAttribute('aria-pressed', 'true');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
+    return [];
   }
   if (id === 'news') {
     const toggle = main.locator(`.newsCategoryToggle[aria-label="${FIXTURE_NEWS_CATEGORY} 카테고리 펼치기"]`);

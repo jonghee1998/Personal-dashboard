@@ -1,7 +1,7 @@
 {
  "home": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2",
+  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -417,7 +417,7 @@
  },
  "finance": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2",
+  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -513,25 +513,40 @@
       "className": "financeSummary",
       "children": [
        {
-        "tag": "div",
-        "className": "financeTotal",
+        "tag": "section",
+        "className": "panel financeCycle",
         "children": [
          {
-          "tag": "section",
-          "className": "metric ",
+          "tag": "h2",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "strong",
+          "className": "financeCycleTotal",
+          "children": []
+         },
+         {
+          "tag": "p",
+          "className": "financeCycleSplit",
+          "children": []
+         },
+         {
+          "tag": "p",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "div",
+          "className": "financeCycleComparison",
           "children": [
            {
-            "tag": "div",
-            "className": "eyebrow",
-            "children": []
-           },
-           {
-            "tag": "strong",
+            "tag": "p",
             "className": "",
             "children": []
            },
            {
-            "tag": "small",
+            "tag": "p",
             "className": "",
             "children": []
            }
@@ -598,15 +613,9 @@
         "className": "dailySpendingHeader",
         "children": [
          {
-          "tag": "div",
+          "tag": "h2",
           "className": "",
-          "children": [
-           {
-            "tag": "h2",
-            "className": "",
-            "children": []
-           }
-          ]
+          "children": []
          },
          {
           "tag": "div",
@@ -615,7 +624,19 @@
            {
             "tag": "button",
             "className": "",
-            "children": []
+            "children": [
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-left",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
            },
            {
             "tag": "strong",
@@ -625,7 +646,19 @@
            {
             "tag": "button",
             "className": "",
-            "children": []
+            "children": [
+             {
+              "tag": "svg",
+              "className": "lucide lucide-chevron-right",
+              "children": [
+               {
+                "tag": "path",
+                "className": "",
+                "children": []
+               }
+              ]
+             }
+            ]
            }
           ]
          }
@@ -633,196 +666,19 @@
        },
        {
         "tag": "div",
-        "className": "dailyTotal",
+        "className": "dailyChart",
         "children": [
          {
-          "tag": "span",
+          "tag": "svg",
           "className": "",
-          "children": []
-         },
-         {
-          "tag": "div",
-          "className": "dailyTotalAmounts",
           "children": [
            {
-            "tag": "strong",
-            "className": "",
-            "children": []
-           },
-           {
-            "tag": "small",
-            "className": "dailyInstallmentTotal",
-            "children": []
-           }
-          ]
-         }
-        ]
-       },
-       {
-        "tag": "div",
-        "className": "dailyLineScroller",
-        "children": [
-         {
-          "tag": "div",
-          "className": "dailyLineCanvas",
-          "children": [
-           {
-            "tag": "svg",
+            "tag": "g",
             "className": "",
             "children": [
              {
-              "tag": "defs",
-              "className": "",
-              "children": [
-               {
-                "tag": "lineargradient",
-                "className": "",
-                "children": [
-                 {
-                  "tag": "stop",
-                  "className": "",
-                  "children": []
-                 },
-                 {
-                  "tag": "stop",
-                  "className": "",
-                  "children": []
-                 }
-                ]
-               }
-              ]
-             },
-             {
-              "tag": "g",
-              "className": "",
-              "children": [
-               {
-                "tag": "line",
-                "className": "",
-                "children": []
-               },
-               {
-                "tag": "text",
-                "className": "",
-                "children": []
-               }
-              ]
-             },
-             {
-              "tag": "g",
-              "className": "",
-              "children": [
-               {
-                "tag": "line",
-                "className": "",
-                "children": []
-               },
-               {
-                "tag": "text",
-                "className": "",
-                "children": []
-               }
-              ]
-             },
-             {
-              "tag": "g",
-              "className": "",
-              "children": [
-               {
-                "tag": "line",
-                "className": "",
-                "children": []
-               },
-               {
-                "tag": "text",
-                "className": "",
-                "children": []
-               }
-              ]
-             },
-             {
-              "tag": "path",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "path",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "circle",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "text",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "text",
-              "className": "",
-              "children": []
-             },
-             {
-              "tag": "text",
-              "className": "",
+              "tag": "line",
+              "className": "dailyGridLine",
               "children": []
              },
              {
@@ -833,63 +689,619 @@
             ]
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "g",
+            "className": "",
+            "children": [
+             {
+              "tag": "line",
+              "className": "dailyGridLine",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "g",
+            "className": "",
+            "children": [
+             {
+              "tag": "line",
+              "className": "dailyGridLine",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "g",
+            "className": "",
+            "children": [
+             {
+              "tag": "line",
+              "className": "dailyGridLine",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "text",
+            "className": "",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "path",
+            "className": "dailyLine",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "line",
+            "className": "dailyMarker",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "circle",
+            "className": "dailyPoint",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit ",
+            "tag": "g",
+            "className": "dailyTooltip",
+            "children": [
+             {
+              "tag": "rect",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "text",
+              "className": "",
+              "children": []
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "dailyHit",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel financeCalendar",
+      "children": [
+       {
+        "tag": "h2",
+        "className": "",
+        "children": []
+       },
+       {
+        "tag": "div",
+        "className": "financeCalendarGrid",
+        "children": [
+         {
+          "tag": "span",
+          "className": "sunday",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "saturday",
+          "children": []
+         },
+         {
+          "tag": "button",
+          "className": "sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
             "children": []
            },
            {
-            "tag": "button",
-            "className": "dailyHit active",
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "saturday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           },
+           {
+            "tag": "span",
+            "className": "financeCalendarAmount low",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "saturday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "saturday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "saturday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "sunday",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "button",
+          "className": "",
+          "children": [
+           {
+            "tag": "span",
+            "className": "financeCalendarDay",
             "children": []
            }
           ]
@@ -898,11 +1310,70 @@
        },
        {
         "tag": "div",
-        "className": "dailyDetails",
+        "className": "financeCalendarLegend",
+        "children": [
+         {
+          "tag": "span",
+          "className": "low",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "mid",
+          "children": []
+         },
+         {
+          "tag": "span",
+          "className": "high",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "p",
+        "className": "financeCalendarThresholds",
+        "children": []
+       }
+      ]
+     },
+     {
+      "tag": "section",
+      "className": "panel dailyDetails",
+      "children": [
+       {
+        "tag": "div",
+        "className": "dailyDetailsHeader",
         "children": [
          {
           "tag": "div",
-          "className": "dailyDetailsHeader",
+          "className": "",
+          "children": [
+           {
+            "tag": "h2",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "small",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "strong",
+          "className": "dailyDetailsTotal",
+          "children": []
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "dailyTransactionWrap",
+        "children": [
+         {
+          "tag": "div",
+          "className": "dailyTransaction",
           "children": [
            {
             "tag": "div",
@@ -921,51 +1392,67 @@
             ]
            },
            {
-            "tag": "strong",
-            "className": "",
-            "children": []
+            "tag": "div",
+            "className": "dailyTransactionActions",
+            "children": [
+             {
+              "tag": "strong",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "button",
+              "className": "memoInlineButton",
+              "children": []
+             }
+            ]
            }
           ]
-         },
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "className": "dailyTransactionWrap",
+        "children": [
          {
           "tag": "div",
-          "className": "dailyTransactionWrap",
+          "className": "dailyTransaction",
           "children": [
            {
             "tag": "div",
-            "className": "dailyTransaction",
+            "className": "",
             "children": [
              {
-              "tag": "div",
+              "tag": "strong",
               "className": "",
-              "children": [
-               {
-                "tag": "strong",
-                "className": "",
-                "children": []
-               },
-               {
-                "tag": "small",
-                "className": "",
-                "children": []
-               }
-              ]
+              "children": []
              },
              {
-              "tag": "div",
-              "className": "dailyTransactionActions",
-              "children": [
-               {
-                "tag": "strong",
-                "className": "",
-                "children": []
-               },
-               {
-                "tag": "button",
-                "className": "memoInlineButton",
-                "children": []
-               }
-              ]
+              "tag": "small",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "small",
+              "className": "dailyInstallment",
+              "children": []
+             }
+            ]
+           },
+           {
+            "tag": "div",
+            "className": "dailyTransactionActions",
+            "children": [
+             {
+              "tag": "strong",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "button",
+              "className": "memoInlineButton",
+              "children": []
              }
             ]
            }
@@ -1448,7 +1935,7 @@
  },
  "news": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2",
+  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -1784,7 +2271,7 @@
  },
  "benefits": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2",
+  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
@@ -2346,7 +2833,7 @@
  },
  "journal": {
   "tag": "div",
-  "className": "shell demoShell designPreview conceptLight uiV2",
+  "className": "shell demoShell designPreview conceptLight uiV2 uiTheme",
   "children": [
    {
     "tag": "header",
