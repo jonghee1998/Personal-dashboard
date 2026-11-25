@@ -212,8 +212,8 @@
     {
       "id": "8",
       "title": "배포 분리",
-      "status": "doing",
-      "note": "AI 몫 완료(check-env, DEPLOY.md) · 나: DEPLOY.md 대로 배포·확인 후 done"
+      "status": "done",
+      "note": "11/25 운영 배포·확인 완료 · 개발 DB는 CI Postgres로 대체"
     },
     {
       "id": "9",
