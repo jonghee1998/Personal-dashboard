@@ -209,6 +209,8 @@ async function checkTabContent(page, id) {
     const nextDay = new Date(Date.parse(FIXTURE_DAY) + 86_400_000).toISOString().slice(0, 10);
     const paymentDay = calendar.locator(`[data-date="${FIXTURE_DAY}"]`);
     const unconfirmedDay = calendar.locator(`[data-date="${nextDay}"]`);
+    const formatWon = amount => `${amount.toLocaleString('ko-KR')}원`;
+    const lumpAmount = formatWon(12000);
 
     await expect(chart).toBeVisible();
     expect(await chart.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
@@ -221,13 +223,13 @@ async function checkTabContent(page, id) {
       expect(coordinates.every((x, i) => Number.isFinite(x) && (i === 0 || x > coordinates[i - 1]))).toBe(true);
     }
     await expect(cycle).toContainText('결제 예정');
-    await expect(cycle.locator('.financeCycleTotal')).toHaveText('42,000원');
-    await expect(cycle.locator('.financeCycleSplit')).toContainText('할부 30,000원');
+    await expect(cycle.locator('.financeCycleTotal')).toHaveText(formatWon(42000));
+    await expect(cycle.locator('.financeCycleSplit')).toContainText(`할부 ${formatWon(30000)}`);
     await expect(cycle.getByText('지난 주기 등록 내역 없음', {exact: true})).toBeVisible();
     await expect(cycle.getByText('지난 주기 비교 없음', {exact: true})).toBeVisible();
     await expect(cycle.locator('progress')).toHaveCount(0);
 
-    const hit = chart.getByRole('button', {name: `${m}월 ${d}일, 지출 12,000원`, exact: true});
+    const hit = chart.getByRole('button', {name: `${m}월 ${d}일, 지출 ${lumpAmount}`, exact: true});
     await chart.getByRole('button', {name: `${m}월 1일, 지출 0원`, exact: true}).click();
     await expect(details.locator('.dailyDetailsTotal')).toHaveText('0원');
     await hit.click();
@@ -236,7 +238,7 @@ async function checkTabContent(page, id) {
     await expect(hit).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay.locator('.financeCalendarAmount')).toHaveText('1.2만');
-    await expect(details.locator('.dailyDetailsTotal')).toHaveText('12,000원');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
     const rows = details.locator('.dailyTransactionWrap');
     await expect(rows).toHaveCount(2);
     await expect(rows.first()).toContainText(FIXTURE_TEXT.merchant);
@@ -252,7 +254,7 @@ async function checkTabContent(page, id) {
     await expect(rows).toHaveCount(0);
     await paymentDay.click();
     await expect(hit).toHaveAttribute('aria-pressed', 'true');
-    await expect(details.locator('.dailyDetailsTotal')).toHaveText('12,000원');
+    await expect(details.locator('.dailyDetailsTotal')).toHaveText(lumpAmount);
     return [];
   }
   if (id === 'news') {
