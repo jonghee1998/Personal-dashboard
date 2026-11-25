@@ -40,3 +40,37 @@ test('shell root keeps existing classes and adds uiTheme; layout imports ui.css 
  const layout=readFileSync(join(root,'app','layout.tsx'),'utf8');
  assert.ok(layout.indexOf("'./globals.css'")>=0&&layout.indexOf("'./ui.css'")>layout.indexOf("'./globals.css'"));
 });
+
+// 11단계 통합 검수(docs/DESIGN_V2.md) 보완
+const comp=name=>readFileSync(join(root,'components','dashboard',name),'utf8');
+
+test('installment label on every transaction row is 10px in --ui-installment',()=>{
+ assert.match(css,/\.dailyTransaction \.dailyInstallment\{font-size:10px;color:var\(--ui-installment\)\}/);
+ assert.match(css,/\.financeTransactionAmount small\{font-size:10px\}/);
+ assert.match(css,/\.financeTransactionAmount \.financeInstallment\{color:var\(--ui-installment\)\}/);
+ assert.match(comp('daily-spending.tsx'),/<small className="dailyInstallment">\{installmentLabel\(x\)\}\{installment\?' · 일 합계 제외':''\}<\/small>/);
+ assert.match(comp('finance-activity.tsx'),/<small className="financeInstallment">\{installmentLabel\(item\)\}<\/small>/);
+});
+
+test('chart tooltip uses manwon format without 원',()=>{
+ assert.match(comp('daily-spending.tsx'),/\{selected\.day\}일 · \{manwon\(selected\.total\)\}<\/text>/);
+});
+
+test('home cycle total shows (일시불 X · 할부 Y) underneath',()=>{
+ assert.match(comp('home-tab.tsx'),/summary\.status==='ok'&&<small className="homeCycleSplit">\(일시불 \{won\(summary\.lumpTotal\)\} · 할부 \{won\(summary\.installmentTotal\)\}\)<\/small>/);
+});
+
+test('old !important colors (delta, saved memo) are overridden with theme colors',()=>{
+ assert.match(css,/\.pointsPanel \.deltaUp\{color:var\(--ui-accent-dark\)!important\}/);
+ assert.match(css,/\.pointsPanel \.deltaDown\{color:var\(--ui-high\)!important\}/);
+ assert.match(css,/\.dailyTransaction \.savedMemo\{color:var\(--ui-accent-dark\)!important\}/);
+});
+
+test('header line and brand mark use theme colors, architecture tab uses theme palette',()=>{
+ assert.match(css,/conceptLight \.top\{[^}]*border-bottom:1px solid var\(--ui-border\)/);
+ assert.match(css,/conceptLight \.brandMark\{[^}]*background:none/);
+ assert.match(css,/\.archBox rect\{fill:#fff;stroke:var\(--ui-border\)\}/);
+ assert.match(css,/\.archBox\.accent rect\{fill:var\(--ui-accent\)/);
+ assert.match(css,/\.archBox\.deep rect\{fill:var\(--ui-text\)/);
+ assert.match(css,/\.archKicker\{color:var\(--ui-faint\)\}/);
+});

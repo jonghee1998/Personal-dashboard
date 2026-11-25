@@ -1456,6 +1456,11 @@
               "tag": "small",
               "className": "",
               "children": []
+             },
+             {
+              "tag": "small",
+              "className": "dailyInstallment",
+              "children": []
              }
             ]
            },
@@ -1756,7 +1761,7 @@
                  },
                  {
                   "tag": "small",
-                  "className": "",
+                  "className": "financeInstallment",
                   "children": []
                  },
                  {
@@ -1805,7 +1810,7 @@
                  },
                  {
                   "tag": "small",
-                  "className": "",
+                  "className": "financeInstallment",
                   "children": []
                  },
                  {
