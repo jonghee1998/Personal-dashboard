@@ -28,8 +28,8 @@ test('bottom nav buttons use svg icons and the shell has no symbol glyphs',()=>{
  for(const id of ['home','finance','news','benefits','journal']) assert.match(shell,new RegExp(`\\s${id}:'M`));
 });
 
-test('shell root keeps old classes and adds uiV2; layout imports ui.css after globals.css',()=>{
- assert.match(shell,/className="shell demoShell designPreview conceptLight uiV2"/);
+test('shell root keeps existing classes and adds uiTheme; layout imports ui.css after globals.css',()=>{
+ assert.match(shell,/className="shell demoShell designPreview conceptLight uiV2 uiTheme"/);
  const layout=readFileSync(join(root,'app','layout.tsx'),'utf8');
  assert.ok(layout.indexOf("'./globals.css'")>=0&&layout.indexOf("'./ui.css'")>layout.indexOf("'./globals.css'"));
 });

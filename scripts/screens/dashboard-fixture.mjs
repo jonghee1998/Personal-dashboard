@@ -11,6 +11,7 @@ export const FIXTURE_NEWS_CATEGORY = '합성분류A';
 export const FIXTURE_TEXT = {
   task: '합성할일A',
   merchant: '합성가맹점A',
+  installment: '합성가맹점C',
   news: '합성뉴스A',
   points: '합성포인트A',
   event: '합성일정A',
@@ -39,6 +40,7 @@ export function dashboardSnapshot() {
     item(5, {kind: 'benefit', title: '합성구독A', amount: 10000, status: 'active', category: 'ai_subscription', source: '합성구독A', event_date: FIXTURE_DAY, metadata: {billing_day: 12, plan: '합성요금제A'}}),
     item(6, {kind: 'task', title: FIXTURE_TEXT.task, category: '할 일', source: '직접 추가', due_date: FIXTURE_DAY, event_date: FIXTURE_DAY}),
     item(7, {kind: 'event', title: FIXTURE_TEXT.event, description: '합성 일정 설명A', status: 'active', category: '일정', source: '합성달력A', event_date: FIXTURE_DAY}),
+    item(8, {kind: 'transaction', title: FIXTURE_TEXT.installment, amount: 30000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A', event_date: FIXTURE_DAY, metadata: {installment_months: 3, paid_at: at('09:00')}}),
   ];
   const stamp = at('10:00');
   const tabs = ['home', 'finance', 'news', 'benefits', 'journal', 'subscriptions', 'points', 'applications'];

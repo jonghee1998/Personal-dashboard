@@ -58,3 +58,59 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiV2.demoShell.designPreview.conceptLight nav.bottom button{transition:none}
 .shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday{color:var(--ui-sub)}
 .shell.uiV2.demoShell.designPreview.conceptLight .calendarWeekday.sunday{color:var(--ui-sun)}
+
+/* 금융 상단 */
+.shell.uiTheme .financeCycle h2,.shell.uiTheme .dailyDetailsHeader h2{margin:0}
+.shell.uiTheme .financeCycleTotal{display:block;font-size:clamp(30px,8vw,44px);margin-top:10px;letter-spacing:-.03em}
+.shell.uiTheme .financeCycle p{margin:6px 0 0;font-size:13px;color:var(--ui-sub)}
+.shell.uiTheme .financeCycle small{margin-left:6px;font-size:11px;color:var(--ui-faint)}
+.shell.uiTheme .financeCycleComparison{margin-top:14px;padding-top:8px;border-top:1px solid var(--ui-line)}
+.shell.uiTheme .financeCycle progress{display:block;width:100%;height:6px;margin:6px 0 10px;appearance:none;border:0;border-radius:8px;background:var(--ui-line2);color:var(--ui-accent)}
+.shell.uiTheme .financeCycle progress::-webkit-progress-bar{background:var(--ui-line2);border-radius:8px}
+.shell.uiTheme .financeCycle progress::-webkit-progress-value{background:var(--ui-accent);border-radius:8px}
+.shell.uiTheme .financeCycle progress::-moz-progress-bar{background:var(--ui-accent);border-radius:8px}
+
+.shell.uiTheme .dailySpendingHeader{align-items:center}
+.shell.uiTheme .dailySpendingHeader h2{margin:0}
+.shell.uiTheme .dailyMonthNav strong{color:var(--ui-text)}
+.shell.uiTheme .dailyMonthNav button,.shell.uiTheme .dailyTransactionActions .memoInlineButton,.shell.uiTheme .dailyMemoActions button{
+ border:1px solid var(--ui-border);border-radius:var(--ui-r-btn);background:#fff;color:var(--ui-accent-dark);box-shadow:none;
+}
+.shell.uiTheme .dailyMonthNav button{display:grid;place-items:center;padding:0;width:32px;height:32px}
+.shell.uiTheme .dailyMonthNav button:disabled{opacity:.4}
+.shell.uiTheme .dailyChart{position:relative;width:100%;margin-top:14px}
+.shell.uiTheme .dailyChart svg{display:block;width:100%;height:auto}
+.shell.uiTheme .dailyChart text{font-size:11px;fill:var(--ui-sub)}
+.shell.uiTheme .dailyGridLine{stroke:var(--ui-line)}
+.shell.uiTheme .dailyLine{fill:none;stroke:var(--ui-accent);stroke-width:2.5;stroke-linecap:round}
+.shell.uiTheme .dailyMarker{stroke:var(--ui-accent);stroke-dasharray:3 4}
+.shell.uiTheme .dailyPoint{fill:var(--ui-accent);stroke:#fff;stroke-width:1.5}
+.shell.uiTheme .dailyTooltip rect{fill:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTooltip text{fill:#fff;font-weight:600}
+.shell.uiTheme .dailyChart .dailyHit{top:18%;height:66%;transform:translateX(-50%);border-radius:var(--ui-r-btn);padding:0}
+.shell.uiTheme .dailyHit:focus-visible{outline:2px solid var(--ui-accent)}
+
+.shell.uiTheme .financeCalendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;row-gap:5px}
+.shell.uiTheme .financeCalendarGrid>span{font-size:12px;color:var(--ui-sub);padding:5px 0}
+.shell.uiTheme .financeCalendarGrid>button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;min-height:43px;padding:0;border:0;border-radius:var(--ui-r-btn);background:none;color:var(--ui-text)}
+.shell.uiTheme .financeCalendarDay{display:grid;place-items:center;width:25px;height:25px;border:1px solid transparent;border-radius:50%;font-size:13px}
+.shell.uiTheme .financeCalendarGrid .sunday{color:var(--ui-sun)}
+.shell.uiTheme .financeCalendarGrid .saturday{color:var(--ui-sat)}
+.shell.uiTheme .financeCalendarGrid [aria-current="date"] .financeCalendarDay{border-color:var(--ui-text)}
+.shell.uiTheme .financeCalendarGrid [aria-pressed="true"] .financeCalendarDay{background:var(--ui-text);color:#fff}
+.shell.uiTheme .financeCalendarAmount{font-size:10px;line-height:1;white-space:nowrap}
+.shell.uiTheme .financeCalendar .low{color:var(--ui-low)}
+.shell.uiTheme .financeCalendar .mid{color:var(--ui-mid)}
+.shell.uiTheme .financeCalendar .high{color:var(--ui-high)}
+.shell.uiTheme .financeCalendarLegend{display:flex;gap:12px;margin-top:8px;font-size:12px}
+.shell.uiTheme .financeCalendarThresholds{margin:5px 0 0;color:var(--ui-sub);font-size:11px}
+
+.shell.uiTheme .dailyDetailsHeader,.shell.uiTheme .dailyTransactionWrap{border-bottom-color:var(--ui-line)}
+.shell.uiTheme .dailyDetailsHeader strong,.shell.uiTheme .dailyTransaction strong{color:var(--ui-text)}
+.shell.uiTheme .dailyDetailsHeader small,.shell.uiTheme .dailyTransaction small,.shell.uiTheme .dailyMemoActions small{color:var(--ui-sub)}
+.shell.uiTheme .dailyTransaction .dailyInstallment{color:var(--ui-installment)}
+.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTransaction strong{overflow-wrap:anywhere}
+.shell.uiTheme .dailyMemoEditor textarea{background:#fff;color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-r-box)}
+.shell.uiTheme .dailyMemoActions .dailyMemoSave{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+.shell.uiTheme .dailyMemoError{color:var(--ui-high)}

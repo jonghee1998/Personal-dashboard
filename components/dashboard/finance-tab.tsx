@@ -2,10 +2,12 @@ import type {Dispatch,SetStateAction} from 'react';
 import type {Item,useDashboardData} from './use-dashboard-data';
 import {amountKnown,card,money} from './dashboard-display';
 import DailySpending from './daily-spending';
-import {paymentDateLabel,paymentTime} from '@/lib/transaction-time';
+import {paymentDateLabel} from '@/lib/transaction-time';
 import {subscriptionDisplay} from '@/lib/dashboard-display';
-import {registeredCoverageDay} from '@/lib/dashboard-freshness';
-import {detailRows,isAggregateWithoutDetail} from '@/lib/finance-view';
+import {registeredCoverageDay,seoulDay} from '@/lib/dashboard-freshness';
+import {cycleGroups,cycleSummary,detailRows,isAggregateWithoutDetail} from '@/lib/finance-view';
+
+const won=(amount:number|null)=>amount===null?'미확인':amount.toLocaleString('ko-KR')+'원';
 
 type Props={
  items:Item[];
@@ -35,10 +37,12 @@ export default function FinanceTab({
  settleTab,setSettleTab,financeView,setFinanceView,editingMemo,setEditingMemo,memoDraft,setMemoDraft,
  openExpenseCategories,setOpenExpenseCategories,expandedExpenseCategories,setExpandedExpenseCategories
 }:Props){
- const transactionAmountsKnown=transactions.length>0&&transactions.every(x=>amountKnown(x.amount));
- const coverageDay=registeredCoverageDay(lastTransactionSourceAt,transactions.map(x=>x.event_date));
+ const now=new Date();
+ const today=seoulDay(now)!;
+ const coverageDay=registeredCoverageDay(lastTransactionSourceAt,transactions.map(x=>x.event_date),now);
+ const summary=cycleSummary(transactions,today,coverageDay);
+ const emptyPrevious=summary.prevTotal===0&&cycleGroups(transactions,today,coverageDay,2)[1].items.length===0;
  const settlements=items.filter(x=>x.kind==='settlement'),pending=settlements.filter(x=>x.status!=='done'),done=settlements.filter(x=>x.status==='done');
- const cardTotal=transactions.filter(x=>x.amount!==null&&x.amount>0).reduce((a,x)=>a+Number(x.amount),0);
  const pendingAmount=pending.reduce((a,x)=>a+Number(x.amount??0),0);
  const settledAmount=done.reduce((a,x)=>a+Number(x.amount??0),0);
  const getMemo=(x:Item)=>typeof x.metadata.memo==='string'?x.metadata.memo:'';
@@ -60,10 +64,30 @@ export default function FinanceTab({
  const subscriptionTotal=subscriptions.filter(x=>subscriptionDisplay(x).active).reduce((sum,x)=>sum+Number(x.amount??0),0);
  return <main>
   <div className="financeSummary">
-    <div className="financeTotal">{card('등록 지출 합계',transactionAmountsKnown?money(cardTotal):'미확인',transactions.length+'건')}</div>
+    <section className="panel financeCycle">
+      <h2>이번 결제 주기 사용액</h2>
+      <strong className="financeCycleTotal">{won(summary.total)}</strong>
+      <p className="financeCycleSplit">(일시불 {won(summary.lumpTotal)} · 할부 {won(summary.installmentTotal)})</p>
+      <p>{summary.cycle.payMonth}월 21일 결제 예정 · 주기 마감까지 {summary.daysLeft}일</p>
+      {coverageDay&&coverageDay<today&&<p>{Number(coverageDay.slice(5,7))}.{Number(coverageDay.slice(8,10))}까지 확인</p>}
+      {summary.status==='no_coverage'&&<p>수집 확인 전</p>}
+      {summary.status==='amount_missing'&&<p>금액 미등록 {summary.missingCount}건</p>}
+      <div className="financeCycleComparison">
+        {summary.progress===null
+          ? <p>지난 주기 비교 없음</p>
+          : <progress aria-label="지난 주기 대비 사용액" value={summary.progress} max={1}/>}
+        {summary.prevStatus==='no_history'
+          ? <p>지난 주기 등록 내역 없음</p>
+          : <p>지난 주기 같은 날 {won(summary.prevSameDayTotal)}
+              {emptyPrevious&&' (등록 내역 0건)'}
+              {summary.prevSameDayTotal!==null&&<small>등록 내역 기준</small>}
+              {summary.prevSameDayTotal===null&&summary.countedThrough&&summary.prevStatus==='amount_missing'&&' · 금액 미등록'}
+            </p>}
+      </div>
+    </section>
     <div className="metricgrid">{card('미정산',money(pendingAmount),pending.length+'건')}{card('정산 완료',money(settledAmount),done.length+'건 완료')}</div>
   </div>
-  <DailySpending transactions={transactions} coverageDay={coverageDay} onSaveMemo={async(id,memo)=>{const item=items.find(x=>x.id===id&&x.kind==='transaction');if(!item)throw new Error('거래 내역을 찾을 수 없습니다');await saveMemoValue(item,memo);}}/>
+  <DailySpending transactions={transactions} today={today} coverageDay={coverageDay} onSaveMemo={async(id,memo)=>{const item=items.find(x=>x.id===id&&x.kind==='transaction');if(!item)throw new Error('거래 내역을 찾을 수 없습니다');await saveMemoValue(item,memo);}}/>
   <section className="panel">
     <h2>카테고리별 지출 분석</h2>
     {barData.length?barData.map(([label,group],i)=><div className="barrow" key={label}>
