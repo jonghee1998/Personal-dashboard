@@ -1,17 +1,19 @@
 // 화면 검사(run.mjs)용 합성 /api/dashboard 응답. 값은 전부 가짜다(실데이터·운영 주소 없음).
 // 일별 지출 차트·달력은 브라우저의 '오늘'을 기준으로 그리므로, run.mjs 는 page.clock.setFixedTime(FIXTURE_NOW) 로
-// 시계를 고정하고 모든 fixture 날짜는 FIXTURE_DAY(FIXTURE_NOW 의 한국 날짜)에 맞춘다.
+// 시계를 고정한다. 기본 날짜는 FIXTURE_DAY, 지난달 거래는 FIXTURE_PREVIOUS_DAY 를 사용한다.
 
 /** 고정 시각(한국 시간 2026-11-12 12:00) */
 export const FIXTURE_NOW = '2026-11-12T03:00:00.000Z';
 /** FIXTURE_NOW 의 한국 날짜 */
 export const FIXTURE_DAY = '2026-11-12';
+export const FIXTURE_PREVIOUS_DAY = '2026-10-20';
 export const FIXTURE_NEWS_CATEGORY = '합성분류A';
 /** 탭별 대표 합성 문구 (run.mjs 탭 검사) */
 export const FIXTURE_TEXT = {
   task: '합성할일A',
   merchant: '합성가맹점A',
   installment: '합성가맹점C',
+  previousMerchant: '합성가맹점D',
   news: '합성뉴스A',
   points: '합성포인트A',
   event: '합성일정A',
@@ -41,6 +43,7 @@ export function dashboardSnapshot() {
     item(6, {kind: 'task', title: FIXTURE_TEXT.task, category: '할 일', source: '직접 추가', due_date: FIXTURE_DAY, event_date: FIXTURE_DAY}),
     item(7, {kind: 'event', title: FIXTURE_TEXT.event, description: '합성 일정 설명A', status: 'active', category: '일정', source: '합성달력A', event_date: FIXTURE_DAY}),
     item(8, {kind: 'transaction', title: FIXTURE_TEXT.installment, amount: 30000, status: 'confirmed', category: '합성지출분류A', source: '합성카드A', event_date: FIXTURE_DAY, metadata: {installment_months: 3, paid_at: at('09:00')}}),
+    item(9, {kind: 'transaction', title: FIXTURE_TEXT.previousMerchant, amount: 8000, status: 'confirmed', category: '합성지출분류B', source: '합성카드A', event_date: FIXTURE_PREVIOUS_DAY, metadata: {payment_type: '일시불', memo: '합성정산메모B 정산'}}),
   ];
   const stamp = at('10:00');
   const tabs = ['home', 'finance', 'news', 'benefits', 'journal', 'subscriptions', 'points', 'applications'];

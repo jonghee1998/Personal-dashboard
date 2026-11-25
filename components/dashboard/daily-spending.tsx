@@ -1,8 +1,8 @@
 'use client';
-import {useState} from 'react';
 import {ChevronLeft,ChevronRight} from 'lucide-react';
 import {paymentTime} from '@/lib/transaction-time';
 import {amountTier,chartPath,dayRows,dayTotals,installmentLabel,manwon} from '@/lib/finance-view';
+import type {MemoEditorProps} from './finance-tab';
 import type {Item} from './use-dashboard-data';
 
 const won=(value:number)=>value.toLocaleString('ko-KR')+'원';
@@ -15,20 +15,16 @@ type Props={
  transactions:Item[];
  today:string;
  coverageDay:string|null;
- onSaveMemo:(id:string,memo:string)=>Promise<void>;
+ month:string;
+ selectedDate:string|null;
+ setMonth:(month:string)=>void;
+ selectDay:(date:string)=>void;
+ memoEditor:MemoEditorProps;
 };
 
-export default function DailySpending({transactions,today,coverageDay,onSaveMemo}:Props){
- const [month,setMonth]=useState(today.slice(0,7));
- const [selectedDate,setSelectedDate]=useState(coverageDay?.slice(0,7)===month?coverageDay:today);
- const [editingId,setEditingId]=useState<string|null>(null);
- const [draft,setDraft]=useState('');
- const [saving,setSaving]=useState(false);
- const [saveError,setSaveError]=useState('');
- const startEdit=(row:Item)=>{setEditingId(row.id);setDraft(typeof row.metadata.memo==='string'?row.metadata.memo:'');setSaveError('');};
- const cancelEdit=()=>{setEditingId(null);setDraft('');setSaveError('');};
- const submitMemo=async(row:Item)=>{if(saving)return;setSaving(true);setSaveError('');try{await onSaveMemo(row.id,draft);cancelEdit();}catch{setSaveError('메모 저장에 실패했습니다. 다시 시도해 주세요.');}finally{setSaving(false);}};
-
+export default function DailySpending({transactions,today,coverageDay,month,selectedDate,setMonth,selectDay,memoEditor}:Props){
+ const {editingMemo,memoDraft,memoError,savingMemoIds,setMemoDraft,startMemo,cancelMemo,saveMemo}=memoEditor;
+ const isEditing=(id:string)=>editingMemo?.id===id&&editingMemo.place==='day';
  const [year,monthNumber]=month.split('-').map(Number);
  const currentMonth=today.slice(0,7);
  const coveredThrough=coverageDay&&coverageDay>today?today:coverageDay;
@@ -52,23 +48,17 @@ export default function DailySpending({transactions,today,coverageDay,onSaveMemo
    if(last?.at(-1)?.day===point.day-1)last.push(point);
    else segments.push([point]);
  }
- const selectedDay=Number(selectedDate.slice(8,10));
+ const selectedDay=selectedDate===null?null:Number(selectedDate.slice(8,10));
  const selected=points.find(point=>point.day===selectedDay);
- const detail=dayRows(transactions,selectedDate,coveredThrough);
- const rows=[
+ const detail=selectedDate===null?null:dayRows(transactions,selectedDate,coveredThrough);
+ const rows=detail?[
    ...detail.lumpRows.sort(byTime).map(item=>({item,installment:false})),
    ...detail.installmentRows.sort(byTime).map(item=>({item,installment:true})),
- ];
- const selectDay=(date:string)=>{
-   if(date===selectedDate)return;
-   setSelectedDate(date);
-   cancelEdit();
- };
+ ]:[];
  const shiftMonth=(offset:number)=>{
    const next=new Date(Date.UTC(year,monthNumber-1+offset,1)).toISOString().slice(0,7);
    if(next>currentMonth)return;
    setMonth(next);
-   selectDay(next===coverageDay?.slice(0,7)?coverageDay:next===currentMonth?today:next+'-01');
  };
 
  return <>
@@ -128,7 +118,7 @@ export default function DailySpending({transactions,today,coverageDay,onSaveMemo
      <p className="financeCalendarThresholds">3만 미만 · 3만~7만 · 7만 이상</p>
    </section>
 
-   <section className="panel dailyDetails">
+   {detail&&<section className="panel dailyDetails">
      <div className="dailyDetailsHeader">
        <div><h2>{monthNumber}월 {selectedDay}일 거래내역</h2><small>{rows.length}건</small></div>
        <strong className="dailyDetailsTotal">{detail.lumpTotal===null?'미확인':won(detail.lumpTotal)}</strong>
@@ -146,16 +136,16 @@ export default function DailySpending({transactions,today,coverageDay,onSaveMemo
          </div>
          <div className="dailyTransactionActions">
            <strong>{x.amount===null?'금액 미등록':won(x.amount)}</strong>
-           <button type="button" className="memoInlineButton" onClick={()=>editingId===x.id?cancelEdit():startEdit(x)}
-             aria-label={x.title+' 메모 '+(x.metadata.memo?'수정':'추가')}>{editingId===x.id?'닫기':x.metadata.memo?'수정':'메모 추가'}</button>
+           <button type="button" className="memoInlineButton" onClick={()=>isEditing(x.id)?cancelMemo():startMemo(x,'day')}
+             aria-label={x.title+' 메모 '+(x.metadata.memo?'수정':'추가')}>{isEditing(x.id)?'닫기':x.metadata.memo?'수정':'메모 추가'}</button>
          </div>
        </div>
-       {editingId===x.id&&<div className="dailyMemoEditor">
-         <textarea aria-label={x.title+' 결제 메모'} value={draft} maxLength={400} rows={3} placeholder="결제 메모를 입력하세요" onChange={e=>setDraft(e.target.value)}/>
-         {saveError&&<p className="dailyMemoError" role="alert">{saveError}</p>}
-         <div className="dailyMemoActions"><small>{draft.length}/400</small><button type="button" disabled={saving} onClick={cancelEdit}>취소</button><button type="button" className="dailyMemoSave" disabled={saving} onClick={()=>void submitMemo(x)}>{saving?'저장 중…':'저장'}</button></div>
+       {isEditing(x.id)&&<div className="dailyMemoEditor">
+         <textarea aria-label={x.title+' 결제 메모'} value={memoDraft} maxLength={400} rows={3} placeholder="결제 메모를 입력하세요" onChange={e=>setMemoDraft(e.target.value)}/>
+         {memoError&&<p className="dailyMemoError" role="alert">{memoError}</p>}
+         <div className="dailyMemoActions"><small>{memoDraft.length}/400</small><button type="button" onClick={cancelMemo}>취소</button><button type="button" className="dailyMemoSave" disabled={savingMemoIds.has(x.id)} onClick={()=>void saveMemo(x)}>{savingMemoIds.has(x.id)?'저장 중…':'저장'}</button></div>
        </div>}
      </div>)}
-   </section>
+   </section>}
  </>;
 }

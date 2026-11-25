@@ -1503,6 +1503,39 @@
           ]
          }
         ]
+       },
+       {
+        "tag": "div",
+        "className": "barrow",
+        "children": [
+         {
+          "tag": "div",
+          "className": "barheading",
+          "children": [
+           {
+            "tag": "span",
+            "className": "",
+            "children": []
+           },
+           {
+            "tag": "b",
+            "className": "",
+            "children": []
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "className": "track",
+          "children": [
+           {
+            "tag": "div",
+            "className": "",
+            "children": []
+           }
+          ]
+         }
+        ]
        }
       ]
      },
@@ -1594,6 +1627,34 @@
         "tag": "div",
         "className": "",
         "children": [
+         {
+          "tag": "div",
+          "className": "categorySection",
+          "children": [
+           {
+            "tag": "button",
+            "className": "categoryHeading expenseCategoryToggle",
+            "children": [
+             {
+              "tag": "b",
+              "className": "",
+              "children": []
+             },
+             {
+              "tag": "span",
+              "className": "expenseCategoryMeta",
+              "children": [
+               {
+                "tag": "span",
+                "className": "expenseCategoryChevron collapsed",
+                "children": []
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
          {
           "tag": "div",
           "className": "categorySection",

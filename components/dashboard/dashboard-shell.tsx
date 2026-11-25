@@ -1,13 +1,13 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import ArchitectureScreen,{ArchitectureIcon} from '@/components/architecture-screen';
 import {visibleDashboardItem} from '@/lib/dashboard-visibility';
 import {dashboardTimestamp} from '@/lib/dashboard-display';
-import {monitoredSources} from '@/lib/dashboard-freshness';
+import {monitoredSources,registeredCoverageDay,seoulDay} from '@/lib/dashboard-freshness';
 import {useDashboardData} from '@/components/dashboard/use-dashboard-data';
 import type {Item} from './use-dashboard-data';
 import HomeTab from './home-tab';
-import FinanceTab from './finance-tab';
+import FinanceTab,{type MemoEditorProps,type MemoPlace} from './finance-tab';
 import NewsTab from './news-tab';
 import BenefitsTab from './benefits-tab';
 import JournalTab from './journal-tab';
@@ -22,7 +22,28 @@ const navPaths:Record<string,string>={
 };
 function NavIcon({id}:{id:string}){return id==='architecture'?<ArchitectureIcon/>:<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d={navPaths[id]}/></svg>}
 export default function DashboardShell(){
- const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[editingMemo,setEditingMemo]=useState<string|null>(null),[memoDraft,setMemoDraft]=useState(''),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
+ const [tab,setTab]=useState('home'),[selectedNewsId,setSelectedNewsId]=useState<string|null>(null),[expandedNewsCategory,setExpandedNewsCategory]=useState<string|null>(null),[openNewsCategories,setOpenNewsCategories]=useState<string[]>([]),[openExpenseCategories,setOpenExpenseCategories]=useState<string[]>([]),[expandedExpenseCategories,setExpandedExpenseCategories]=useState<string[]>([]),[settleTab,setSettleTab]=useState<'pending'|'done'>('pending'),[financeView,setFinanceView]=useState<'transactions'|'memos'>('transactions'),[taskDraft,setTaskDraft]=useState(''),[taskFormOpen,setTaskFormOpen]=useState(false);
+ const [financeMonth,setFinanceMonth]=useState<string|null>(null);
+ const [financeDate,setFinanceDate]=useState<string|null>(null);
+ const [memo,setMemo]=useState<{editingMemo:MemoEditorProps['editingMemo'];memoDraft:string;memoError:string}>({
+   editingMemo:null,memoDraft:'',memoError:'',
+ });
+ // 저장 응답은 렌더를 기다리지 않고 마지막 편집 이벤트의 값을 읽는다.
+ const latestMemo=useRef(memo);
+ const nextMemoSession=useRef(0);
+ const pendingMemoIds=useRef(new Set<string>());
+ const [savingMemoIds,setSavingMemoIds]=useState<ReadonlySet<string>>(new Set());
+ const updateMemo=(next:typeof memo)=>{
+   latestMemo.current=next;
+   setMemo(next);
+ };
+ const startMemo=(item:Item,place:MemoPlace)=>updateMemo({
+   editingMemo:{id:item.id,place,session:++nextMemoSession.current},
+   memoDraft:typeof item.metadata.memo==='string'?item.metadata.memo:'',
+   memoError:'',
+ });
+ const cancelMemo=()=>updateMemo({editingMemo:null,memoDraft:'',memoError:''});
+ const setMemoDraft=(memoDraft:string)=>updateMemo({...latestMemo.current,memoDraft});
  const {rawItems,updates,sourceUpdates,syncHealth,hasSnapshot,loading,error,statusBusy,userEmail,refreshing,refreshNotice,taskBusy,taskRemoving,manualRefresh,change,addTask:addTaskTitle,removeTask,saveMemoValue,signOut}=useDashboardData();
  const items=useMemo(()=>rawItems.filter(visibleDashboardItem),[rawItems]);
  const updateTime=(key:string)=>dashboardTimestamp(updates[key]);
@@ -33,8 +54,43 @@ export default function DashboardShell(){
  const transactions=useMemo(()=>items.filter(x=>x.kind==='transaction'),[items]);
  // 성공하면 입력을 비우고 폼을 닫는다. 실패하면 입력을 남긴다(오류는 훅이 보인다).
  const addTask=async()=>{if(await addTaskTitle(taskDraft)){setTaskDraft('');setTaskFormOpen(false);}};
- const saveMemo=async(x:Item)=>{
-   try{await saveMemoValue(x,memoDraft);setEditingMemo(null);setMemoDraft('');}catch{}
+ const saveMemo=async(item:Item)=>{
+   const {editingMemo,memoDraft}=latestMemo.current;
+   const pending=pendingMemoIds.current;
+   if(editingMemo?.id!==item.id||pending.has(item.id))return;
+
+   pending.add(item.id);
+   setSavingMemoIds(new Set(pending));
+   updateMemo({...latestMemo.current,memoError:''});
+   try{
+     await saveMemoValue(item,memoDraft);
+     const latest=latestMemo.current;
+     if(latest.editingMemo?.session===editingMemo.session&&latest.memoDraft===memoDraft)cancelMemo();
+   }catch{
+     const latest=latestMemo.current;
+     if(latest.editingMemo?.session===editingMemo.session){
+       updateMemo({...latest,memoError:'메모 저장에 실패했습니다. 다시 시도해 주세요.'});
+     }
+   }finally{
+     pending.delete(item.id);
+     setSavingMemoIds(new Set(pending));
+   }
+ };
+ const memoEditor={...memo,savingMemoIds,startMemo,cancelMemo,setMemoDraft,saveMemo};
+ const now=new Date();
+ const today=seoulDay(now)!;
+ const coverageDay=registeredCoverageDay(syncHealth.transactions?.last_source_at??null,transactions.map(x=>x.event_date),now);
+ const currentMonth=today.slice(0,7);
+ const initialDate=coverageDay?.slice(0,7)===currentMonth?coverageDay:today;
+ useEffect(()=>{
+   if(tab==='finance'&&hasSnapshot&&financeMonth===null){
+     setFinanceMonth(currentMonth);
+     setFinanceDate(initialDate);
+   }
+ },[tab,hasSnapshot,financeMonth,currentMonth,initialDate]);
+ const changeFinanceMonth=(next:string)=>{
+   setFinanceMonth(next);
+   setFinanceDate(null);
  };
 
  const openFinance=()=>setTab('finance');
@@ -48,10 +104,10 @@ export default function DashboardShell(){
    setTaskFormOpen={setTaskFormOpen} setTaskDraft={setTaskDraft} addTask={addTask} change={change}
    removeTask={removeTask} openFinance={openFinance} openNewsList={openNewsList}/>}
  {tab==='finance'&&<FinanceTab items={items} transactions={transactions}
-   lastTransactionSourceAt={syncHealth.transactions?.last_source_at??null} updateLabel={updateLabel}
-   statusBusy={statusBusy} change={change} saveMemoValue={saveMemoValue} saveMemo={saveMemo}
+   today={today} coverageDay={coverageDay} updateLabel={updateLabel}
+   statusBusy={statusBusy} change={change} memoEditor={memoEditor}
    settleTab={settleTab} setSettleTab={setSettleTab} financeView={financeView} setFinanceView={setFinanceView}
-   editingMemo={editingMemo} setEditingMemo={setEditingMemo} memoDraft={memoDraft} setMemoDraft={setMemoDraft}
+   month={financeMonth??currentMonth} selectedDate={financeMonth===null?initialDate:financeDate} setMonth={changeFinanceMonth} selectDay={setFinanceDate}
    openExpenseCategories={openExpenseCategories} setOpenExpenseCategories={setOpenExpenseCategories}
    expandedExpenseCategories={expandedExpenseCategories} setExpandedExpenseCategories={setExpandedExpenseCategories}/>}
  {tab==='news'&&<NewsTab items={items} selectedNewsId={selectedNewsId}
