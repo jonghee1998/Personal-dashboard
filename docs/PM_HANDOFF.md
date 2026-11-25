@@ -38,7 +38,7 @@ _마지막 갱신: 2026-11-25 04시_
 
 ## 다음 할 일
 1. 8단계(배포 분리): **완료(2026-11-25).** 운영 DB에 마이그레이션 4→5 적용·정의/권한 확인 통과, 백필 표 없음, BACKFILL_APPLY_ENABLED 없음, 운영 Vercel(private-dashboard 프로젝트)을 새 저장소 main 에 연결해 배포. 배포 후 확인 통과: 무로그인 / → 로그인, 탭 6개(구조 포함), 메모 저장, 피클AI v1 수집 200·upserted ≥ 1. check-env --compare 는 개발 Vercel 프로젝트가 없어 생략. 이제 main 반영이 곧 운영 배포다.
-2. 9단계(피클AI 전환): AI 몫 완료 — 빌드된 앱 수신 검사(v2 최초·재전송·실행 키 충돌·report 선행 409·실패 보고·형식 오류)와 docs/INGEST_V2.md 전환 확인 절차(#80·#87·#91·#96). **더 계획하지 않는다.** 남은 것은 사람 몫(피클AI 설정을 v2 로 변경, 8단계 배포 확인 뒤). 9단계 done 때 targetRows·architecture.json 의 9단계 행(수신 API·피클AI)을 함께 갱신.
+2. 9단계(피클AI 전환): **완료(2026-11-25).** 피클AI가 v2 본문으로 전송(별도 /api/sync-runs 보고 끔), 첫 v2 수신(transactions) 200·idempotent false·upserted = 항목 수·run success 확인. 다른 dataset 은 밤 동기화에서 처음 v2 로 온다. 서버의 v1·/api/sync-runs 는 호환용으로 남아 있다(지우는 건 사용자와 정할 때).
 3. 10단계(옛 저장소 정리): **완료(2026-11-25).** 사용자가 private_dashboard 저장소를 삭제했다.
 → 그래서 자동 모드의 다음 계획은 **쓰지 않는다**(남은 일이 사람 몫뿐). 사람이 8·9단계를 끝냈다고 말하면 PM 이 done PR 을 올리고, 11단계(디자인)는 사용자가 요청할 때 시작한다.
 4. 정리(나중, 자동 계획 안 함 — 사용자와 정할 때): 백필 마이그레이션·`tests/atomic-backfill.test.sql`과 `dashboard-qa.yml`의 백필 잡(`.github` 변경이라 PM PR).
