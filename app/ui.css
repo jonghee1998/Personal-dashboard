@@ -28,9 +28,9 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiV2.demoShell.designPreview.conceptLight .error{background:#FDF1EE;color:#8A2F1D;border-radius:var(--ui-r-box)}
 
 /* 상단 */
-.shell.uiV2.demoShell.designPreview.conceptLight .top{align-items:flex-start;margin-bottom:20px}
+.shell.uiV2.demoShell.designPreview.conceptLight .top{align-items:flex-start;margin-bottom:20px;border-bottom:1px solid var(--ui-border)}
 .shell.uiV2.demoShell.designPreview.conceptLight .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ui-accent)}
-.shell.uiV2.demoShell.designPreview.conceptLight .brandMark{display:inline-flex;color:var(--ui-accent)}
+.shell.uiV2.demoShell.designPreview.conceptLight .brandMark{display:inline-flex;color:var(--ui-accent);background:none;width:16px;height:16px;margin-right:0;border-radius:0}
 .shell.uiV2.demoShell.designPreview.conceptLight .top h1{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ui-text);margin:6px 0 0}
 .shell.uiV2.demoShell.designPreview.conceptLight .pageUpdateTime{display:block;margin-top:6px;color:var(--ui-faint);font-size:11px;line-height:1.5}
 .shell.uiV2.demoShell.designPreview.conceptLight .refreshButton,.shell.uiV2.demoShell.designPreview.conceptLight .profile{background:#FFFFFF;background-image:none;border:1px solid var(--ui-border);color:var(--ui-text);border-radius:var(--ui-r-btn);box-shadow:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
@@ -108,8 +108,9 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme .dailyDetailsHeader,.shell.uiTheme .dailyTransactionWrap{border-bottom-color:var(--ui-line)}
 .shell.uiTheme .dailyDetailsHeader strong,.shell.uiTheme .dailyTransaction strong{color:var(--ui-text)}
 .shell.uiTheme .dailyDetailsHeader small,.shell.uiTheme .dailyTransaction small,.shell.uiTheme .dailyMemoActions small{color:var(--ui-sub)}
-.shell.uiTheme .dailyTransaction .dailyInstallment{color:var(--ui-installment)}
-.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)}
+.shell.uiTheme .dailyTransaction .dailyInstallment{font-size:10px;color:var(--ui-installment)}
+/* globals.css 의 옛 .savedMemo 색이 !important 라 같은 방식으로 덮는다 */
+.shell.uiTheme .dailyTransaction .savedMemo{color:var(--ui-accent-dark)!important}
 .shell.uiTheme .dailyTransaction strong{overflow-wrap:anywhere}
 .shell.uiTheme .dailyMemoEditor textarea{background:#fff;color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-r-box)}
 .shell.uiTheme .dailyMemoActions .dailyMemoSave{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
@@ -237,9 +238,11 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme.uiV2 .pointSummary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:4px 0 14px;border-bottom:1px solid var(--ui-line)}
 .shell.uiTheme.uiV2 .pointSummaryTotal{font-size:clamp(28px,8vw,36px);font-weight:800;letter-spacing:-.03em;color:var(--ui-text)}
 .shell.uiTheme.uiV2 .pointSummaryDelta{font-size:13px;color:var(--ui-sub)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaUp{color:var(--ui-accent-dark)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaDown{color:var(--ui-high)}
-.shell.uiTheme.uiV2 .pointsPanel .deltaFlat{color:var(--ui-sub)}
+/* globals.css 의 옛 증감 색(.deltaUp 등)이 !important 라 같은 방식으로 덮는다 */
+.shell.uiTheme.uiV2 .pointsPanel .deltaUp{color:var(--ui-accent-dark)!important}
+.shell.uiTheme.uiV2 .pointsPanel .deltaDown{color:var(--ui-high)!important}
+.shell.uiTheme.uiV2 .pointsPanel .deltaFlat{color:var(--ui-sub)!important}
+.shell.uiTheme.uiV2 .pointIncreaseReason,.shell.uiTheme.uiV2 .pointDecreaseReason{color:var(--ui-sub)!important}
 .shell.uiTheme.uiV2 .pointRow{display:block;padding:0;border:0;border-bottom:1px solid var(--ui-line);background:none}
 .shell.uiTheme.uiV2 .pointRow:last-of-type{border-bottom:0}
 .shell.uiTheme.uiV2 .pointRowHead{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 0;border:0;background:none;color:var(--ui-text);text-align:left;font:inherit}
@@ -329,3 +332,21 @@ html:has(.shell.uiV2),body:has(.shell.uiV2){background:#FFFFFF;color:var(--ui-te
 .shell.uiTheme.uiV2 .calendarSearchResultText>span{font-size:12px;color:var(--ui-sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .shell.uiTheme.uiV2 .calendarNoEntries{display:flex;flex-direction:column;align-items:center;padding:28px 12px;color:var(--ui-sub);font-size:14px}
 .shell.uiTheme.uiV2 .calendarDemoNote{margin:0;font-size:12px;color:var(--ui-faint);text-align:center}
+
+/* 구조 */
+.shell.uiTheme.uiV2 .archKicker{color:var(--ui-faint)}
+.shell.uiTheme.uiV2 h2.archTitle{color:var(--ui-text)}
+.shell.uiTheme.uiV2 .archLines p,.shell.uiTheme.uiV2 .archTable td{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archTable tbody th{color:var(--ui-text)}
+.shell.uiTheme.uiV2 .archTable thead th{color:var(--ui-sub);border-bottom-color:var(--ui-border)}
+.shell.uiTheme.uiV2 .archTable tbody th,.shell.uiTheme.uiV2 .archTable td{border-bottom-color:var(--ui-line)}
+.shell.uiTheme.uiV2 .archMethods,.shell.uiTheme.uiV2 .archNote,.shell.uiTheme.uiV2 .archLegend{color:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archTag{background:#fff;border-color:var(--ui-border);color:var(--ui-accent-dark)}
+.shell.uiTheme.uiV2 .archBox rect{fill:#fff;stroke:var(--ui-border)}
+.shell.uiTheme.uiV2 .archBox.accent rect{fill:var(--ui-accent);stroke:var(--ui-accent)}
+.shell.uiTheme.uiV2 .archBox.deep rect{fill:var(--ui-text);stroke:var(--ui-text)}
+.shell.uiTheme.uiV2 .archBox text{fill:var(--ui-text)}
+.shell.uiTheme.uiV2 .archBox.accent text,.shell.uiTheme.uiV2 .archBox.deep text{fill:#fff}
+.shell.uiTheme.uiV2 .archColLabel{fill:var(--ui-sub)}
+.shell.uiTheme.uiV2 .archArrow{stroke:var(--ui-faint)}
+.shell.uiTheme.uiV2 .archArrowHead{fill:var(--ui-faint)}

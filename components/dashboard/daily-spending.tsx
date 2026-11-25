@@ -89,7 +89,7 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
            <circle className="dailyPoint" cx={selected.x} cy={selected.y} r="4"/>
            <g className="dailyTooltip" transform={`translate(${Math.min(WIDTH-104,Math.max(0,selected.x-52))} 0)`}>
              <rect width="104" height="24" rx="8"/>
-             <text x="52" y="16" textAnchor="middle">{selected.day}일 · {manwon(selected.total)}원</text>
+             <text x="52" y="16" textAnchor="middle">{selected.day}일 · {manwon(selected.total)}</text>
            </g>
          </>}
        </svg>
@@ -132,7 +132,7 @@ export default function DailySpending({transactions,today,coverageDay,month,sele
          <div>
            <strong>{x.title}</strong>
            <small>{x.category??'기타'}{paymentTime(x)?' · '+paymentTime(x):''}</small>
-           {installment&&<small className="dailyInstallment">{installmentLabel(x)} · 일 합계 제외</small>}
+           <small className="dailyInstallment">{installmentLabel(x)}{installment?' · 일 합계 제외':''}</small>
            {typeof x.metadata.memo==='string'&&x.metadata.memo&&<small className="savedMemo">{x.metadata.memo}</small>}
          </div>
          <div className="dailyTransactionActions">

@@ -132,6 +132,73 @@ async function checkComputedStyles(page) {
     });
     if (low.length) errs.push(`${id} 탭 글자 대비 4.5 미만: ${low.join(', ')}`);
   }
+  errs.push(...await checkDesignSpec(page));
+  return errs;
+}
+
+/** 디자인 사양(docs/DESIGN_V2.md) 계산값 대조: 탭 6개 그림자·그라데이션·글꼴, 금융 할부·단계색·요일색, 혜택 증감색, 홈 합계, 구조 탭 색 */
+async function checkDesignSpec(page) {
+  const errs = [];
+  const RGB = {text: 'rgb(11, 11, 12)', border: 'rgb(235, 235, 235)', accent: 'rgb(43, 89, 195)', accentDark: 'rgb(31, 68, 160)',
+    installment: 'rgb(154, 106, 30)', low: 'rgb(78, 139, 110)', mid: 'rgb(192, 138, 43)', high: 'rgb(196, 81, 58)',
+    sun: 'rgb(196, 81, 58)', sat: 'rgb(59, 110, 168)', white: 'rgb(255, 255, 255)'};
+  for (const [id, label] of [['home', '홈'], ['finance', '금융'], ['news', '뉴스'], ['benefits', '혜택'], ['journal', '기록'], ['architecture', '구조']]) {
+    await clickTab(page, label);
+    if (id === 'architecture') await page.locator('section.archSection').first().waitFor();
+    const r = await page.evaluate(() => {
+      const shell = document.querySelector('.shell.uiTheme');
+      const bad = [];
+      for (const el of [shell, ...shell.querySelectorAll('*')]) {
+        const cs = getComputedStyle(el);
+        if (cs.boxShadow !== 'none') bad.push(`${el.className?.baseVal ?? el.className} box-shadow`);
+        if (/gradient\(/.test(cs.backgroundImage)) bad.push(`${el.className?.baseVal ?? el.className} gradient`);
+      }
+      const cards = [...shell.querySelectorAll('main .panel')].map(el => getComputedStyle(el));
+      const s = getComputedStyle(shell);
+      return {bad: bad.slice(0, 5), font: s.fontFamily, numeric: s.fontVariantNumeric, bg: s.backgroundColor,
+        cards: cards.filter(c => c.borderTopColor !== 'rgb(235, 235, 235)' || c.borderTopLeftRadius !== '16px' || c.backgroundColor !== 'rgb(255, 255, 255)').length,
+        headerLine: getComputedStyle(shell.querySelector('header.top')).borderBottomColor};
+    });
+    if (r.bad.length) errs.push(`${id} 그림자·그라데이션: ${r.bad.join(', ')}`);
+    if (!/^"?Pretendard/.test(r.font)) errs.push(`${id} 글꼴 ${r.font}`);
+    if (!r.numeric.includes('tabular-nums')) errs.push(`${id} 숫자 ${r.numeric}`);
+    if (r.bg !== RGB.white) errs.push(`${id} 셸 배경 ${r.bg}`);
+    if (r.cards) errs.push(`${id} 카드 ${r.cards}개가 흰 바탕·#EBEBEB 테두리·16px 반경 아님`);
+    if (r.headerLine !== RGB.border) errs.push(`${id} 상단 구분선 ${r.headerLine}`);
+  }
+  const styles = (selector, props) => page.locator(selector).evaluateAll((list, props) =>
+    list.map(el => Object.fromEntries(props.map(p => [p, getComputedStyle(el)[p]]))), props);
+
+  await clickTab(page, '홈');
+  const split = await page.locator('.homeCycleSplit').textContent();
+  if (!/^\(일시불 .+ · 할부 .+\)$/.test(split ?? '')) errs.push(`홈 주기 합계 아래 '(일시불 X · 할부 Y)' 아님: ${split}`);
+  if (await page.locator('main').getByText(/오늘 일정|정산 받을 돈/).count()) errs.push('홈에 오늘 일정·정산 받을 돈 카드가 있음');
+  if (!await page.locator('.taskPanel .taskDeleteButton').count()) errs.push('홈 할 일 삭제 버튼 없음');
+
+  await clickTab(page, '금융');
+  const labels = await styles('.financeInstallment, .dailyInstallment', ['fontSize', 'color']);
+  if (!labels.length) errs.push('금융 할부 표기 없음');
+  for (const l of labels) if (l.fontSize !== '10px' || l.color !== RGB.installment) errs.push(`할부 표기 ${l.fontSize} ${l.color}`);
+  for (const tier of ['low', 'mid', 'high']) {
+    for (const c of await styles(`.financeCalendar .${tier}`, ['color'])) if (c.color !== RGB[tier]) errs.push(`달력 ${tier} ${c.color}`);
+  }
+  for (const [cls, want] of [['sunday', RGB.sun], ['saturday', RGB.sat]]) {
+    const list = await styles(`.financeCalendarGrid .${cls}`, ['color']);
+    if (!list.length || list.some(c => c.color !== want)) errs.push(`달력 ${cls} 색 ${list.map(c => c.color).join(',')}`);
+  }
+
+  await clickTab(page, '혜택');
+  for (const [cls, want] of [['deltaUp', RGB.accentDark], ['deltaDown', RGB.high]]) {
+    for (const c of await styles(`.pointsPanel .${cls}`, ['color'])) if (c.color !== want) errs.push(`혜택 ${cls} ${c.color}`);
+  }
+
+  await clickTab(page, '구조');
+  await page.locator('section.archSection').first().waitFor();
+  const fill = async selector => (await styles(selector, ['fill', 'stroke']))[0];
+  const plain = await fill('.archBox.plain rect'), accent = await fill('.archBox.accent rect'), deep = await fill('.archBox.deep rect');
+  if (plain?.fill !== RGB.white || plain?.stroke !== RGB.border) errs.push(`구조 상자 ${JSON.stringify(plain)}`);
+  if (accent?.fill !== RGB.accent) errs.push(`구조 강조 상자 ${JSON.stringify(accent)}`);
+  if (deep?.fill !== RGB.text) errs.push(`구조 진한 상자 ${JSON.stringify(deep)}`);
   return errs;
 }
 
@@ -233,7 +300,7 @@ async function checkTabContent(page, id) {
     await expect(details.locator('.dailyDetailsTotal')).toHaveText('0원');
     await hit.click();
     await expect(chart.locator('.dailyMarker')).toHaveCount(1);
-    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만원`);
+    await expect(chart.locator('.dailyTooltip text')).toHaveText(`${d}일 · 1.2만`);
     await expect(hit).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay).toHaveAttribute('aria-pressed', 'true');
     await expect(paymentDay.locator('.financeCalendarAmount')).toHaveText('1.2만');
@@ -242,6 +309,7 @@ async function checkTabContent(page, id) {
     await expect(rows).toHaveCount(2);
     await expect(rows.first()).toContainText(FIXTURE_TEXT.merchant);
     await expect(rows.last()).toContainText(FIXTURE_TEXT.installment);
+    await expect(rows.first().locator('.dailyInstallment')).toHaveText('(일시불)');
     await expect(rows.last().locator('.dailyInstallment')).toHaveText('(할부 3개월) · 일 합계 제외');
 
     await unconfirmedDay.click();
